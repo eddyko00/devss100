@@ -11,6 +11,7 @@ import com.afweb.service.ServiceAFweb;
 import com.afweb.service.ServiceRemoteDB;
 
 import com.afweb.util.*;
+import static com.afweb.util.CKey.POSTGRESQLDB;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -206,7 +207,11 @@ public class SsnsDataDB {
     public static String createDummytable() {
         String sqlCMD = "";
         if ((CKey.SQL_DATABASE == CKey.MYSQL) || (CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) || (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL)) {
-            sqlCMD = "create table ssnsdummy (id int(10) not null auto_increment, primary key (id))";
+            if (CKey.DB == CKey.POSTGRESQLDB) {
+                sqlCMD = "create table ssnsdummy (id int(10) not null primary))";
+            } else if (CKey.DB == CKey.MYSQLDB) {
+                sqlCMD = "create table ssnsdummy (id int(10) not null auto_increment, primary key (id))";
+            }
         }
         return sqlCMD;
     }
@@ -232,7 +237,7 @@ public class SsnsDataDB {
         logger.info(">>>>> initSsnsDataDB Table creation");
         try {
 
-            boolean initDBflag = false;
+            boolean initDBflag = true;
             if (initDBflag == true) {
                 processExecuteDB("drop table if exists ssnsdummy");
             }
@@ -248,7 +253,13 @@ public class SsnsDataDB {
         try {
 
             processExecuteDB("drop table if exists ssnsdummy1");
-            processExecuteDB("create table ssnsdummy1 (id int(10) not null auto_increment, primary key (id))");
+            String sqlCMD = "";
+            if (CKey.DB == CKey.POSTGRESQLDB) {
+                sqlCMD = "create table ssnsdummy1 (id int not null primary key)";
+            } else if (CKey.DB == CKey.MYSQLDB) {
+                sqlCMD = "create table ssnsdummy1 (id int(10) not null auto_increment, primary key (id))";
+            }
+            processExecuteDB(sqlCMD);
             total = getCountRowsInTable(getJdbcTemplate(), "ssnsdummy1");
             if (total == -1) {
                 return -1;
@@ -268,17 +279,59 @@ public class SsnsDataDB {
 
             ArrayList createTableList = new ArrayList();
 
-            createTableList.add("create table ssnsdummy (id int(10) not null auto_increment, primary key (id))");
-            createTableList.add("create table ssnslock (id int(10) not null auto_increment, lockname varchar(255) not null unique, type int(10) not null, lockdatedisplay date, lockdatel bigint(20), comment varchar(255), primary key (id))");
-            createTableList.add("create table cust (id int(10) not null auto_increment, username varchar(255) not null unique, password varchar(255) not null, type int(10) not null, status int(10) not null, substatus int(10) not null, startdate date, firstname varchar(255), lastname varchar(255), email varchar(255), updatedatedisplay date, updatedatel bigint(20) not null, primary key (id))");
-            createTableList.add("create table ssnscomm (id int(10) not null auto_increment, name varchar(255) not null, type int(10) not null, status int(10) not null, substatus int(10) not null, updatedatedisplay date, updatedatel bigint(20) not null, data text, accountid int(10) not null, customerid int(10) not null, primary key (id))");
-            createTableList.add("create table ssnsdata (id int(10) not null auto_increment, name varchar(255) not null, status int(10) not null, type int(10) not null,"
-                    + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint(20), "
-                    + "data text,  updatedatedisplay date, updatedatel bigint(20) not null, primary key (id))");
-            createTableList.add("create table ssnsacc (id int(10) not null auto_increment, name varchar(255) not null, status int(10) not null, type int(10) not null,"
-                    + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint(20), "
-                    + "data text,  updatedatedisplay date, updatedatel bigint(20) not null, primary key (id))");
+            if (CKey.DB == CKey.POSTGRESQLDB) {
+                //https://www.postgresql.org/docs/9.2/datatype.html
+                createTableList.add("create table ssnsdummy (id int not null primary key)");
+                ExecuteSQLArrayList(createTableList);
+                createTableList.clear();
+                //https://kb.objectrocket.com/postgresql/autoincrement-in-postgres-using-serial-1288
+                createTableList.add("CREATE SEQUENCE ssnslockIdSeq");
+                createTableList.add("create table ssnslock (id int not null primary key DEFAULT NEXTVAL('ssnslockIdSeq'), lockname varchar(255) not null unique, type int not null, lockdatedisplay date, lockdatel bigint, comment varchar(255))");
+                createTableList.add("ALTER SEQUENCE ssnslockIdSeq OWNED BY ssnslock.id");
+                ExecuteSQLArrayList(createTableList);
+                createTableList.clear();
 
+                createTableList.add("CREATE SEQUENCE custIdSeq");
+                createTableList.add("create table cust (id int not null primary key DEFAULT NEXTVAL('custIdSeq'), username varchar(255) not null unique, password varchar(255) not null, type int not null, status int not null, substatus int not null, startdate date, firstname varchar(255), lastname varchar(255), email varchar(255), updatedatedisplay date, updatedatel bigint not null)");
+                createTableList.add("ALTER SEQUENCE custIdSeq OWNED BY cust.id");
+                ExecuteSQLArrayList(createTableList);
+                createTableList.clear();
+
+                createTableList.add("CREATE SEQUENCE ssnscommIdSeq");
+                createTableList.add("create table ssnscomm (id int not null primary key DEFAULT NEXTVAL('ssnscommIdSeq'), name varchar(255) not null, type int not null, status int not null, substatus int not null, updatedatedisplay date, updatedatel bigint not null, data text, accountid int not null, customerid int not null)");
+                createTableList.add("ALTER SEQUENCE ssnscommIdSeq OWNED BY ssnscomm.id");
+                ExecuteSQLArrayList(createTableList);
+                createTableList.clear();
+
+                createTableList.add("CREATE SEQUENCE ssnsdataIdSeq");
+                createTableList.add("create table ssnsdata (id int not null primary key DEFAULT NEXTVAL('ssnsdataIdSeq'), name varchar(255) not null, status int not null, type int not null,"
+                        + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint, "
+                        + "data text,  updatedatedisplay date, updatedatel bigint not null)");
+                createTableList.add("ALTER SEQUENCE ssnsdataIdSeq OWNED BY ssnsdata.id");
+                ExecuteSQLArrayList(createTableList);
+                createTableList.clear();
+                
+                createTableList.add("CREATE SEQUENCE ssnsaccIdSeq");
+                createTableList.add("create table ssnsacc (id int not null primary key DEFAULT NEXTVAL('ssnsaccIdSeq'), name varchar(255) not null, status int not null, type int not null,"
+                        + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint, "
+                        + "data text,  updatedatedisplay date, updatedatel bigint not null)");
+                createTableList.add("ALTER SEQUENCE ssnsaccIdSeq OWNED BY ssnsacc.id");                
+                ExecuteSQLArrayList(createTableList);
+                createTableList.clear();
+
+            } else if (CKey.DB == CKey.MYSQLDB) {
+                createTableList.add("create table ssnsdummy (id int(10) not null auto_increment, primary key (id))");
+                createTableList.add("create table ssnslock (id int(10) not null auto_increment, lockname varchar(255) not null unique, type int(10) not null, lockdatedisplay date, lockdatel bigint(20), comment varchar(255), primary key (id))");
+                createTableList.add("create table cust (id int(10) not null auto_increment, username varchar(255) not null unique, password varchar(255) not null, type int(10) not null, status int(10) not null, substatus int(10) not null, startdate date, firstname varchar(255), lastname varchar(255), email varchar(255), updatedatedisplay date, updatedatel bigint(20) not null, primary key (id))");
+                createTableList.add("create table ssnscomm (id int(10) not null auto_increment, name varchar(255) not null, type int(10) not null, status int(10) not null, substatus int(10) not null, updatedatedisplay date, updatedatel bigint(20) not null, data text, accountid int(10) not null, customerid int(10) not null, primary key (id))");
+                createTableList.add("create table ssnsdata (id int(10) not null auto_increment, name varchar(255) not null, status int(10) not null, type int(10) not null,"
+                        + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint(20), "
+                        + "data text,  updatedatedisplay date, updatedatel bigint(20) not null, primary key (id))");
+                createTableList.add("create table ssnsacc (id int(10) not null auto_increment, name varchar(255) not null, status int(10) not null, type int(10) not null,"
+                        + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint(20), "
+                        + "data text,  updatedatedisplay date, updatedatel bigint(20) not null, primary key (id))");
+
+            }
             boolean resultCreate = ExecuteSQLArrayList(createTableList);
 
             logger.info("> initSsnsDataDB Done - result " + resultCreate);

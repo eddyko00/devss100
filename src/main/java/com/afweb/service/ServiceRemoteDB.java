@@ -508,8 +508,6 @@ public class ServiceRemoteDB {
 //            String[] dataArray = output.split("~");
             String[] dataArray = splitIncludeEmpty(output, '~');
             output = "[";
-// "create table lockobject (id int(10) not null auto_increment, lockname varchar(255) not null unique, type int(10) not null, 
-//lockdatedisplay date, lockdatel bigint(20), comment varchar(255), primary key (id))");
 
             int recSize = 6;
             for (int i = 0; i < dataArray.length; i += recSize) {

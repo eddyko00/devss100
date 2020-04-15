@@ -12,7 +12,11 @@ public class CKey {
     public static final int REMOTE_MYSQL = 2; // https://eddyko.000webhostapp.com/webgetreq.php php mysql
     public static final int MYSQL = 0;   //direct mysql
 
-    public static final int SQL_DATABASE = REMOTE_MYSQL;
+    public static final int POSTGRESQLDB = 1;
+    public static final int MYSQLDB = 0;
+    public static int DB = POSTGRESQLDB;    
+    
+    public static final int SQL_DATABASE = LOCAL_MYSQL;
     //
     //////////////////////
     //
@@ -23,7 +27,7 @@ public class CKey {
 
     public static boolean NN_DEBUG = true; //false; //true; 
     public static boolean OPENSHIFT_DB1 = true; //false; 
-    public static boolean UI_ONLY = true;
+    public static boolean UI_ONLY = false;
 
 //    //
 //    //

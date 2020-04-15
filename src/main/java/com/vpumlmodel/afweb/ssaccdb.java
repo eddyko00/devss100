@@ -9,8 +9,6 @@ package com.vpumlmodel.afweb;
  *
  * @author eddyko
  */
-//            createTableList.add("create table ssnsdata (id int(10) not null auto_increment, name varchar(255) not null, status int(10) not null, type int(10) not null,
-//app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint(20), data text,  updatedatedisplay date, updatedatel bigint(20) not null, primary key (id))");
 public class ssaccdb {
 
     /**
