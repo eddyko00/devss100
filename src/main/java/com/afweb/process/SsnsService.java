@@ -51,6 +51,19 @@ public class SsnsService {
     public static String APP_PRODUCT_TYPE_SING = "SING";
     public static String APP_PRODUCT_TYPE_APP = "APP";
 
+    public static String APP_1 = "getAppointment";
+    public static String APP_2 = "cancelAppointment";
+    public static String APP_3 = "searchTimeSlot";
+    public static String APP_4 = "updateAppointment";
+
+    public static String PRO_1 = "getProductList";
+    public static String PRO_2 = "getProductById";
+
+    public static String WI_1 = "getDeviceStatus";
+    public static String WI_2 = "callbackNotification";
+    public static String WI_3 = "getDevices";
+    public static String WI_4 = "configureDeviceStatus";
+
     private SsnsDataImp ssnsDataImp = new SsnsDataImp();
 
     public String getFeatureSsnsAppointment(SsnsData dataObj) {
@@ -66,7 +79,7 @@ public class SsnsService {
         String dataSt = "";
         try {
             String oper = dataObj.getOper();
-            if (oper.equals("updateAppointment")) {
+            if (oper.equals(APP_4)) { //"updateAppointment")) {
                 dataSt = dataObj.getData();
                 dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
                 dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
@@ -89,7 +102,19 @@ public class SsnsService {
                     }
 
                 }
-            } else if (oper.equals("cancelAppointment")) {
+            } else if (oper.equals(APP_1)) { //"getAppointment")) {
+                dataSt = dataObj.getData();
+                dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+                String[] operList = dataSt.split(",");
+                if (operList.length > 3) {
+                    banid = operList[0];
+                    cust = operList[1];
+                }
+            } else if (oper.equals(APP_2)) {//"cancelAppointment")) {
                 dataSt = dataObj.getData();
                 dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
                 dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
@@ -113,9 +138,12 @@ public class SsnsService {
             } else {
                 logger.info("> getFeatureSsnsAppointment Other oper " + oper);
             }
-
-            if (appTId.equals("")) {
-                return "";
+            if (oper.equals(APP_1)) {
+                ;
+            } else {
+                if (appTId.equals("")) {
+                    return "";
+                }
             }
             logger.info(dataSt);
 
@@ -123,6 +151,10 @@ public class SsnsService {
             boolean stat = this.updateSsnsAppointment(appTId, banid, cust, host, pData, dataObj);
             if (stat == true) {
                 getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+            } else {
+                if (oper.equals(APP_1)) {
+                    getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+                }
             }
 
         } catch (Exception ex) {
@@ -135,9 +167,10 @@ public class SsnsService {
         try {
             String featTTV = "";
             String oper = dataObj.getOper();
-            if (oper.equals("updateAppointment")) {
+            if (oper.equals(APP_4) || oper.equals(APP_1)) {
                 if ((banid.length() == 0) && (cust.length() == 0)) {
                     featTTV = APP_PRODUCT_TYPE_APP;
+                    featTTV += ":" + dataObj.getOper();
                     featTTV += ":" + host;
                     featTTV += ":" + oper;
                     featTTV += ":ContactEng";
@@ -146,12 +179,16 @@ public class SsnsService {
                     if (outputSt == null) {
                         return false;
                     }
-                    ProductApp prodTTV = parseAppointmentFeature(outputSt);
+                    if (outputSt.length() < 80) {  // or test "appointmentList":[]
+                        return false;
+                    }
+                    ProductApp prodTTV = parseAppointmentFeature(outputSt, dataObj.getOper());
                     pData.setpAPP(prodTTV);
                     featTTV = prodTTV.getFeat();
                 }
-            } else if (oper.equals("cancelAppointment")) {
+            } else if (oper.equals(APP_2)) {
                 featTTV = APP_PRODUCT_TYPE_APP;
+                featTTV += ":" + dataObj.getOper();
                 featTTV += ":" + host;
                 featTTV += ":" + oper;
                 if ((banid.length() == 0) && (cust.length() == 0)) {
@@ -163,7 +200,7 @@ public class SsnsService {
 
             logger.info("> updateSsnsAppointment featTTV " + featTTV);
 /////////////TTV   
-            ArrayList<String> flow = getFlowSsnsProdiuctInventory(dataObj);
+            ArrayList<String> flow = getSsnsFlowTrace(dataObj);
             if (flow == null) {
                 logger.info("> updateSsnsAppointment skip no flow");
                 return false;
@@ -208,7 +245,7 @@ public class SsnsService {
         return false;
     }
 
-    public static ProductApp parseAppointmentFeature(String outputSt) {
+    public static ProductApp parseAppointmentFeature(String outputSt, String oper) {
 
         if (outputSt == null) {
             return null;
@@ -282,6 +319,7 @@ public class SsnsService {
         }
 
         String featTTV = APP_PRODUCT_TYPE_APP;
+        featTTV += ":" + oper;
         featTTV += ":" + prodTTV.getHost();
         featTTV += ":" + prodTTV.getCategory();
         featTTV += ":" + prodTTV.getStatusCd();
@@ -298,8 +336,10 @@ public class SsnsService {
         }
         String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/appointment?customerid=" + cust;
         if (banid.length() > 0) {
-            url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=" + banid + "&customerid=" + cust
-                    + "&appointmentlist.hostsystemcd.in=" + host;
+            url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=" + banid + "&customerid=" + cust;
+            if (host.length() > 0) {
+                url += "&appointmentlist.hostsystemcd.in=" + host;
+            }
         }
         try {
             String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);
@@ -321,7 +361,7 @@ public class SsnsService {
         }
         ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
         outputList.addAll(outList);
-        ProductTTV prodTTV = parseProductTtvFeature(outputSt);
+        ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
         return prodTTV.getFeatTTV();
     }
 
@@ -384,13 +424,13 @@ public class SsnsService {
             if (outputSt == null) {
                 return false;
             }
-            ProductTTV prodTTV = parseProductInternetFeature(outputSt);
+            ProductTTV prodTTV = parseProductInternetFeature(outputSt, dataObj.getOper());
 
             pData.setpHSIC(prodTTV);
             featTTV = prodTTV.getFeatTTV();
             logger.info("> updateSsnsProdiuctInventoryInternet HSIC feat " + featTTV);
 /////////////TTV   
-            ArrayList<String> flow = getFlowSsnsProdiuctInventory(dataObj);
+            ArrayList<String> flow = getSsnsFlowTrace(dataObj);
             if (flow == null) {
                 logger.info("> updateSsnsProdiuctInventoryInternet HSIC skip no flow");
                 return false;
@@ -435,13 +475,12 @@ public class SsnsService {
         return false;
     }
 
-    public static ProductTTV parseProductInternetFeature(String outputSt) {
+    public static ProductTTV parseProductInternetFeature(String outputSt, String oper) {
 
         if (outputSt == null) {
             return null;
         }
         ProductTTV prodTTV = new ProductTTV();
-        int productCdInit = 0;
         int quotaAmtInit = 0;
         int fifaInit = 0;
 
@@ -499,7 +538,7 @@ public class SsnsService {
         }
 
         String featTTV = APP_PRODUCT_TYPE_HSIC;
-
+        featTTV += ":" + oper;
         String fifa = "fifa";
         if (prodTTV.getIsFIFA() == 0) {
             fifa = "comp";
@@ -520,13 +559,13 @@ public class SsnsService {
             if (outputSt == null) {
                 return false;
             }
-            ProductTTV prodTTV = parseProductTtvFeature(outputSt);
+            ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
 
             pData.setpTTV(prodTTV);
             featTTV = prodTTV.getFeatTTV();
             logger.info("> updateSsnsProdiuctInventory TTV feat " + featTTV);
 /////////////TTV   
-            ArrayList<String> flow = getFlowSsnsProdiuctInventory(dataObj);
+            ArrayList<String> flow = getSsnsFlowTrace(dataObj);
             if (flow == null) {
                 logger.info("> updateSsnsProdiuctInventory TTV skip no flow");
                 return false;
@@ -571,7 +610,7 @@ public class SsnsService {
         return false;
     }
 
-    public static ProductTTV parseProductTtvFeature(String outputSt) {
+    public static ProductTTV parseProductTtvFeature(String outputSt, String oper) {
 
         if (outputSt == null) {
             return null;
@@ -648,7 +687,7 @@ public class SsnsService {
         }
 
         String featTTV = APP_PRODUCT_TYPE_TTV;
-
+        featTTV += ":" + oper;
         String fifa = "fifa";
         if (prodTTV.getIsFIFA() == 0) {
             fifa = "comp";
@@ -678,7 +717,7 @@ public class SsnsService {
         return null;
     }
 
-    public ArrayList<String> getFlowSsnsProdiuctInventory(SsnsData dataObj) {
+    public ArrayList<String> getSsnsFlowTrace(SsnsData dataObj) {
         ArrayList<String> flow = new ArrayList();
         ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjListByUid(dataObj.getApp(), dataObj.getUid());
         if (ssnsList != null) {

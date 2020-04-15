@@ -356,24 +356,27 @@ public class ServiceAFweb {
                     boolean ETLsplunkFlat = false;
                     if (ETLsplunkFlat == true) {
 
-                        boolean clearsplunkflag = true;
+                        boolean clearsplunkflag = false;
                         if (clearsplunkflag == true) {
                             this.getSsnsDataImp().deleteAllSsnsData(0);
                         }
-                        String app = SsnsService.APP_WIFI;
-                        processETLsplunk(app, 30000);
-                        app = SsnsService.APP_PRODUCT;
-                        processETLsplunk(app, 20000);
-                        app = SsnsService.APP_APP;
-                        processETLsplunk(app, 0);
+                        for (int i = 0; i < 10; i++) {
+                            processETL();
+                        }
 
-                        String appTTV = SsnsService.APP_TTVSUB; // "ttvsub";
-                        processETLsplunkTTV(appTTV, 0);
-                        appTTV = SsnsService.APP_TTVREQ; //"ttvreq";
-                        processETLsplunkTTV(appTTV, 0);
-//                        
-
-                        this.getSsnsDataImp().deleteAllSsnsData(1);
+//                        String app = SsnsService.APP_WIFI;
+//                        processETLsplunk(app, 30000);
+//                        app = SsnsService.APP_PRODUCT;
+//                        processETLsplunk(app, 20000);
+//                        app = SsnsService.APP_APP;
+//                        processETLsplunk(app, 0);
+//
+//                        String appTTV = SsnsService.APP_TTVSUB; // "ttvsub";
+//                        processETLsplunkTTV(appTTV, 0);
+//                        appTTV = SsnsService.APP_TTVREQ; //"ttvreq";
+//                        processETLsplunkTTV(appTTV, 0);
+////                        
+//                        this.getSsnsDataImp().deleteAllSsnsData(1);
                     }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
@@ -441,8 +444,8 @@ public class ServiceAFweb {
                 if (CKey.NN_DEBUG == true) {
                     if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                         //10 Sec * 5 ~ 1 minutes
-                        processETL();
-                        return;
+//                        processETL();
+//                        return;
                     }
                 }
             }
@@ -1057,7 +1060,6 @@ public class ServiceAFweb {
                             status = replaceAll("\"\"", "\"", status);
                             ret = "parameter";
                         }
-
                         continue;
                     }
 
@@ -1072,25 +1074,13 @@ public class ServiceAFweb {
 //                    logger.info("splunk " + i + " " + spSt);
                     continue;
                 }
-                String APP_1 = "getAppointment";
-                String APP_2 = "cancelAppointment";
-                String APP_3 = "searchTimeSlot";
-                String APP_4 = "updateAppointment";
-
-                String PRO_1 = "getProductList";
-                String PRO_2 = "getProductById";
-
-                String WI_1 = "getDeviceStatus";
-                String WI_2 = "callbackNotification";
-                String WI_3 = "getDevices";
-                String WI_4 = "configureDeviceStatus";
 
                 SsnsData item = new SsnsData();
-                if (oper.equals(APP_1) || oper.equals(APP_2) || oper.equals(APP_3) || oper.equals(APP_4)) {
+                if (oper.equals(SsnsService.APP_1) || oper.equals(SsnsService.APP_2) || oper.equals(SsnsService.APP_3) || oper.equals(SsnsService.APP_4)) {
                     app = SsnsService.APP_APP;
-                } else if (oper.equals(PRO_1) || oper.equals(PRO_2)) {
+                } else if (oper.equals(SsnsService.PRO_1) || oper.equals(SsnsService.PRO_2)) {
                     app = SsnsService.APP_PRODUCT;
-                } else if (oper.equals(WI_1) || oper.equals(WI_2) || oper.equals(WI_3) || oper.equals(WI_4)) {
+                } else if (oper.equals(SsnsService.WI_1) || oper.equals(SsnsService.WI_2) || oper.equals(SsnsService.WI_3) || oper.equals(SsnsService.WI_4)) {
                     app = SsnsService.APP_WIFI;
                 } else {
                     return;
@@ -1113,6 +1103,11 @@ public class ServiceAFweb {
                 SsnsData ssnsObj = getSsnsDataImp().getSsnsDataObj(key);
                 if (ssnsObj == null) {
                     writeSQLArray.add(sql);
+                    if (writeSQLArray.size() > 100) {
+                        proceSssendRequestObj(writeSQLArray);
+                        writeSQLArray.clear();
+                    }
+
                     numAdd++;
                 } else {
                     numDup++;

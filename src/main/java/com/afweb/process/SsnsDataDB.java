@@ -11,7 +11,7 @@ import com.afweb.service.ServiceAFweb;
 import com.afweb.service.ServiceRemoteDB;
 
 import com.afweb.util.*;
-import static com.afweb.util.CKey.POSTGRESQLDB;
+
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -208,7 +208,7 @@ public class SsnsDataDB {
         String sqlCMD = "";
         if ((CKey.SQL_DATABASE == CKey.MYSQL) || (CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) || (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL)) {
             if (CKey.DB == CKey.POSTGRESQLDB) {
-                sqlCMD = "create table ssnsdummy (id int(10) not null primary))";
+                sqlCMD = "create table ssnsdummy (id int not null primary key)";
             } else if (CKey.DB == CKey.MYSQLDB) {
                 sqlCMD = "create table ssnsdummy (id int(10) not null auto_increment, primary key (id))";
             }
@@ -237,7 +237,7 @@ public class SsnsDataDB {
         logger.info(">>>>> initSsnsDataDB Table creation");
         try {
 
-            boolean initDBflag = true;
+            boolean initDBflag = false;
             if (initDBflag == true) {
                 processExecuteDB("drop table if exists ssnsdummy");
             }
