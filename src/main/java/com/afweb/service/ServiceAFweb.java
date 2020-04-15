@@ -58,9 +58,10 @@ public class ServiceAFweb {
     public static String URL_PRODUCT = "";
     public static String URL_PATH_OP_DB_PHP1 = "";
     public static String URL_PATH_OP = "";
-    public static String SERVERDB_REMOTE_URL = "";  
+    public static String SERVERDB_REMOTE_URL = "";
     public static String SERVERDB_URL = "";
-    public static String PROXYURL ="";
+    public static String PROXYURL = "";
+
     /**
      * @return the serverObj
      */
@@ -123,9 +124,8 @@ public class ServiceAFweb {
 
         enSt = CKey.PROXYURL_TMP;
         enSt = replaceAll("abc", "", enSt);
-        PROXYURL = enSt;        
-        
-        
+        PROXYURL = enSt;
+
         SERVERDB_REMOTE_URL = URL_PATH_OP_DB_PHP1;  //LocalPCflag = false;
         SERVERDB_URL = URL_PATH_OP;
 
@@ -648,7 +648,7 @@ public class ServiceAFweb {
             return;
         }
 
-        String app = "wifi";
+        String app = SsnsService.APP_WIFI; //"wifi";
         file = CKey.FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             processETLsplunk(app, 20000);
@@ -656,7 +656,7 @@ public class ServiceAFweb {
             return;
         }
 
-        app = "product";
+        app = SsnsService.APP_PRODUCT;  //"product"
         file = CKey.FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             processETLsplunk(app, 20000);
@@ -664,7 +664,7 @@ public class ServiceAFweb {
             return;
         }
 
-        app = "appointment";
+        app = SsnsService.APP_APP;  //"appointment"
         file = CKey.FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             processETLsplunk(app, 0);
@@ -672,7 +672,7 @@ public class ServiceAFweb {
             return;
         }
 
-        String appTTV = "ttvsub";
+        String appTTV = SsnsService.APP_TTVSUB;  //ttvsub"
         file = CKey.FileLocalPath + appTTV + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             processETLsplunkTTV(appTTV, 0);
@@ -680,7 +680,7 @@ public class ServiceAFweb {
             return;
         }
 
-        appTTV = "ttvreq";
+        appTTV = SsnsService.APP_TTVREQ; //"ttvreq";
         file = CKey.FileLocalPath + appTTV + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             processETLsplunkTTV(appTTV, 0);
@@ -1072,7 +1072,30 @@ public class ServiceAFweb {
 //                    logger.info("splunk " + i + " " + spSt);
                     continue;
                 }
+                String APP_1 = "getAppointment";
+                String APP_2 = "cancelAppointment";
+                String APP_3 = "searchTimeSlot";
+                String APP_4 = "updateAppointment";
+
+                String PRO_1 = "getProductList";
+                String PRO_2 = "getProductById";
+
+                String WI_1 = "getDeviceStatus";
+                String WI_2 = "callbackNotification";
+                String WI_3 = "getDevices";
+                String WI_4 = "configureDeviceStatus";
+
                 SsnsData item = new SsnsData();
+                if (oper.equals(APP_1) || oper.equals(APP_2) || oper.equals(APP_3) || oper.equals(APP_4)) {
+                    app = SsnsService.APP_APP;
+                } else if (oper.equals(PRO_1) || oper.equals(PRO_2)) {
+                    app = SsnsService.APP_PRODUCT;
+                } else if (oper.equals(WI_1) || oper.equals(WI_2) || oper.equals(WI_3) || oper.equals(WI_4)) {
+                    app = SsnsService.APP_WIFI;
+                } else {
+                    return;
+                }
+
                 item.setUid(tran);
                 item.setApp(app);
                 item.setOper(oper);
