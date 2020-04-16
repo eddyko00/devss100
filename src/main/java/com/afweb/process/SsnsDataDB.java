@@ -580,7 +580,7 @@ public class SsnsDataDB {
         return 0;
     }
 
-    public static String insertSsnsAccObjectSQL(SsnsData nData) {
+    public static String insertSsnsAccObjectSQL(SsnsAcc nData) {
         String dataSt = nData.getData();
         dataSt = dataSt.replaceAll("|", "");
         dataSt = dataSt.replaceAll("'", "");
@@ -604,7 +604,7 @@ public class SsnsDataDB {
         return 0;
     }
 
-    public int insertSsnsAccObject(SsnsData nData) {
+    public int insertSsnsAccObject(SsnsAcc nData) {
         try {
             String sqlCMD = insertSsnsAccObjectSQL(nData);
             return processUpdateDB(sqlCMD);
@@ -828,10 +828,10 @@ public class SsnsDataDB {
         return entries;
     }
 
-    public ArrayList<SsnsData> getSsnsDataObjList(String app, String ret, int status) {
+    public ArrayList<SsnsData> getSsnsDataObjList(String app, String ret, int status, int length) {
         String sql = "select * from ssnsdata where app='" + app + "' and ret='" + ret + "' and status=" + status
                 + " order by updatedatel asc";
-        ArrayList entries = getAllSsnsDataSQL(sql, 0);
+        ArrayList entries = getAllSsnsDataSQL(sql, length);
         return entries;
     }
 
@@ -841,11 +841,6 @@ public class SsnsDataDB {
         return entries;
     }
 
-//    public ArrayList getSsnsDataObj(String name, int length) {
-//        String sql = "select * from ssnsdata where name='" + name + "'" + " order by updatedatel asc";
-//        ArrayList entries = getAllSsnsDataSQL(sql, length);
-//        return entries;
-//    }
     public ArrayList getAllNameSQL(String sql) {
         if (checkCallRemoveSQL_Mysql() == true) {
             ArrayList nnList;

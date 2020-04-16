@@ -73,7 +73,7 @@ public class SsnsDataImp {
         return ssnsdb.insertSsnsDataObject(Data);
     }
 
-    public int insertSsnsAccObject(SsnsData nData) {
+    public int insertSsnsAccObject(SsnsAcc nData) {
         return ssnsdb.insertSsnsAccObject(nData);
     }
 
@@ -99,8 +99,8 @@ public class SsnsDataImp {
         return ssnsdb.getSsnsDataIDList(app, ret, status);
     }
 
-    public ArrayList<SsnsData> getSsnsDataObjList(String app, String ret, int status) {
-        return ssnsdb.getSsnsDataObjList(app, ret, status);
+    public ArrayList<SsnsData> getSsnsDataObjList(String app, String ret, int status, int length) {
+        return ssnsdb.getSsnsDataObjList(app, ret, status, length);
     }
 
     public SsnsData getSsnsDataObj(String name) {

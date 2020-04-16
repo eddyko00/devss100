@@ -383,17 +383,17 @@ public class ServiceAFweb {
                     boolean clearssnsflag = false;
                     if (clearssnsflag == true) {
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
-                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
                         getSsnsDataImp().updateSsnsDataAllOpenStatus();
                     }
 
-                    boolean procflag = true;
+                    boolean procflag = false;
                     if (procflag == true) {
                         SsnsService ss = new SsnsService();
 //                        String app = SsnsService.APP_APP;
 //                        String ret = "parameter";
 //                        int status = ConstantKey.OPEN;
-//                        ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjList(app, ret, status);
+//                        ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjList(app, ret, status, 10);
 //                        if (ssnsList != null) {
 ////                            logger.info("> ssnsList " + ssnsList.size());
 //                            for (int i = 0; i < ssnsList.size(); i++) {

@@ -192,7 +192,61 @@ public class SsnsService {
             logger.info(dataSt);
 
 /////////////
-            boolean stat = this.updateSsnsAppointment(appTId, banid, cust, host, pData, dataObj);
+            //call devop to get customer id
+            if ((banid.length() == 0) && (cust.length() == 0)) {
+                if (host.equals("FIFA") || host.equals("LYNX")) {
+                    String custid = getCustIdAppointmentDevop(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+                    if (custid.length() != 0) {
+                        cust = custid;
+                        dataObj.setCusid(custid);
+                    }
+                }
+            }
+            SsnsAcc NAccObj = new SsnsAcc();
+            NAccObj.setDown("splunkflow");
+            boolean stat = this.updateSsnsAppointment(oper, appTId, banid, cust, host, pData, dataObj, NAccObj);
+            if (stat == true) {
+                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                boolean exist = false;
+                if (ssnsAccObjList != null) {
+                    if (ssnsAccObjList.size() != 0) {
+                        SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                        if (ssnsObj.getDown().equals("splunkflow")) {
+                            exist = true;
+                        }
+                    }
+                }
+                if (exist == false) {
+                    int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
+                }
+
+                ////////cannot get post request working........
+//                if (oper.equals(APP_3) || oper.equals(APP_2) || ((banid.length() == 0) && (cust.length() == 0))) {
+//                    ;
+//                } else {
+//
+//                    oper = APP_3;  //"searchTimeSlot";
+//                    NAccObj = new SsnsAcc();
+//                    NAccObj.setDown("");
+//                    stat = this.updateSsnsAppointment(oper, appTId, banid, cust, host, pData, dataObj, NAccObj);
+//                    if (stat == true) {
+//                        ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+//                        exist = false;
+//                        if (ssnsAccObjList != null) {
+//                            if (ssnsAccObjList.size() != 0) {
+//                                SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+//                                if (ssnsObj.getDown().equals("")) {
+//                                    exist = true;
+//                                }
+//                            }
+//                        }
+//                        if (exist == false) {
+//                            int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
+//                        }
+//                    }
+//                }
+            }
+
             if (stat == true) {
                 getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
             } else {
@@ -207,38 +261,22 @@ public class SsnsService {
         return "";
     }
 
-    public boolean updateSsnsAppointment(String appTId, String banid, String cust, String host, ProductData pData, SsnsData dataObj) {
+    public boolean updateSsnsAppointment(String oper, String appTId, String banid, String cust, String host, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
             String featTTV = "";
-            String oper = dataObj.getOper();
+
             if (oper.equals(APP_4) || oper.equals(APP_1) || oper.equals(APP_3)) {
                 if ((banid.length() == 0) && (cust.length() == 0)) {
                     featTTV = APP_PRODUCT_TYPE_APP;
-                    featTTV += ":" + dataObj.getOper();
-                    featTTV += ":" + host;
                     featTTV += ":" + oper;
+                    featTTV += ":" + host;
                     featTTV += ":ContactEng";
-
-                    String custid = getCustIdAppointmentDevop(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
-
-                    if (custid.length() != 0) {
-                        cust = custid;
-                        String outputSt = null;
-                        outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
-                        if (outputSt == null) {
-                            return false;
-                        }
-                        if (outputSt.length() < 80) {  // or test "appointmentList":[]
-                            return false;
-                        }
-                        ProductApp prodTTV = parseAppointmentFeature(outputSt, dataObj.getOper());
-                        pData.setpAPP(prodTTV);
-                        featTTV = prodTTV.getFeat();
-                    }
                 } else {
                     String outputSt = null;
-                    if (oper.equals(APP_3)) {
-                        outputSt = SsnsTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+                    if (oper.equals(APP_3)) {  //"searchTimeSlot";
+//                        not sure why it does not work so just call get appointment to get eh feature
+//                        outputSt = SsnsTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+                        outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
                     } else {
                         outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
                     }
@@ -248,15 +286,14 @@ public class SsnsService {
                     if (outputSt.length() < 80) {  // or test "appointmentList":[]
                         return false;
                     }
-                    ProductApp prodTTV = parseAppointmentFeature(outputSt, dataObj.getOper());
+                    ProductApp prodTTV = parseAppointmentFeature(outputSt, oper);
                     pData.setpAPP(prodTTV);
                     featTTV = prodTTV.getFeat();
                 }
-            } else if (oper.equals(APP_2)) {
+            } else if (oper.equals(APP_2)) {   //"cancelAppointment";
                 featTTV = APP_PRODUCT_TYPE_APP;
-                featTTV += ":" + dataObj.getOper();
-                featTTV += ":" + host;
                 featTTV += ":" + oper;
+                featTTV += ":" + host;
                 if ((banid.length() == 0) && (cust.length() == 0)) {
                     featTTV += ":ContactEng";
                 }
@@ -266,45 +303,32 @@ public class SsnsService {
 
             logger.info("> updateSsnsAppointment featTTV " + featTTV);
 /////////////TTV   
-            ArrayList<String> flow = getSsnsFlowTrace(dataObj);
-            if (flow == null) {
-                logger.info("> updateSsnsAppointment skip no flow");
-                return false;
-            }
-
-            pData.setFlow(flow);
-
-            SsnsData NdataObj = new SsnsData();
-            NdataObj.setName(featTTV);
-            NdataObj.setBanid(banid);
-            NdataObj.setUid(dataObj.getUid());
-            NdataObj.setApp(dataObj.getApp());
-            NdataObj.setOper(dataObj.getOper());
-            NdataObj.setDown(dataObj.getDown());
-            NdataObj.setRet(dataObj.getRet());
-            NdataObj.setExec(dataObj.getExec());
-
-            String nameSt = new ObjectMapper().writeValueAsString(pData);
-            NdataObj.setData(nameSt);
-            Calendar dateNow = TimeConvertion.getCurrentCalendar();
-            NdataObj.setUpdatedatedisplay(new java.sql.Date(dateNow.getTimeInMillis()));
-            NdataObj.setUpdatedatel(dateNow.getTimeInMillis());
-
-//            
-            ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NdataObj.getName(), NdataObj.getUid());
-            boolean exist = false;
-            if (ssnsAccObjList != null) {
-                if (ssnsAccObjList.size() != 0) {
-                    exist = true;
+            if (NAccObj.getDown().equals("splunkflow")) {
+                ArrayList<String> flow = getSsnsFlowTrace(dataObj);
+                if (flow == null) {
+                    logger.info("> updateSsnsAppointment skip no flow");
                     return false;
                 }
+                pData.setFlow(flow);
             }
-            if (exist == false) {
-                int ret = getSsnsDataImp().insertSsnsAccObject(NdataObj);
-                if (ret == 1) {
-                    return true;
-                }
-            }
+
+            NAccObj.setName(featTTV);
+            NAccObj.setBanid(banid);
+            NAccObj.setCusid(cust);
+            NAccObj.setTiid(appTId);
+            NAccObj.setUid(dataObj.getUid());
+            NAccObj.setApp(dataObj.getApp());
+            NAccObj.setOper(oper);
+//            NdataObj.setDown("");
+            NAccObj.setRet(dataObj.getRet());
+            NAccObj.setExec(dataObj.getExec());
+
+            String nameSt = new ObjectMapper().writeValueAsString(pData);
+            NAccObj.setData(nameSt);
+            Calendar dateNow = TimeConvertion.getCurrentCalendar();
+            NAccObj.setUpdatedatedisplay(new java.sql.Date(dateNow.getTimeInMillis()));
+            NAccObj.setUpdatedatel(dateNow.getTimeInMillis());
+            return true;
         } catch (Exception ex) {
             logger.info("> updateSsnsAppointment Exception" + ex.getMessage());
         }
@@ -398,9 +422,6 @@ public class SsnsService {
 
     public String getCustIdAppointmentDevop(String ProductURL, String appTId, String banid, String cust, String host) {
 
-        if (host.equals("OMS9")) {
-            return "";
-        }
         String url = "http://localhost:8080/v2/cmo/selfmgmt/appointmentmanagement/devop/searchtimeslot";
         HashMap newbodymap = new HashMap();
         newbodymap.put("customerId", cust);
@@ -409,9 +430,15 @@ public class SsnsService {
         try {
             String custid = "";
             String output = this.sendRequest_Ssns(METHOD_POST, url, null, newbodymap);
+
             if (output == null) {
                 return "";
             }
+            ArrayList arrayItem = new ObjectMapper().readValue(output, ArrayList.class);
+            if (arrayItem.size() < 1) {
+                return "";
+            }
+            output = (String) arrayItem.get(1);
             output = ServiceAFweb.replaceAll("\"", "", output);
             output = ServiceAFweb.replaceAll("\\", "", output);
             String[] oList = output.split(",");
@@ -435,7 +462,9 @@ public class SsnsService {
 
     public String SsnsTimeslot(String ProductURL, String appTId, String banid, String cust, String host) {
 
-        String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
+        String url = ProductURL + ":443/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
+//        String url = "http://localhost:8080/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
+
         HashMap newbodymap = new HashMap();
         newbodymap.put("customerId", cust);
         newbodymap.put("id", appTId);
@@ -557,24 +586,24 @@ public class SsnsService {
 
             pData.setFlow(flow);
 
-            SsnsData NdataObj = new SsnsData();
-            NdataObj.setName(prodTTV.getFeatTTV());
-            NdataObj.setBanid(banid);
-            NdataObj.setUid(dataObj.getUid());
-            NdataObj.setApp(dataObj.getApp());
-            NdataObj.setOper(dataObj.getOper());
-            NdataObj.setDown(dataObj.getDown());
-            NdataObj.setRet(dataObj.getRet());
-            NdataObj.setExec(dataObj.getExec());
+            SsnsAcc NAccObj = new SsnsAcc();
+            NAccObj.setName(prodTTV.getFeatTTV());
+            NAccObj.setBanid(banid);
+            NAccObj.setUid(dataObj.getUid());
+            NAccObj.setApp(dataObj.getApp());
+            NAccObj.setOper(dataObj.getOper());
+            NAccObj.setDown(dataObj.getDown());
+            NAccObj.setRet(dataObj.getRet());
+            NAccObj.setExec(dataObj.getExec());
 
             String nameSt = new ObjectMapper().writeValueAsString(pData);
-            NdataObj.setData(nameSt);
+            NAccObj.setData(nameSt);
             Calendar dateNow = TimeConvertion.getCurrentCalendar();
-            NdataObj.setUpdatedatedisplay(new java.sql.Date(dateNow.getTimeInMillis()));
-            NdataObj.setUpdatedatel(dateNow.getTimeInMillis());
+            NAccObj.setUpdatedatedisplay(new java.sql.Date(dateNow.getTimeInMillis()));
+            NAccObj.setUpdatedatel(dateNow.getTimeInMillis());
 
 //            
-            ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NdataObj.getName(), NdataObj.getUid());
+            ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
             boolean exist = false;
             if (ssnsAccObjList != null) {
                 if (ssnsAccObjList.size() != 0) {
@@ -583,7 +612,7 @@ public class SsnsService {
                 }
             }
             if (exist == false) {
-                int ret = getSsnsDataImp().insertSsnsAccObject(NdataObj);
+                int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
                 if (ret == 1) {
                     return true;
                 }
@@ -692,24 +721,24 @@ public class SsnsService {
 
             pData.setFlow(flow);
 
-            SsnsData NdataObj = new SsnsData();
-            NdataObj.setName(prodTTV.getFeatTTV());
-            NdataObj.setBanid(banid);
-            NdataObj.setUid(dataObj.getUid());
-            NdataObj.setApp(dataObj.getApp());
-            NdataObj.setOper(dataObj.getOper());
-            NdataObj.setDown(dataObj.getDown());
-            NdataObj.setRet(dataObj.getRet());
-            NdataObj.setExec(dataObj.getExec());
+            SsnsAcc NAccObj = new SsnsAcc();
+            NAccObj.setName(prodTTV.getFeatTTV());
+            NAccObj.setBanid(banid);
+            NAccObj.setUid(dataObj.getUid());
+            NAccObj.setApp(dataObj.getApp());
+            NAccObj.setOper(dataObj.getOper());
+            NAccObj.setDown(dataObj.getDown());
+            NAccObj.setRet(dataObj.getRet());
+            NAccObj.setExec(dataObj.getExec());
 
             String nameSt = new ObjectMapper().writeValueAsString(pData);
-            NdataObj.setData(nameSt);
+            NAccObj.setData(nameSt);
             Calendar dateNow = TimeConvertion.getCurrentCalendar();
-            NdataObj.setUpdatedatedisplay(new java.sql.Date(dateNow.getTimeInMillis()));
-            NdataObj.setUpdatedatel(dateNow.getTimeInMillis());
+            NAccObj.setUpdatedatedisplay(new java.sql.Date(dateNow.getTimeInMillis()));
+            NAccObj.setUpdatedatel(dateNow.getTimeInMillis());
 
 //            
-            ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NdataObj.getName(), NdataObj.getUid());
+            ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
             boolean exist = false;
             if (ssnsAccObjList != null) {
                 if (ssnsAccObjList.size() != 0) {
@@ -718,7 +747,7 @@ public class SsnsService {
                 }
             }
             if (exist == false) {
-                int ret = getSsnsDataImp().insertSsnsAccObject(NdataObj);
+                int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
                 if (ret == 1) {
                     return true;
                 }
