@@ -1469,7 +1469,7 @@ public class ServiceAFweb {
 
     }
 
-    public ArrayList<SsnsAcc> getprodttv(String EmailUserName, String IDSt, int length) {
+    public ArrayList<SsnsAcc> getapp(String EmailUserName, String IDSt, int length) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -1477,12 +1477,25 @@ public class ServiceAFweb {
         if (IDSt.equals(custObj.getId() + "") != true) {
             return null;
         }
-        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByApp(SsnsService.APP_PRODUCT, length);
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByApp(SsnsService.APP_APP, length);
         return ssnsAccObjList;
 
     }
 
-    public ArrayList<SsnsAcc> getprodttvByFeature(String EmailUserName, String IDSt, String name) {
+    public ArrayList<SsnsAcc> getSsnsprod(String EmailUserName, String IDSt, int length, String prod) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (IDSt.equals(custObj.getId() + "") != true) {
+            return null;
+        }
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByApp(prod, length);
+        return ssnsAccObjList;
+
+    }
+
+    public ArrayList<SsnsAcc> getappByFeature(String EmailUserName, String IDSt, String name) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -1491,12 +1504,12 @@ public class ServiceAFweb {
             return null;
         }
 
-        ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(SsnsService.APP_PRODUCT, name);
+        ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(SsnsService.APP_APP, name);
         return SsnsAcclist;
 
     }
 
-    public NameData getprodttvByFeature(String EmailUserName, String IDSt) {
+    public ArrayList<SsnsAcc> getSsnsprodByFeatureName(String EmailUserName, String IDSt, String name, String prod) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -1505,14 +1518,43 @@ public class ServiceAFweb {
             return null;
         }
 
-        ArrayList<String> namelist = getSsnsDataImp().getSsnsAccObjListByFeature(SsnsService.APP_PRODUCT);
+        ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(prod, name);
+        return SsnsAcclist;
+
+    }
+
+    public NameData getappByFeature(String EmailUserName, String IDSt) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (IDSt.equals(custObj.getId() + "") != true) {
+            return null;
+        }
+
+        ArrayList<String> namelist = getSsnsDataImp().getSsnsAccObjListByFeature(SsnsService.APP_APP);
+        NameData nameData = new NameData();
+        nameData.setName(namelist);
+        return nameData;
+    }
+
+    public NameData getSsnsprodByFeature(String EmailUserName, String IDSt, String prod) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (IDSt.equals(custObj.getId() + "") != true) {
+            return null;
+        }
+
+        ArrayList<String> namelist = getSsnsDataImp().getSsnsAccObjListByFeature(prod);
         NameData nameData = new NameData();
         nameData.setName(namelist);
         return nameData;
 
     }
 
-    public SsnsAcc getprodttvById(String EmailUserName, String IDSt, String PIDSt) {
+    public SsnsAcc getappById(String EmailUserName, String IDSt, String PIDSt) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -1520,7 +1562,7 @@ public class ServiceAFweb {
         if (IDSt.equals(custObj.getId() + "") != true) {
             return null;
         }
-        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(SsnsService.APP_PRODUCT, PIDSt);
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(SsnsService.APP_APP, PIDSt);
         if (ssnsAccObjList != null) {
             if (ssnsAccObjList.size() > 0) {
                 SsnsAcc ssnsAccObj = (SsnsAcc) ssnsAccObjList.get(0);
@@ -1530,7 +1572,7 @@ public class ServiceAFweb {
         return null;
     }
 
-    public ArrayList<String> getprodttvByIdRT(String EmailUserName, String IDSt, String PIDSt) {
+    public SsnsAcc getSsnsprodById(String EmailUserName, String IDSt, String PIDSt, String prod) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -1538,7 +1580,25 @@ public class ServiceAFweb {
         if (IDSt.equals(custObj.getId() + "") != true) {
             return null;
         }
-        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(SsnsService.APP_PRODUCT, PIDSt);
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(prod, PIDSt);
+        if (ssnsAccObjList != null) {
+            if (ssnsAccObjList.size() > 0) {
+                SsnsAcc ssnsAccObj = (SsnsAcc) ssnsAccObjList.get(0);
+                return ssnsAccObj;
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<String> getSsnsprodByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (IDSt.equals(custObj.getId() + "") != true) {
+            return null;
+        }
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(prod, PIDSt);
         if (ssnsAccObjList != null) {
             if (ssnsAccObjList.size() > 0) {
                 SsnsAcc ssnsAccObj = (SsnsAcc) ssnsAccObjList.get(0);
