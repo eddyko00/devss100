@@ -320,7 +320,7 @@ public class SsnsService {
             NAccObj.setApp(dataObj.getApp());
             NAccObj.setOper(oper);
 //            NdataObj.setDown("");
-            NAccObj.setRet(dataObj.getRet());
+            NAccObj.setRet(host);
             NAccObj.setExec(dataObj.getExec());
 
             String nameSt = new ObjectMapper().writeValueAsString(pData);
@@ -462,8 +462,8 @@ public class SsnsService {
 
     public String SsnsTimeslot(String ProductURL, String appTId, String banid, String cust, String host) {
 
-        String url = ProductURL + ":443/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
-//        String url = "http://localhost:8080/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
+//        String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
+        String url = "http://localhost:8080/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
 
         HashMap newbodymap = new HashMap();
         newbodymap.put("customerId", cust);
@@ -476,6 +476,60 @@ public class SsnsService {
             logger.info("> SsnsAppointment exception " + ex.getMessage());
         }
         return null;
+    }
+
+    public String getFeatureSsnsProdTestingApp(SsnsAcc dataObj, ArrayList<String> outputList, String Oper) {
+        if (dataObj == null) {
+            return "";
+        }
+
+        dataObj.getData();
+        String banid = dataObj.getBanid();
+        String appTId = dataObj.getTiid();
+        String cust = dataObj.getCusid();
+        String host = dataObj.getRet();
+        String outputSt = null;
+        if (Oper == APP_1) {
+            outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+            outputList.addAll(outList);
+            ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
+
+            return prodTTV.getFeatTTV();
+        } else if (Oper == APP_3) {
+            outputSt = SsnsTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+            outputList.addAll(outList);
+            String feat = dataObj.getName();
+            int NumofStart = 0;
+            for (int i = 0; i < outList.size(); i++) {
+                String inLine = outList.get(i);
+                if (inLine.indexOf("startDate") != -1) {
+                    NumofStart++;
+                }
+            }
+            feat += ":startdate:" + NumofStart;
+            String featList[] = feat.split(":");
+            String newFeat = "";
+            for (int i = 0; i < featList.length; i++) {
+                String line = featList[i];
+                if (i == 0) {
+                    newFeat += line;
+                    continue;
+                }
+                if (i == 1) {
+                    newFeat += ":" + Oper;
+                    continue;
+                }
+                newFeat += ":" + line;
+            }
+            return newFeat;
+        }
+        if (outputSt == null) {
+            return "";
+        }
+
+        return "";
     }
 
     public String SsnsAppointment(String ProductURL, String appTId, String banid, String cust, String host) {
@@ -498,10 +552,11 @@ public class SsnsService {
         return null;
     }
 
-    public String getFeatureSsnsProdTesting(SsnsAcc dataObj, ArrayList<String> outputList) {
+    public String getFeatureSsnsProdTestingProdttv(SsnsAcc dataObj, ArrayList<String> outputList) {
         if (dataObj == null) {
             return "";
         }
+
         String banid = dataObj.getBanid();
         String outputSt = SsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, SsnsService.APP_PRODUCT_TYPE_TTV);
         if (outputSt == null) {

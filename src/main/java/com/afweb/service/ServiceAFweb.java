@@ -383,7 +383,7 @@ public class ServiceAFweb {
                     boolean clearssnsflag = false;
                     if (clearssnsflag == true) {
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
+                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
                         getSsnsDataImp().updateSsnsDataAllOpenStatus();
                     }
 
@@ -1590,6 +1590,32 @@ public class ServiceAFweb {
         return null;
     }
 
+    public ArrayList<String> getSsnsprodAppByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (IDSt.equals(custObj.getId() + "") != true) {
+            return null;
+        }
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(prod, PIDSt);
+        if (ssnsAccObjList != null) {
+            if (ssnsAccObjList.size() > 0) {
+                SsnsAcc ssnsAccObj = (SsnsAcc) ssnsAccObjList.get(0);
+                ArrayList<String> outputList = new ArrayList();
+                SsnsService ss = new SsnsService();
+                String feat = "";
+
+                if ((Oper == SsnsService.APP_1) || (Oper == SsnsService.APP_3)) {
+                    feat = ss.getFeatureSsnsProdTestingApp(ssnsAccObj, outputList, Oper);
+                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
+                }
+                return outputList;
+            }
+        }
+        return null;
+    }
+
     public ArrayList<String> getSsnsprodByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
@@ -1604,7 +1630,11 @@ public class ServiceAFweb {
                 SsnsAcc ssnsAccObj = (SsnsAcc) ssnsAccObjList.get(0);
                 ArrayList<String> outputList = new ArrayList();
                 SsnsService ss = new SsnsService();
-                String feat = ss.getFeatureSsnsProdTesting(ssnsAccObj, outputList);
+                if (prod == SsnsService.APP_PRODUCT) {
+                    String feat = ss.getFeatureSsnsProdTestingProdttv(ssnsAccObj, outputList);
+                } else {
+
+                }
 
                 return outputList;
             }
