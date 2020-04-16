@@ -102,6 +102,7 @@ public class AccountImp {
 
     public CustomerObj getCustomerStatus(String UserName, String Password) {
 //        logger.info("> getCustomerPassword  " + UserName);
+        UserName = UserName.toUpperCase();
         CustomerObj customer = accountdb.getCustomer(UserName, Password);
         if (customer != null) {
             return customer;
@@ -111,6 +112,7 @@ public class AccountImp {
 
     public CustomerObj getCustomerPassword(String UserName, String Password) {
 //        logger.info("> getCustomerPassword  " + UserName);
+        UserName = UserName.toUpperCase();
         CustomerObj customer = accountdb.getCustomer(UserName, Password);
         if (customer != null) {
             if (customer.getStatus() == ConstantKey.OPEN) {
@@ -146,9 +148,13 @@ public class AccountImp {
     }
 
     public int addCustomer(CustomerObj newCustomer) {
+
         if (newCustomer == null) {
             return 0;
         }
+        String userN = newCustomer.getUsername();
+        userN = userN.toUpperCase();
+        newCustomer.setUsername(userN);
         logger.info("> addCustomer  " + newCustomer.getUsername());
         int result = 0;
         try {
@@ -159,8 +165,7 @@ public class AccountImp {
         return result;
     }
 
-    public int updateCustAllStatus(String UserName,
-            int substatus) {
+    public int updateCustAllStatus(String UserName,int substatus) {
 
         CustomerObj customer = getCustomerPassword(UserName, null);
         if (customer != null) {
@@ -541,7 +546,7 @@ public class AccountImp {
                 index++;
                 if (i % 500 == 0) {
                     logger.info("> restoreDBcomm " + tableName + " " + i);
-                }                
+                }
                 if (index > 50) {
                     index = 0;
                     int ret = serviceAFWeb.sendRequestObj(writeSQLArray);
