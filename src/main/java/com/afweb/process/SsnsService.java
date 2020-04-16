@@ -23,6 +23,7 @@ import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import java.util.Map;
 
@@ -95,9 +96,51 @@ public class SsnsService {
                     cust = cust.replace("customerId:", "");
                     for (int k = 0; k < operList.length; k++) {
                         String inLine = operList[k];
+
                         if (inLine.indexOf("hostSystemCd:") != -1) {
                             host = inLine;
                             host = host.replace("hostSystemCd:", "");
+                        }
+                    }
+
+                }
+            } else if (oper.equals(APP_3)) { //"timeslot")) {
+                dataSt = dataObj.getData();
+                dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+                String[] operList = dataSt.split(",");
+                if (operList.length > 3) {
+
+                    int custInti = 0;
+                    for (int k = 0; k < operList.length; k++) {
+                        String inLine = operList[k];
+                        if (inLine.indexOf("ban:") != -1) {
+                            banid = inLine;
+                            banid = host.replace("ban:", "");
+                            continue;
+                        }
+                        if (inLine.indexOf("customerId:") != -1) {
+
+                            cust = inLine;
+                            cust = host.replace("customerId:", "");
+                            continue;
+                        }
+                        if (inLine.indexOf("id:") != -1) {
+                            if (custInti == 1) {
+                                continue;
+                            }
+                            custInti = 1;
+                            appTId = inLine;
+                            appTId = appTId.replace("id:", "");
+                            continue;
+                        }
+                        if (inLine.indexOf("hostSystemCd:") != -1) {
+                            host = inLine;
+                            host = host.replace("hostSystemCd:", "");
+                            continue;
                         }
                     }
 
@@ -135,6 +178,7 @@ public class SsnsService {
                     host = operList[3];
 
                 }
+
             } else {
                 logger.info("> getFeatureSsnsAppointment Other oper " + oper);
             }
@@ -167,15 +211,37 @@ public class SsnsService {
         try {
             String featTTV = "";
             String oper = dataObj.getOper();
-            if (oper.equals(APP_4) || oper.equals(APP_1)) {
+            if (oper.equals(APP_4) || oper.equals(APP_1) || oper.equals(APP_3)) {
                 if ((banid.length() == 0) && (cust.length() == 0)) {
                     featTTV = APP_PRODUCT_TYPE_APP;
                     featTTV += ":" + dataObj.getOper();
                     featTTV += ":" + host;
                     featTTV += ":" + oper;
                     featTTV += ":ContactEng";
+
+                    String custid = getCustIdAppointmentDevop(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+
+                    if (custid.length() != 0) {
+                        cust = custid;
+                        String outputSt = null;
+                        outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+                        if (outputSt == null) {
+                            return false;
+                        }
+                        if (outputSt.length() < 80) {  // or test "appointmentList":[]
+                            return false;
+                        }
+                        ProductApp prodTTV = parseAppointmentFeature(outputSt, dataObj.getOper());
+                        pData.setpAPP(prodTTV);
+                        featTTV = prodTTV.getFeat();
+                    }
                 } else {
-                    String outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+                    String outputSt = null;
+                    if (oper.equals(APP_3)) {
+                        outputSt = SsnsTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+                    } else {
+                        outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+                    }
                     if (outputSt == null) {
                         return false;
                     }
@@ -328,6 +394,59 @@ public class SsnsService {
         prodTTV.setFeat(featTTV);
 
         return prodTTV;
+    }
+
+    public String getCustIdAppointmentDevop(String ProductURL, String appTId, String banid, String cust, String host) {
+
+        if (host.equals("OMS9")) {
+            return "";
+        }
+        String url = "http://localhost:8080/v2/cmo/selfmgmt/appointmentmanagement/devop/searchtimeslot";
+        HashMap newbodymap = new HashMap();
+        newbodymap.put("customerId", cust);
+        newbodymap.put("id", appTId);
+        newbodymap.put("hostSystemCd", host);
+        try {
+            String custid = "";
+            String output = this.sendRequest_Ssns(METHOD_POST, url, null, newbodymap);
+            if (output == null) {
+                return "";
+            }
+            output = ServiceAFweb.replaceAll("\"", "", output);
+            output = ServiceAFweb.replaceAll("\\", "", output);
+            String[] oList = output.split(",");
+            for (int i = 0; i < oList.length; i++) {
+                String line = oList[i];
+                if (line.indexOf("customerId:") != -1) {
+                    custid = ServiceAFweb.replaceAll("customerId:", "", line);
+                    if (custid.equals("null")) {
+                        return "";
+                    }
+                    return custid;
+                }
+            }
+
+            return "";
+        } catch (Exception ex) {
+            logger.info("> SsnsAppointment exception " + ex.getMessage());
+        }
+        return null;
+    }
+
+    public String SsnsTimeslot(String ProductURL, String appTId, String banid, String cust, String host) {
+
+        String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
+        HashMap newbodymap = new HashMap();
+        newbodymap.put("customerId", cust);
+        newbodymap.put("id", appTId);
+        newbodymap.put("hostSystemCd", host);
+        try {
+            String output = this.sendRequest_Ssns(METHOD_POST, url, null, newbodymap);
+            return output;
+        } catch (Exception ex) {
+            logger.info("> SsnsAppointment exception " + ex.getMessage());
+        }
+        return null;
     }
 
     public String SsnsAppointment(String ProductURL, String appTId, String banid, String cust, String host) {
@@ -773,16 +892,8 @@ public class SsnsService {
             }
 
             String bodyElement = "";
-
-            if (bodyParams != null && !bodyParams.isEmpty()) {
-                String bodyTmp = "";
-                for (String key : bodyParams.keySet()) {
-                    bodyTmp = bodyParams.get(key);
-                    bodyTmp = bodyTmp.replaceAll("&", "-");
-                    bodyTmp = bodyTmp.replaceAll("%", "%25");
-                    bodyElement = key + "=" + bodyTmp;
-                }
-
+            if (bodyParams != null) {
+                bodyElement = new ObjectMapper().writeValueAsString(bodyParams);
             }
 
             URLPath += webResourceString;
@@ -799,13 +910,13 @@ public class SsnsService {
                 con = (HttpURLConnection) request.openConnection();
             }
 
-            if (URLPath.indexOf(":8080") == -1) {
-                String authStr = "APP_SELFSERVEUSGBIZSVC" + ":" + "soaorgid";
-                // encode data on your side using BASE64
-                byte[] bytesEncoded = Base64.encodeBase64(authStr.getBytes());
-                String authEncoded = new String(bytesEncoded);
-                con.setRequestProperty("Authorization", "Basic " + authEncoded);
-            }
+//            if (URLPath.indexOf(":8080") == -1) {
+            String authStr = "APP_SELFSERVEUSGBIZSVC" + ":" + "soaorgid";
+            // encode data on your side using BASE64
+            byte[] bytesEncoded = Base64.encodeBase64(authStr.getBytes());
+            String authEncoded = new String(bytesEncoded);
+            con.setRequestProperty("Authorization", "Basic " + authEncoded);
+//            }
 
             if (method.equals(METHOD_POST)) {
                 con.setRequestMethod("POST");
@@ -813,8 +924,8 @@ public class SsnsService {
                 con.setRequestMethod("GET");
             }
             con.setRequestProperty("User-Agent", USER_AGENT);
-            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
-//                con.setRequestProperty("Content-Type", "application/json; utf-8");
+//            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+            con.setRequestProperty("Content-Type", "application/json; utf-8");
 
             if (method.equals(METHOD_POST)) {
                 // For POST only - START

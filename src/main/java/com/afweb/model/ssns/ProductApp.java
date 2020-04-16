@@ -12,6 +12,20 @@ package com.afweb.model.ssns;
 public class ProductApp {
 
     /**
+     * @return the appid
+     */
+    public String getAppid() {
+        return appid;
+    }
+
+    /**
+     * @param appid the appid to set
+     */
+    public void setAppid(String appid) {
+        this.appid = appid;
+    }
+
+    /**
      * @return the host
      */
     public String getHost() {
@@ -84,6 +98,7 @@ public class ProductApp {
     private String feat = "";
     private String category = "";
     private String statusCd = "";
-    private String categoryCd ="";
-    private String host = "";    
+    private String categoryCd = "";
+    private String host = "";
+    private String appid = "";
 }

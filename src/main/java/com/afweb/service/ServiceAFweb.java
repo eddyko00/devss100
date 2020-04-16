@@ -390,20 +390,29 @@ public class ServiceAFweb {
                     boolean procflag = true;
                     if (procflag == true) {
                         SsnsService ss = new SsnsService();
-                        String app = SsnsService.APP_APP;
-                        String ret = "parameter";
-                        int status = ConstantKey.OPEN;
-                        ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjList(app, ret, status);
-                        if (ssnsList != null) {
-//                            logger.info("> ssnsList " + ssnsList.size());
-                            for (int i = 0; i < ssnsList.size(); i++) {
-                                SsnsData data = ssnsList.get(i);
-                                String feature = ss.getFeatureSsnsAppointment(data);
-//                                String feature = ss.getFeatureSsnsProdiuctInventory(data);
+//                        String app = SsnsService.APP_APP;
+//                        String ret = "parameter";
+//                        int status = ConstantKey.OPEN;
+//                        ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjList(app, ret, status);
+//                        if (ssnsList != null) {
+////                            logger.info("> ssnsList " + ssnsList.size());
+//                            for (int i = 0; i < ssnsList.size(); i++) {
+//                                SsnsData data = ssnsList.get(i);
+//                                String feature = ss.getFeatureSsnsAppointment(data);
+////                                String feature = ss.getFeatureSsnsProdiuctInventory(data);
+//                            }
+//                        }
 
+                        ArrayList ttvNameArrayTemp = getAllOpenAppArray();
+                        if (ttvNameArrayTemp != null) {
+                            for (int i = 0; i < ttvNameArrayTemp.size(); i++) {
+                                String idSt = (String) ttvNameArrayTemp.get(i);
+
+                                int id = Integer.parseInt(idSt);
+                                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                                String feature = ss.getFeatureSsnsAppointment(data);
                             }
                         }
-
 //                        this.getSsnsDataImp().deleteAllSsnsData(0);
 //                        ssnsList = getSsnsDataImp().getSsnsDataObjList(app, ret, status);
 //                        if (ssnsList != null) {
@@ -468,20 +477,22 @@ public class ServiceAFweb {
                 // 30 sec per tick ~  for 3 hour   60 s*60 *3 /30 
             }
             if ((getServerObj().getProcessTimerCnt() % 13) == 0) {
-
+                ;
+            } else if ((getServerObj().getProcessTimerCnt() % 9) == 0) {
+                ;
             } else if ((getServerObj().getProcessTimerCnt() % 7) == 0) {
                 //////require to save memory
                 System.gc();
                 //////require to save memory
-
+                processFeatureProd();
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
-
+                processFeatureApp();
             } else if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                 //10 Sec * 5 ~ 1 minutes
-//                processETL();
+                processETL();
 
             } else if ((getServerObj().getProcessTimerCnt() % 2) == 0) {
-                processFeatureTTV();
+
             } else {
 
             }
@@ -570,39 +581,39 @@ public class ServiceAFweb {
         }
     }
 
-    ArrayList<String> getAllOpenTtvArray() {
-        String app = SsnsService.APP_PRODUCT;
+    ArrayList<String> getAllOpenAppArray() {
+        String app = SsnsService.APP_APP;
         String ret = "parameter";
         int status = ConstantKey.OPEN;
         return getSsnsDataImp().getSsnsDataIDList(app, ret, status);
     }
 
-    ArrayList<String> ttvNameArray = new ArrayList();
+    ArrayList<String> appNameArray = new ArrayList();
 
-    private ArrayList updateTtvNameArray() {
-        if (ttvNameArray != null && ttvNameArray.size() > 0) {
-            return ttvNameArray;
+    private ArrayList updateAppNameArray() {
+        if (appNameArray != null && appNameArray.size() > 0) {
+            return appNameArray;
         }
-        ArrayList ttvNameArrayTemp = getAllOpenTtvArray();
+        ArrayList ttvNameArrayTemp = getAllOpenAppArray();
         if (ttvNameArrayTemp != null) {
-            ttvNameArray = ttvNameArrayTemp;
+            appNameArray = ttvNameArrayTemp;
         }
-        return ttvNameArray;
+        return appNameArray;
     }
 
-    public int processFeatureTTV() {
+    public int processFeatureApp() {
 
-        updateTtvNameArray();
+        updateAppNameArray();
         int result = 0;
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
         String LockName = "FEATURE_" + ServiceAFweb.getServerObj().getServerName();
 
         try {
-            if ((ttvNameArray == null) || (ttvNameArray.size() == 0)) {
+            if ((appNameArray == null) || (appNameArray.size() == 0)) {
                 return 0;
             }
-            logger.info("processFeatureTTV for 1 minutes size " + ttvNameArray.size());
+            logger.info("processFeatureTTV for 1 minutes size " + appNameArray.size());
 
             long currentTime = System.currentTimeMillis();
             long lockDate1Min = TimeConvertion.addMinutes(currentTime, 1);
@@ -614,7 +625,7 @@ public class ServiceAFweb {
                     break;
                 }
 //                }
-                if (ttvNameArray.size() == 0) {
+                if (appNameArray.size() == 0) {
                     break;
                 }
 
@@ -625,8 +636,80 @@ public class ServiceAFweb {
                 if (lockReturn == 0) {
                     return 0;
                 }
-                String idSt = (String) ttvNameArray.get(0);
-                ttvNameArray.remove(0);
+                String idSt = (String) appNameArray.get(0);
+                appNameArray.remove(0);
+                SsnsService ss = new SsnsService();
+                int id = Integer.parseInt(idSt);
+                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                String feature = ss.getFeatureSsnsAppointment(data);
+                logger.info("> feature " + i + " " + feature);
+
+                AFSleep();
+            }
+        } catch (Exception ex) {
+        }
+        removeNameLock(LockName, ConstantKey.FE_LOCKTYPE);
+        return result;
+
+    }
+
+    ArrayList<String> getAllOpenProdArray() {
+        String app = SsnsService.APP_PRODUCT;
+        String ret = "parameter";
+        int status = ConstantKey.OPEN;
+        return getSsnsDataImp().getSsnsDataIDList(app, ret, status);
+    }
+
+    ArrayList<String> prodNameArray = new ArrayList();
+
+    private ArrayList updateProdNameArray() {
+        if (prodNameArray != null && prodNameArray.size() > 0) {
+            return prodNameArray;
+        }
+        ArrayList ttvNameArrayTemp = getAllOpenProdArray();
+        if (ttvNameArrayTemp != null) {
+            prodNameArray = ttvNameArrayTemp;
+        }
+        return prodNameArray;
+    }
+
+    public int processFeatureProd() {
+
+        updateProdNameArray();
+        int result = 0;
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        long lockDateValue = dateNow.getTimeInMillis();
+        String LockName = "FEATURE_" + ServiceAFweb.getServerObj().getServerName();
+
+        try {
+            if ((prodNameArray == null) || (prodNameArray.size() == 0)) {
+                return 0;
+            }
+            logger.info("processFeatureProd for 1 minutes size " + prodNameArray.size());
+
+            long currentTime = System.currentTimeMillis();
+            long lockDate1Min = TimeConvertion.addMinutes(currentTime, 1);
+
+            for (int i = 0; i < 5; i++) {
+                currentTime = System.currentTimeMillis();
+//                if (CKey.NN_DEBUG != true) {
+                if (lockDate1Min < currentTime) {
+                    break;
+                }
+//                }
+                if (prodNameArray.size() == 0) {
+                    break;
+                }
+
+                int lockReturn = setLockNameProcess(LockName, ConstantKey.FE_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureTTV");
+                if (CKey.NN_DEBUG == true) {
+                    lockReturn = 1;
+                }
+                if (lockReturn == 0) {
+                    return 0;
+                }
+                String idSt = (String) prodNameArray.get(0);
+                prodNameArray.remove(0);
                 SsnsService ss = new SsnsService();
                 int id = Integer.parseInt(idSt);
                 SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
