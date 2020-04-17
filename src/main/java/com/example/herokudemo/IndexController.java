@@ -55,6 +55,18 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/prodttv/featureall");
         arrayString.add("/cust/{username}/id/{id}/prodttv/feature?name=");
 
+        arrayString.add("/cust/{username}/id/{id}/prodhsic?length={0 for all}");
+        arrayString.add("/cust/{username}/id/{id}/prodhsic/id/{pid}");
+        arrayString.add("/cust/{username}/id/{id}/prodhsic/id/{pid}/rt");
+        arrayString.add("/cust/{username}/id/{id}/prodhsic/featureall");
+        arrayString.add("/cust/{username}/id/{id}/prodhsic/feature?name=");
+
+        arrayString.add("/cust/{username}/id/{id}/prodphone?length={0 for all}");
+        arrayString.add("/cust/{username}/id/{id}/prodphone/id/{pid}");
+        arrayString.add("/cust/{username}/id/{id}/prodphone/id/{pid}/rt");
+        arrayString.add("/cust/{username}/id/{id}/prodphone/featureall");
+        arrayString.add("/cust/{username}/id/{id}/prodphone/feature?name=");
+
         arrayString.add("/cust/{username}/id/{id}/app?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/app/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/app/id/{pid}/rt");
@@ -207,6 +219,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
+
     @RequestMapping(value = "/cust/{username}/id/{id}/app/id/{pid}/rt/getapp", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getappidrt(
@@ -225,7 +238,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-    
+
     @RequestMapping(value = "/cust/{username}/id/{id}/app/id/{pid}/rt/gettimeslot", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getappidrtTimeSlot(
@@ -243,7 +256,8 @@ public class IndexController {
         ArrayList<String> ret = afWebService.getSsnsprodAppByIdRT(username, idSt, pidSt, SsnsService.APP_APP, oper);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
-    }    
+    }
+
     @RequestMapping(value = "/cust/{username}/id/{id}/app/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     NameData getappfeature(
@@ -280,8 +294,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-
-//        arrayString.add("/cust/{username}/id/{id}/prodttv?length=");
+////////////////////////////////////
     @RequestMapping(value = "/cust/{username}/id/{id}/prodttv", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getprodttv(
@@ -304,7 +317,6 @@ public class IndexController {
         return ret;
     }
 
-//        arrayString.add("/cust/{username}/id/{id}/prodttv/id/{pid}");      
     @RequestMapping(value = "/cust/{username}/id/{id}/prodttv/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     SsnsAcc getprodttvid(
@@ -323,7 +335,6 @@ public class IndexController {
         return ret;
     }
 
-// arrayString.add("/cust/{username}/id/{id}/prodttv/id/{pid}/rt");
     @RequestMapping(value = "/cust/{username}/id/{id}/prodttv/id/{pid}/rt", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getprodttvidrt(
@@ -337,12 +348,13 @@ public class IndexController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             return null;
         }
+
         ArrayList<String> ret = afWebService.getSsnsprodByIdRT(username, idSt, pidSt, SsnsService.APP_PRODUCT);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-//        arrayString.add("/cust/{username}/id/{id}/prodttv/feature?name=");     
 
+ 
     @RequestMapping(value = "/cust/{username}/id/{id}/prodttv/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     NameData getprodttvfeature(
@@ -361,7 +373,6 @@ public class IndexController {
         return ret;
     }
 
-//        arrayString.add("/cust/{username}/id/{id}/prodttv/feature/name?name=");     
     @RequestMapping(value = "/cust/{username}/id/{id}/prodttv/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getprodttvfeatureName(
@@ -380,6 +391,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
+//////////////////////////////////////////////
 
     @RequestMapping(value = "/ping", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody

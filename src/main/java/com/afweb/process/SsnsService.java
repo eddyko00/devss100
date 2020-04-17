@@ -526,13 +526,13 @@ public class SsnsService {
         return null;
     }
 
-    public String getFeatureSsnsProdTestingProdttv(SsnsAcc dataObj, ArrayList<String> outputList) {
+    public String getFeatureSsnsProdTestingProdttv(SsnsAcc dataObj, ArrayList<String> outputList, String oper) {
         if (dataObj == null) {
             return "";
         }
 
         String banid = dataObj.getBanid();
-        String outputSt = SsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, SsnsService.APP_PRODUCT_TYPE_TTV);
+        String outputSt = SsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, oper);
         if (outputSt == null) {
             return "";
         }
@@ -543,7 +543,7 @@ public class SsnsService {
     }
 
     public String getFeatureSsnsProdiuctInventory(SsnsData dataObj) {
-        String featTTV = "";
+
         ProductData pData = new ProductData();
         if (dataObj == null) {
             return "";

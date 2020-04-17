@@ -387,7 +387,7 @@ public class ServiceAFweb {
                         getSsnsDataImp().updateSsnsDataAllOpenStatus();
                     }
 
-                    boolean procflag = true;
+                    boolean procflag = false;
                     if (procflag == true) {
                         SsnsService ss = new SsnsService();
 
@@ -1632,8 +1632,10 @@ public class ServiceAFweb {
                 SsnsAcc ssnsAccObj = (SsnsAcc) ssnsAccObjList.get(0);
                 ArrayList<String> outputList = new ArrayList();
                 SsnsService ss = new SsnsService();
+                String feat="";
                 if (prod == SsnsService.APP_PRODUCT) {
-                    String feat = ss.getFeatureSsnsProdTestingProdttv(ssnsAccObj, outputList);
+                    String oper = ssnsAccObj.getRet();
+                    feat = ss.getFeatureSsnsProdTestingProdttv(ssnsAccObj, outputList, oper);
                 } else {
 
                 }
