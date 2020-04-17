@@ -22,11 +22,9 @@ public class CKey {
     //
     public static boolean PROXY = false; //false; //true; 
     public static String PROXYURL_TMP = "webproxystatic-on.tslabc.tabceluabcs.com";
-    
     public static String URL_PRODUCT_TMP = "https://sabcoa-mp-rmsabck-prabc.tsabcl.teabclus.com";
 
-    public static boolean NN_DEBUG = true; //false; //true; 
-    public static boolean OPENSHIFT_DB1 = true; //false; 
+    public static boolean NN_DEBUG = false; //false; //true; 
     public static boolean UI_ONLY = false;
 
 //    //
