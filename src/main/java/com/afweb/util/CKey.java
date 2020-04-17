@@ -27,7 +27,7 @@ public class CKey {
 
     public static boolean NN_DEBUG = true; //false; //true; 
     public static boolean OPENSHIFT_DB1 = true; //false; 
-    public static boolean UI_ONLY = true;
+    public static boolean UI_ONLY = false;
 
 //    //
 //    //

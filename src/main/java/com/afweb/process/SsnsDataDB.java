@@ -835,8 +835,8 @@ public class SsnsDataDB {
         return entries;
     }
 
-    public ArrayList getSsnsDataObj(String name, int length) {
-        String sql = "select id as name from ssnsdata where name='" + name + "'" + " order by updatedatel asc";
+    public ArrayList<SsnsData> getSsnsDataObj(String name, int length) {
+        String sql = "select * from ssnsdata where name='" + name + "'" + " order by updatedatel asc";
         ArrayList entries = getAllSsnsDataSQL(sql, length);
         return entries;
     }
