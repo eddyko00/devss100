@@ -14,6 +14,20 @@ import java.util.ArrayList;
 public class ProductData {
 
     /**
+     * @return the pSING
+     */
+    public ProductTTV getpSING() {
+        return pSING;
+    }
+
+    /**
+     * @param pSING the pSING to set
+     */
+    public void setpSING(ProductTTV pSING) {
+        this.pSING = pSING;
+    }
+
+    /**
      * @return the pAPP
      */
     public ProductApp getpAPP() {
@@ -27,6 +41,7 @@ public class ProductData {
         this.pAPP = pAPP;
     }
 
+    private ProductTTV pSING;    
     private ProductTTV pTTV;
     private ProductTTV pHSIC;
     private ProductApp pAPP;

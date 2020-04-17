@@ -12,6 +12,34 @@ package com.afweb.model.ssns;
 public class ProductTTV {
 
     /**
+     * @return the voicemail
+     */
+    public int getVoicemail() {
+        return voicemail;
+    }
+
+    /**
+     * @param voicemail the voicemail to set
+     */
+    public void setVoicemail(int voicemail) {
+        this.voicemail = voicemail;
+    }
+
+    /**
+     * @return the CallControl
+     */
+    public String getCallControl() {
+        return CallControl;
+    }
+
+    /**
+     * @param CallControl the CallControl to set
+     */
+    public void setCallControl(String CallControl) {
+        this.CallControl = CallControl;
+    }
+
+    /**
      * @return the region
      */
     public String getRegion() {
@@ -86,11 +114,13 @@ public class ProductTTV {
     private String offer = "";
     private String productCd = "";
     private int ChannelList = 0;
-    private String region="";
+    private String region = "";
     private String SecurityBundle = "";
-    private String EmailFeatures="";
-    private String UnlimitedUsage="";
-    private String PrimaryPricePlan="";
+    private String EmailFeatures = "";
+    private String UnlimitedUsage = "";
+    private String PrimaryPricePlan = "";
+    private String CallControl = "";
+    private int voicemail = 0;
 
     /**
      * @return the featTTV
