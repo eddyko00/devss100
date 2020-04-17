@@ -67,7 +67,6 @@ public class SsnsService {
     private SsnsDataImp ssnsDataImp = new SsnsDataImp();
 
     public String getFeatureSsnsAppointment(SsnsData dataObj) {
-        String featTTV = "";
         ProductData pData = new ProductData();
         if (dataObj == null) {
             return "";
@@ -194,11 +193,12 @@ public class SsnsService {
             //call devop to get customer id
             if ((banid.length() == 0) && (cust.length() == 0)) {
                 if (host.equals("FIFA") || host.equals("LYNX")) {
-                    String custid = getCustIdAppointmentDevop(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
-                    if (custid.length() != 0) {
-                        cust = custid;
-                        dataObj.setCusid(custid);
-                    }
+                    // not that useful
+//                    String custid = getCustIdAppointmentDevop(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+//                    if (custid.length() != 0) {
+//                        cust = custid;
+//                        dataObj.setCusid(custid);
+//                    }
                 }
             }
             SsnsAcc NAccObj = new SsnsAcc();
@@ -248,8 +248,7 @@ public class SsnsService {
                 } else {
                     String outputSt = null;
                     if (oper.equals(APP_GET_TIMES)) {  //"searchTimeSlot";
-//                        not sure why it does not work so just call get appointment to get eh feature
-//                        outputSt = SsnsTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+//                        not sure why it does not work so just call get appointment to get the feature
                         outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
                     } else {
                         outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
@@ -293,15 +292,17 @@ public class SsnsService {
             NAccObj.setUid(dataObj.getUid());
             NAccObj.setApp(dataObj.getApp());
             NAccObj.setOper(oper);
-//            NdataObj.setDown("");
+
+//          NAccObj.setDown(""); // set by NAccObj
             NAccObj.setRet(host);
             NAccObj.setExec(dataObj.getExec());
 
             String nameSt = new ObjectMapper().writeValueAsString(pData);
             NAccObj.setData(nameSt);
-            Calendar dateNow = TimeConvertion.getCurrentCalendar();
-            NAccObj.setUpdatedatedisplay(new java.sql.Date(dateNow.getTimeInMillis()));
-            NAccObj.setUpdatedatel(dateNow.getTimeInMillis());
+
+            NAccObj.setUpdatedatel(dataObj.getUpdatedatel());
+            NAccObj.setUpdatedatedisplay(new java.sql.Date(dataObj.getUpdatedatel()));
+
             return true;
         } catch (Exception ex) {
             logger.info("> updateSsnsAppointment Exception" + ex.getMessage());
@@ -532,7 +533,8 @@ public class SsnsService {
         }
 
         String banid = dataObj.getBanid();
-        String outputSt = SsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, oper);
+        String prodid = dataObj.getTiid();
+        String outputSt = SsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, prodid, oper);
         if (outputSt == null) {
             return "";
         }
@@ -541,6 +543,8 @@ public class SsnsService {
         ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
         return prodTTV.getFeatTTV();
     }
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////    
 
     public String getFeatureSsnsProdiuctInventory(SsnsData dataObj) {
 
@@ -576,71 +580,119 @@ public class SsnsService {
             logger.info(daSt);
 
 /////////////
-            SsnsAcc NAccObj = new SsnsAcc();
-            NAccObj.setTiid(prodid);
-            NAccObj.setRet(APP_PRODUCT_TYPE_SING);
-            NAccObj.setDown("splunkflow");
-            String PIoper = SsnsService.APP_PRODUCT_TYPE_SING;
-            boolean stat = this.updateSsnsProdiuctInventory(PIoper, banid, pData, dataObj, NAccObj);
-            if (stat == true) {
-                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
-                boolean exist = false;
-                if (ssnsAccObjList != null) {
-                    if (ssnsAccObjList.size() != 0) {
-                        SsnsAcc ssnsObj = ssnsAccObjList.get(0);
-                        if (ssnsObj.getDown().equals("splunkflow")) {
-                            exist = true;
-                        }
-                    }
-                }
-                if (exist == false) {
-                    int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
-                }
-            }
-            NAccObj = new SsnsAcc();
-            NAccObj.setTiid(prodid);
-            NAccObj.setRet(APP_PRODUCT_TYPE_HSIC);
-            NAccObj.setDown("splunkflow");
-            PIoper = SsnsService.APP_PRODUCT_TYPE_HSIC;
-            stat = this.updateSsnsProdiuctInventory(PIoper, banid, pData, dataObj, NAccObj);
-            if (stat == true) {
-                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
-                boolean exist = false;
-                if (ssnsAccObjList != null) {
-                    if (ssnsAccObjList.size() != 0) {
-                        SsnsAcc ssnsObj = ssnsAccObjList.get(0);
-                        if (ssnsObj.getDown().equals("splunkflow")) {
-                            exist = true;
-                        }
-                    }
-                }
-                if (exist == false) {
-                    int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
-                }
-            }
+            if (oper.equals(PROD_GET_BYID)) {
 
-            NAccObj = new SsnsAcc();
-            NAccObj.setTiid(prodid);
-            NAccObj.setRet(APP_PRODUCT_TYPE_TTV);
-            NAccObj.setDown("splunkflow");
-            PIoper = SsnsService.APP_PRODUCT_TYPE_TTV;
-            stat = this.updateSsnsProdiuctInventory(PIoper, banid, pData, dataObj, NAccObj);
-            if (stat == true) {
-                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
-                boolean exist = false;
-                if (ssnsAccObjList != null) {
-                    if (ssnsAccObjList.size() != 0) {
-                        SsnsAcc ssnsObj = ssnsAccObjList.get(0);
-                        if (ssnsObj.getDown().equals("splunkflow")) {
-                            exist = true;
-                        }
+                String outputSt = SsnsProdiuctInventoryByProdId(ServiceAFweb.URL_PRODUCT, banid, prodid);
+                if (outputSt == null) {
+                    return "";
+                }
+
+                ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
+                String valueSt = "";
+                for (int j = 0; j < outputList.size(); j++) {
+                    String inLine = outputList.get(outputList.size() - 1 - j);
+                    if (inLine.indexOf("productType") != -1) {
+                        valueSt = inLine;
+                        valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                        valueSt = ServiceAFweb.replaceAll("productType:", "", valueSt);
+                        break;
                     }
                 }
-                if (exist == false) {
-                    int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
+// 
+                if (valueSt.length() == 0) {
+                    return "";
+                }
+                String PIoper = valueSt;
+
+                SsnsAcc NAccObj = new SsnsAcc();
+                NAccObj.setTiid(prodid);
+                NAccObj.setRet(PIoper);
+                NAccObj.setDown("splunkflow");
+
+                boolean stat = this.updateSsnsProdiuctInventoryByProdId(PIoper, banid, prodid, pData, dataObj, NAccObj);
+                if (stat == true) {
+                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                    boolean exist = false;
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() != 0) {
+                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                            if (ssnsObj.getDown().equals("splunkflow")) {
+                                exist = true;
+                            }
+                        }
+                    }
+                    if (exist == false) {
+                        int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
+                    }
                 }
             }
+//            
+            if (oper.equals(PROD_GET_PROD)) {
+                SsnsAcc NAccObj = new SsnsAcc();
+                NAccObj.setTiid(prodid);
+                NAccObj.setRet(APP_PRODUCT_TYPE_SING);
+                NAccObj.setDown("splunkflow");
+                String PIoper = APP_PRODUCT_TYPE_SING;
+                boolean stat = this.updateSsnsProdiuctInventory(PIoper, banid, prodid, pData, dataObj, NAccObj);
+                if (stat == true) {
+                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                    boolean exist = false;
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() != 0) {
+                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                            if (ssnsObj.getDown().equals("splunkflow")) {
+                                exist = true;
+                            }
+                        }
+                    }
+                    if (exist == false) {
+                        int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
+                    }
+                }
+                NAccObj = new SsnsAcc();
+                NAccObj.setTiid(prodid);
+                NAccObj.setRet(APP_PRODUCT_TYPE_HSIC);
+                NAccObj.setDown("splunkflow");
+                PIoper = APP_PRODUCT_TYPE_HSIC;
+                stat = this.updateSsnsProdiuctInventory(PIoper, banid, prodid, pData, dataObj, NAccObj);
+                if (stat == true) {
+                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                    boolean exist = false;
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() != 0) {
+                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                            if (ssnsObj.getDown().equals("splunkflow")) {
+                                exist = true;
+                            }
+                        }
+                    }
+                    if (exist == false) {
+                        int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
+                    }
+                }
 
+                NAccObj = new SsnsAcc();
+                NAccObj.setTiid(prodid);
+                NAccObj.setRet(APP_PRODUCT_TYPE_TTV);
+                NAccObj.setDown("splunkflow");
+                PIoper = APP_PRODUCT_TYPE_TTV;
+                stat = this.updateSsnsProdiuctInventory(PIoper, banid, prodid, pData, dataObj, NAccObj);
+                if (stat == true) {
+                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                    boolean exist = false;
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() != 0) {
+                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                            if (ssnsObj.getDown().equals("splunkflow")) {
+                                exist = true;
+                            }
+                        }
+                    }
+                    if (exist == false) {
+                        int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
+                    }
+                }
+            }
             //update to complete so will not process again
             getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
 
@@ -966,13 +1018,74 @@ public class SsnsService {
         return null;
     }
 
-    public boolean updateSsnsProdiuctInventory(String oper, String banid, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
+    public boolean updateSsnsProdiuctInventoryByProdId(String oper, String banid, String prodid, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
 
             String featTTV = "";
             String outputSt = null;
 
-            outputSt = SsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, oper);
+            outputSt = SsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, prodid, oper);
+            if (outputSt == null) {
+                return false;
+            }
+
+            if (oper.equals(APP_PRODUCT_TYPE_HSIC)) {
+                ProductTTV prodHSIC = parseProductInternetFeature(outputSt, dataObj.getOper());
+                pData.setpHSIC(prodHSIC);
+                featTTV = prodHSIC.getFeatTTV();
+            } else if (oper.equals(APP_PRODUCT_TYPE_TTV)) {
+                ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
+                pData.setpTTV(prodTTV);
+                featTTV = prodTTV.getFeatTTV();
+            } else if (oper.equals(APP_PRODUCT_TYPE_SING)) {
+                ProductTTV prodSING = parseProductPhoneFeature(outputSt, dataObj.getOper());
+                pData.setpSING(prodSING);
+                featTTV = prodSING.getFeatTTV();
+            }
+
+            logger.info("> updateSsnsProdiuctInventory feat " + featTTV);
+/////////////TTV   
+            ArrayList<String> flow = getSsnsFlowTrace(dataObj);
+            if (flow == null) {
+                logger.info("> updateSsnsProdiuctInventory skip no flow");
+                return false;
+            }
+
+            pData.setFlow(flow);
+
+            NAccObj.setName(featTTV);
+            NAccObj.setBanid(banid);
+            NAccObj.setCusid(dataObj.getCusid());
+            NAccObj.setUid(dataObj.getUid());
+            NAccObj.setApp(dataObj.getApp());
+            NAccObj.setTiid(dataObj.getTiid());
+            NAccObj.setOper(dataObj.getOper());
+
+            NAccObj.setDown(NAccObj.getDown());
+            NAccObj.setRet(NAccObj.getRet());
+
+            NAccObj.setExec(dataObj.getExec());
+
+            String nameSt = new ObjectMapper().writeValueAsString(pData);
+            NAccObj.setData(nameSt);
+
+            NAccObj.setUpdatedatel(dataObj.getUpdatedatel());
+            NAccObj.setUpdatedatedisplay(new java.sql.Date(dataObj.getUpdatedatel()));
+
+            return true;
+        } catch (Exception ex) {
+            logger.info("> updateSsnsProdiuctInventory Exception" + ex.getMessage());
+        }
+        return false;
+    }
+
+    public boolean updateSsnsProdiuctInventory(String oper, String banid, String prodid, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
+        try {
+
+            String featTTV = "";
+            String outputSt = null;
+
+            outputSt = SsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, prodid, oper);
             if (outputSt == null) {
                 return false;
             }
@@ -1018,9 +1131,10 @@ public class SsnsService {
 
             String nameSt = new ObjectMapper().writeValueAsString(pData);
             NAccObj.setData(nameSt);
-            Calendar dateNow = TimeConvertion.getCurrentCalendar();
-            NAccObj.setUpdatedatedisplay(new java.sql.Date(dateNow.getTimeInMillis()));
-            NAccObj.setUpdatedatel(dateNow.getTimeInMillis());
+
+            NAccObj.setUpdatedatel(dataObj.getUpdatedatel());
+            NAccObj.setUpdatedatedisplay(new java.sql.Date(dataObj.getUpdatedatel()));
+
             return true;
         } catch (Exception ex) {
             logger.info("> updateSsnsProdiuctInventory Exception" + ex.getMessage());
@@ -1139,13 +1253,34 @@ public class SsnsService {
         return prodTTV;
     }
 
-    public String SsnsProdiuctInventory(String ProductURL, String ban, String productType) {
-        String url = ProductURL + "/v1/cmo/selfmgmt/productinventory/product?billingAccount.id=" + ban
-                + "&productType=" + productType;
-        if (productType.equals(APP_PRODUCT_TYPE_TTV)) {
-            url += "&fields=product.characteristic.channelInfoList";
-        } else if (productType.equals(APP_PRODUCT_TYPE_SING)) {
-            url += "&fields=product.characteristic.voicemail";
+    public String SsnsProdiuctInventoryByProdId(String ProductURL, String ban, String prodid) {
+        String url = ProductURL + "/v1/cmo/selfmgmt/productinventory/product/" + prodid + "?billingAccount.id=" + ban;
+        try {
+            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);
+            return output;
+        } catch (Exception ex) {
+            logger.info("> SsnsProdiuctInventory exception " + ex.getMessage());
+        }
+        return null;
+    }
+
+    public String SsnsProdiuctInventory(String ProductURL, String ban, String prodid, String productType) {
+        String url = "";
+        if (prodid.length() == 0) {
+            url = ProductURL + "/v1/cmo/selfmgmt/productinventory/product?billingAccount.id=" + ban
+                    + "&productType=" + productType;
+            if (productType.equals(APP_PRODUCT_TYPE_TTV)) {
+                url += "&fields=product.characteristic.channelInfoList";
+            } else if (productType.equals(APP_PRODUCT_TYPE_SING)) {
+                url += "&fields=product.characteristic.voicemail";
+            }
+        } else {
+            url = ProductURL + "/v1/cmo/selfmgmt/productinventory/product/" + prodid + "?billingAccount.id=" + ban;
+            if (productType.equals(APP_PRODUCT_TYPE_TTV)) {
+                url += "&fields=product.characteristic.channelInfoList";
+            } else if (productType.equals(APP_PRODUCT_TYPE_SING)) {
+                url += "&fields=product.characteristic.voicemail";
+            }
         }
         try {
             String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);

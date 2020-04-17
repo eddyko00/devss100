@@ -386,38 +386,45 @@ public class ServiceAFweb {
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
                         getSsnsDataImp().updateSsnsDataAllOpenStatus();
                     }
-
+/////////
+/////////
                     boolean procflag = false;
                     if (procflag == true) {
                         SsnsService ss = new SsnsService();
+                        String feature = "";
+                        boolean prodflag = true;
+                        if (prodflag == true) {
+                            ArrayList ttvNameArrayTemp = getAllOpenProductArray();
+                            if (ttvNameArrayTemp != null) {
+                                for (int i = 0; i < ttvNameArrayTemp.size(); i++) {
+                                    String idSt = (String) ttvNameArrayTemp.get(i);
 
-                        ArrayList ttvNameArrayTemp = getAllOpenProductArray();
-                        if (ttvNameArrayTemp != null) {
-                            for (int i = 0; i < ttvNameArrayTemp.size(); i++) {
-                                String idSt = (String) ttvNameArrayTemp.get(i);
+                                    int id = Integer.parseInt(idSt);
+                                    SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                                    feature = ss.getFeatureSsnsProdiuctInventory(data);
+                                }
+                            }
+                        }
+                    }
+/////////
+/////////
+                    boolean appflag = true;
+                    if (appflag == true) {
+                        SsnsService ss = new SsnsService();
+                        String feature = "";
+                        ArrayList appNameArrayTemp = getAllOpenAppArray();
+                        if (appNameArrayTemp != null) {
+                            for (int i = 0; i < appNameArrayTemp.size(); i++) {
+                                String idSt = (String) appNameArrayTemp.get(i);
 
                                 int id = Integer.parseInt(idSt);
                                 SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
-                                String feature = ss.getFeatureSsnsProdiuctInventory(data);
+                                feature = ss.getFeatureSsnsAppointment(data);
                             }
                         }
-
-//                        ArrayList ttvNameArrayTemp = getAllOpenAppArray();
-//                        if (ttvNameArrayTemp != null) {
-//                            for (int i = 0; i < ttvNameArrayTemp.size(); i++) {
-//                                String idSt = (String) ttvNameArrayTemp.get(i);
-//
-//                                int id = Integer.parseInt(idSt);
-//                                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
-//                                String feature = ss.getFeatureSsnsAppointment(data);
-//                            }
-//                        }
-//                        this.getSsnsDataImp().deleteAllSsnsData(0);
-//                        ssnsList = getSsnsDataImp().getSsnsDataObjList(app, ret, status);
-//                        if (ssnsList != null) {
-//                            logger.info("> processTimer ssnsList " + ssnsList.size());
-//                        }
                     }
+                    
+
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////  
                     logger.info("> Debug end ");
@@ -1632,7 +1639,7 @@ public class ServiceAFweb {
                 SsnsAcc ssnsAccObj = (SsnsAcc) ssnsAccObjList.get(0);
                 ArrayList<String> outputList = new ArrayList();
                 SsnsService ss = new SsnsService();
-                String feat="";
+                String feat = "";
                 if (prod == SsnsService.APP_PRODUCT) {
                     String oper = ssnsAccObj.getRet();
                     feat = ss.getFeatureSsnsProdTestingProdttv(ssnsAccObj, outputList, oper);
