@@ -382,37 +382,36 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////                    
                     boolean clearssnsflag = false;
                     if (clearssnsflag == true) {
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
-                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
+                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
                         getSsnsDataImp().updateSsnsDataAllOpenStatus();
                     }
 
-                    boolean procflag = false;
+                    boolean procflag = true;
                     if (procflag == true) {
                         SsnsService ss = new SsnsService();
-//                        String app = SsnsService.APP_APP;
-//                        String ret = "parameter";
-//                        int status = ConstantKey.OPEN;
-//                        ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjList(app, ret, status, 10);
-//                        if (ssnsList != null) {
-////                            logger.info("> ssnsList " + ssnsList.size());
-//                            for (int i = 0; i < ssnsList.size(); i++) {
-//                                SsnsData data = ssnsList.get(i);
-//                                String feature = ss.getFeatureSsnsAppointment(data);
-////                                String feature = ss.getFeatureSsnsProdiuctInventory(data);
-//                            }
-//                        }
 
-                        ArrayList ttvNameArrayTemp = getAllOpenAppArray();
+                        ArrayList ttvNameArrayTemp = getAllOpenProductArray();
                         if (ttvNameArrayTemp != null) {
                             for (int i = 0; i < ttvNameArrayTemp.size(); i++) {
                                 String idSt = (String) ttvNameArrayTemp.get(i);
 
                                 int id = Integer.parseInt(idSt);
                                 SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
-                                String feature = ss.getFeatureSsnsAppointment(data);
+                                String feature = ss.getFeatureSsnsProdiuctInventory(data);
                             }
                         }
+
+//                        ArrayList ttvNameArrayTemp = getAllOpenAppArray();
+//                        if (ttvNameArrayTemp != null) {
+//                            for (int i = 0; i < ttvNameArrayTemp.size(); i++) {
+//                                String idSt = (String) ttvNameArrayTemp.get(i);
+//
+//                                int id = Integer.parseInt(idSt);
+//                                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+//                                String feature = ss.getFeatureSsnsAppointment(data);
+//                            }
+//                        }
 //                        this.getSsnsDataImp().deleteAllSsnsData(0);
 //                        ssnsList = getSsnsDataImp().getSsnsDataObjList(app, ret, status);
 //                        if (ssnsList != null) {
@@ -421,8 +420,9 @@ public class ServiceAFweb {
                     }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////  
-
+                    logger.info("> Debug end ");
                 }
+
             }
         }
         if (CKey.UI_ONLY == true) {
@@ -653,7 +653,7 @@ public class ServiceAFweb {
 
     }
 
-    ArrayList<String> getAllOpenProdArray() {
+    ArrayList<String> getAllOpenProductArray() {
         String app = SsnsService.APP_PRODUCT;
         String ret = "parameter";
         int status = ConstantKey.OPEN;
@@ -666,7 +666,7 @@ public class ServiceAFweb {
         if (prodNameArray != null && prodNameArray.size() > 0) {
             return prodNameArray;
         }
-        ArrayList ttvNameArrayTemp = getAllOpenProdArray();
+        ArrayList ttvNameArrayTemp = getAllOpenProductArray();
         if (ttvNameArrayTemp != null) {
             prodNameArray = ttvNameArrayTemp;
         }
@@ -1159,9 +1159,9 @@ public class ServiceAFweb {
                 }
 
                 SsnsData item = new SsnsData();
-                if (oper.equals(SsnsService.APP_1) || oper.equals(SsnsService.APP_2) || oper.equals(SsnsService.APP_3) || oper.equals(SsnsService.APP_4)) {
+                if (oper.equals(SsnsService.APP_GET_APP) || oper.equals(SsnsService.APP_CAN_APP) || oper.equals(SsnsService.APP_GET_TIMES) || oper.equals(SsnsService.APP_UPDATE)) {
                     app = SsnsService.APP_APP;
-                } else if (oper.equals(SsnsService.PRO_1) || oper.equals(SsnsService.PRO_2)) {
+                } else if (oper.equals(SsnsService.PROD_GET_BYID) || oper.equals(SsnsService.PROD_GET_PROD)) {
                     app = SsnsService.APP_PRODUCT;
                 } else if (oper.equals(SsnsService.WI_1) || oper.equals(SsnsService.WI_2) || oper.equals(SsnsService.WI_3) || oper.equals(SsnsService.WI_4)) {
                     app = SsnsService.APP_WIFI;
@@ -1190,7 +1190,9 @@ public class ServiceAFweb {
                         proceSssendRequestObj(writeSQLArray);
                         writeSQLArray.clear();
                     }
-
+                    if ((numAdd % 400) == 0) {
+                        logger.info("> ETLsplunkProcess  " + numAdd);
+                    }
                     numAdd++;
                 } else {
                     numDup++;
@@ -1606,7 +1608,7 @@ public class ServiceAFweb {
                 SsnsService ss = new SsnsService();
                 String feat = "";
 
-                if ((Oper == SsnsService.APP_1) || (Oper == SsnsService.APP_3)) {
+                if ((Oper == SsnsService.APP_GET_APP) || (Oper == SsnsService.APP_GET_TIMES)) {
                     feat = ss.getFeatureSsnsProdTestingApp(ssnsAccObj, outputList, Oper);
                     logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
                 }

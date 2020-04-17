@@ -8,7 +8,6 @@ package com.afweb.process;
 import com.afweb.model.*;
 import com.afweb.model.ssns.*;
 import com.afweb.service.ServiceAFweb;
-import static com.afweb.service.ServiceAFweb.*;
 
 import com.afweb.util.*;
 
@@ -52,13 +51,13 @@ public class SsnsService {
     public static String APP_PRODUCT_TYPE_SING = "SING";
     public static String APP_PRODUCT_TYPE_APP = "APP";
 
-    public static String APP_1 = "getAppointment";
-    public static String APP_2 = "cancelAppointment";
-    public static String APP_3 = "searchTimeSlot";
-    public static String APP_4 = "updateAppointment";
+    public static String APP_GET_APP = "getAppointment";
+    public static String APP_CAN_APP = "cancelAppointment";
+    public static String APP_GET_TIMES = "searchTimeSlot";
+    public static String APP_UPDATE = "updateAppointment";
 
-    public static String PRO_1 = "getProductList";
-    public static String PRO_2 = "getProductById";
+    public static String PROD_GET_PROD = "getProductList";
+    public static String PROD_GET_BYID = "getProductById";
 
     public static String WI_1 = "getDeviceStatus";
     public static String WI_2 = "callbackNotification";
@@ -80,7 +79,7 @@ public class SsnsService {
         String dataSt = "";
         try {
             String oper = dataObj.getOper();
-            if (oper.equals(APP_4)) { //"updateAppointment")) {
+            if (oper.equals(APP_UPDATE)) { //"updateAppointment")) {
                 dataSt = dataObj.getData();
                 dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
                 dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
@@ -104,7 +103,7 @@ public class SsnsService {
                     }
 
                 }
-            } else if (oper.equals(APP_3)) { //"timeslot")) {
+            } else if (oper.equals(APP_GET_TIMES)) { //"timeslot")) {
                 dataSt = dataObj.getData();
                 dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
                 dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
@@ -145,7 +144,7 @@ public class SsnsService {
                     }
 
                 }
-            } else if (oper.equals(APP_1)) { //"getAppointment")) {
+            } else if (oper.equals(APP_GET_APP)) { //"getAppointment")) {
                 dataSt = dataObj.getData();
                 dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
                 dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
@@ -157,7 +156,7 @@ public class SsnsService {
                     banid = operList[0];
                     cust = operList[1];
                 }
-            } else if (oper.equals(APP_2)) {//"cancelAppointment")) {
+            } else if (oper.equals(APP_CAN_APP)) {//"cancelAppointment")) {
                 dataSt = dataObj.getData();
                 dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
                 dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
@@ -182,7 +181,7 @@ public class SsnsService {
             } else {
                 logger.info("> getFeatureSsnsAppointment Other oper " + oper);
             }
-            if (oper.equals(APP_1)) {
+            if (oper.equals(APP_GET_APP)) {
                 ;
             } else {
                 if (appTId.equals("")) {
@@ -220,37 +219,12 @@ public class SsnsService {
                     int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
                 }
 
-                ////////cannot get post request working........
-//                if (oper.equals(APP_3) || oper.equals(APP_2) || ((banid.length() == 0) && (cust.length() == 0))) {
-//                    ;
-//                } else {
-//
-//                    oper = APP_3;  //"searchTimeSlot";
-//                    NAccObj = new SsnsAcc();
-//                    NAccObj.setDown("");
-//                    stat = this.updateSsnsAppointment(oper, appTId, banid, cust, host, pData, dataObj, NAccObj);
-//                    if (stat == true) {
-//                        ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
-//                        exist = false;
-//                        if (ssnsAccObjList != null) {
-//                            if (ssnsAccObjList.size() != 0) {
-//                                SsnsAcc ssnsObj = ssnsAccObjList.get(0);
-//                                if (ssnsObj.getDown().equals("")) {
-//                                    exist = true;
-//                                }
-//                            }
-//                        }
-//                        if (exist == false) {
-//                            int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
-//                        }
-//                    }
-//                }
             }
 
             if (stat == true) {
                 getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
             } else {
-                if (oper.equals(APP_1)) {
+                if (oper.equals(APP_GET_APP)) {
                     getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
                 }
             }
@@ -265,7 +239,7 @@ public class SsnsService {
         try {
             String featTTV = "";
 
-            if (oper.equals(APP_4) || oper.equals(APP_1) || oper.equals(APP_3)) {
+            if (oper.equals(APP_UPDATE) || oper.equals(APP_GET_APP) || oper.equals(APP_GET_TIMES)) {
                 if ((banid.length() == 0) && (cust.length() == 0)) {
                     featTTV = APP_PRODUCT_TYPE_APP;
                     featTTV += ":" + oper;
@@ -273,7 +247,7 @@ public class SsnsService {
                     featTTV += ":ContactEng";
                 } else {
                     String outputSt = null;
-                    if (oper.equals(APP_3)) {  //"searchTimeSlot";
+                    if (oper.equals(APP_GET_TIMES)) {  //"searchTimeSlot";
 //                        not sure why it does not work so just call get appointment to get eh feature
 //                        outputSt = SsnsTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
                         outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
@@ -290,7 +264,7 @@ public class SsnsService {
                     pData.setpAPP(prodTTV);
                     featTTV = prodTTV.getFeat();
                 }
-            } else if (oper.equals(APP_2)) {   //"cancelAppointment";
+            } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
                 featTTV = APP_PRODUCT_TYPE_APP;
                 featTTV += ":" + oper;
                 featTTV += ":" + host;
@@ -489,14 +463,14 @@ public class SsnsService {
         String cust = dataObj.getCusid();
         String host = dataObj.getRet();
         String outputSt = null;
-        if (Oper == APP_1) {
+        if (Oper == APP_GET_APP) {
             outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             outputList.addAll(outList);
             ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
 
             return prodTTV.getFeatTTV();
-        } else if (Oper == APP_3) {
+        } else if (Oper == APP_GET_TIMES) {
             outputSt = SsnsTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             outputList.addAll(outList);
@@ -574,19 +548,11 @@ public class SsnsService {
         if (dataObj == null) {
             return "";
         }
-        String prodBanid = "";
+        String prodid = "";
         String banid = "";
         try {
 
             String oper = dataObj.getOper();
-            if (oper.equals("getProductById")) {
-                ;
-            } else if (oper.equals("getProductList")) {
-                ;
-            } else {
-                logger.info("> getFeatureSsnsProdiuctInventory Other oper " + oper);
-            }
-
             String daSt = dataObj.getData();
             //["xxx","xxx","product.characteristic.channelInfoList",null,null,null]
             daSt = ServiceAFweb.replaceAll("[", "", daSt);
@@ -596,10 +562,13 @@ public class SsnsService {
             if (daList.length < 3) {
                 return "";
             }
-            prodBanid = daList[0];
-            banid = daList[1];
-            if (banid.equals("null")) {
-                banid = prodBanid;
+            if (oper.equals(PROD_GET_BYID)) {
+                prodid = daList[0];
+                banid = daList[1];
+            } else if (oper.equals(PROD_GET_PROD)) {
+                banid = daList[0];
+            } else {
+                logger.info("> getFeatureSsnsProdiuctInventory Other oper " + oper);
             }
             if (banid.equals("null")) {
                 return "";
@@ -607,9 +576,48 @@ public class SsnsService {
             logger.info(daSt);
 
 /////////////
-            boolean stat = this.updateSsnsProdiuctInventoryInternet(banid, pData, dataObj);
+            SsnsAcc NAccObj = new SsnsAcc();
+            NAccObj.setTiid(prodid);
+            NAccObj.setRet(APP_PRODUCT_TYPE_HSIC);
+            NAccObj.setDown("splunkflow");
 
-            stat = this.updateSsnsProdiuctInventoryTTV(banid, pData, dataObj);
+            boolean stat = this.updateSsnsProdiuctInventoryInternet(banid, pData, dataObj, NAccObj);
+            if (stat == true) {
+                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                boolean exist = false;
+                if (ssnsAccObjList != null) {
+                    if (ssnsAccObjList.size() != 0) {
+                        SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                        if (ssnsObj.getDown().equals("splunkflow")) {
+                            exist = true;
+                        }
+                    }
+                }
+                if (exist == false) {
+                    int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
+                }
+            }
+
+            NAccObj = new SsnsAcc();
+            NAccObj.setTiid(prodid);
+            NAccObj.setRet(APP_PRODUCT_TYPE_TTV);
+            NAccObj.setDown("splunkflow");
+            stat = this.updateSsnsProdiuctInventoryTTV(banid, pData, dataObj, NAccObj);
+            if (stat == true) {
+                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                boolean exist = false;
+                if (ssnsAccObjList != null) {
+                    if (ssnsAccObjList.size() != 0) {
+                        SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                        if (ssnsObj.getDown().equals("splunkflow")) {
+                            exist = true;
+                        }
+                    }
+                }
+                if (exist == false) {
+                    int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
+                }
+            }
 
             //update to complete so will not process again
             getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
@@ -620,7 +628,7 @@ public class SsnsService {
         return "";
     }
 
-    public boolean updateSsnsProdiuctInventoryInternet(String banid, ProductData pData, SsnsData dataObj) {
+    public boolean updateSsnsProdiuctInventoryInternet(String banid, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
             String featTTV = "";
             String outputSt = SsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, SsnsService.APP_PRODUCT_TYPE_HSIC);
@@ -636,18 +644,20 @@ public class SsnsService {
             ArrayList<String> flow = getSsnsFlowTrace(dataObj);
             if (flow == null) {
                 logger.info("> updateSsnsProdiuctInventoryInternet HSIC skip no flow");
-                return false;
             }
 
             pData.setFlow(flow);
 
-            SsnsAcc NAccObj = new SsnsAcc();
             NAccObj.setName(prodTTV.getFeatTTV());
             NAccObj.setBanid(banid);
+            NAccObj.setCusid(dataObj.getCusid());
             NAccObj.setUid(dataObj.getUid());
             NAccObj.setApp(dataObj.getApp());
-            NAccObj.setOper(dataObj.getOper());
-            NAccObj.setDown(dataObj.getDown());
+
+            NAccObj.setOper(NAccObj.getOper());
+            NAccObj.setDown(NAccObj.getDown());
+            NAccObj.setTiid(NAccObj.getTiid());
+
             NAccObj.setRet(dataObj.getRet());
             NAccObj.setExec(dataObj.getExec());
 
@@ -657,105 +667,230 @@ public class SsnsService {
             NAccObj.setUpdatedatedisplay(new java.sql.Date(dateNow.getTimeInMillis()));
             NAccObj.setUpdatedatel(dateNow.getTimeInMillis());
 
-//            
-            ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
-            boolean exist = false;
-            if (ssnsAccObjList != null) {
-                if (ssnsAccObjList.size() != 0) {
-                    exist = true;
-                    return false;
-                }
-            }
-            if (exist == false) {
-                int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
-                if (ret == 1) {
-                    return true;
-                }
-            }
         } catch (Exception ex) {
             logger.info("> updateSsnsProdiuctInventoryInternet HSIC Exception" + ex.getMessage());
         }
         return false;
     }
 
+//    public static ProductTTV parseProductInternetFeature(String outputSt, String oper) {
+//
+//        if (outputSt == null) {
+//            return null;
+//        }
+//        ProductTTV prodTTV = new ProductTTV();
+//        int quotaAmtInit = 0;
+//        int fifaInit = 0;
+//
+//        ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
+//        for (int j = 0; j < outputList.size(); j++) {
+//            String inLine = outputList.get(j);
+////            logger.info("" + inLine);
+//            //"name":"isFIFA",
+//            if (inLine.indexOf("isFIFA") != -1) {
+//                if (fifaInit == 1) {
+//                    continue;
+//                }
+//                fifaInit = 1;
+//                String valueSt = outputList.get(j + 1);
+//                if (valueSt.indexOf("false") != -1) {
+//                    prodTTV.setIsFIFA(0);
+//                }
+//                if (valueSt.indexOf("true") != -1) {
+//                    prodTTV.setIsFIFA(1);
+//                }
+//                continue;
+//            }
+//            if (inLine.indexOf("quotaAmt") != -1) {
+//
+//                if (quotaAmtInit == 1) {
+//                    continue;
+//                }
+//                String valueSt = outputList.get(j + 1);
+//                if (valueSt.indexOf("value") == -1) {
+//                    continue;
+//                }
+//
+//                if (valueSt.indexOf("B") == -1) {
+//                    ;
+//                } else {
+//                    continue;
+//                }
+//                quotaAmtInit = 1;
+//                valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+//                valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
+//
+//                prodTTV.setOffer(valueSt);
+//
+//                valueSt = outputList.get(j - 3);
+//                if (valueSt.indexOf("value") == -1) {
+//                    continue;
+//                }
+//                valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+//                valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
+//                valueSt = ServiceAFweb.replaceAll(" ", "-", valueSt);
+//                prodTTV.setProductCd(valueSt);
+//                continue;
+//            }
+//        }
+//
+//        String featTTV = APP_PRODUCT_TYPE_HSIC;
+//        featTTV += ":" + oper;
+//        String fifa = "fifa";
+//        if (prodTTV.getIsFIFA() == 0) {
+//            fifa = "comp";
+//        }
+//        featTTV += ":" + fifa;
+//        featTTV += ":" + prodTTV.getOffer();
+//        featTTV += ":" + prodTTV.getProductCd();
+//
+//        prodTTV.setFeatTTV(featTTV);
+//
+//        return prodTTV;
+//    }
     public static ProductTTV parseProductInternetFeature(String outputSt, String oper) {
 
         if (outputSt == null) {
             return null;
         }
-        ProductTTV prodTTV = new ProductTTV();
-        int quotaAmtInit = 0;
-        int fifaInit = 0;
+        try {
+            ProductTTV prodTTV = new ProductTTV();
+            int quotaAmtInit = 0;
+            int fifaInit = 0;
+            int planInit = 0;
 
-        ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
-        for (int j = 0; j < outputList.size(); j++) {
-            String inLine = outputList.get(j);
+            ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
+
+            for (int j = 0; j < outputList.size(); j++) {
+                String inLine = outputList.get(outputList.size() - 1 - j);
 //            logger.info("" + inLine);
-            //"name":"isFIFA",
-            if (inLine.indexOf("isFIFA") != -1) {
-                if (fifaInit == 1) {
+                //"name":"isFIFA",
+                if (inLine.indexOf("isFIFA") != -1) {
+                    if (fifaInit == 1) {
+                        continue;
+                    }
+                    fifaInit = 1;
+                    String valueSt = outputList.get(j - 1);
+                    if (valueSt.indexOf("false") != -1) {
+                        prodTTV.setIsFIFA(0);
+                    }
+                    if (valueSt.indexOf("true") != -1) {
+                        prodTTV.setIsFIFA(1);
+                    }
                     continue;
                 }
-                fifaInit = 1;
-                String valueSt = outputList.get(j + 1);
-                if (valueSt.indexOf("false") != -1) {
-                    prodTTV.setIsFIFA(0);
+                if (inLine.indexOf("SecurityBundle") != -1) {
+
+                    if (quotaAmtInit == 1) {
+                        continue;
+                    }
+                    quotaAmtInit = 1;
+                    boolean exit = false;
+                    for (int k = j; k <= outputList.size(); k++) {
+                        String inL = outputList.get(outputList.size() - 1 - k);
+                        if (inL.indexOf("productRelationship") != -1) {
+                            for (int m = k; m <= outputList.size(); m++) {
+                                String inLL = outputList.get(outputList.size() - 1 - m);
+                                if (inLL.indexOf("productNm") != -1) {
+                                    String valueSt = outputList.get(outputList.size() - 1 - m + 1);
+                                    valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                                    valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
+                                    valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
+                                    prodTTV.setSecurityBundle(valueSt);
+                                    exit = true;
+                                    break;
+                                }
+                                if (exit == true) {
+                                    break;
+                                }
+                            }
+                            if (exit == true) {
+                                break;
+                            }
+                        }
+                        if (exit == true) {
+                            break;
+                        }
+                    }
+
+                    continue;
                 }
-                if (valueSt.indexOf("true") != -1) {
-                    prodTTV.setIsFIFA(1);
+
+                if (inLine.indexOf("PrimaryPricePlan") != -1) {
+
+                    if (planInit == 1) {
+                        continue;
+                    }
+                    planInit = 1;
+                    boolean exit = false;
+                    for (int k = j; k <= outputList.size(); k++) {
+                        String inL = outputList.get(outputList.size() - 1 - k);
+                        if (inL.indexOf("productRelationship") != -1) {
+                            for (int m = k; m <= outputList.size(); m++) {
+                                String inLL = outputList.get(outputList.size() - 1 - m);
+                                if (inLL.indexOf("productNm") != -1) {
+                                    String valueSt = outputList.get(outputList.size() - 1 - m + 1);
+                                    valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                                    valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
+                                    valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
+                                    prodTTV.setPrimaryPricePlan(valueSt);
+                                    exit = true;
+                                    break;
+                                }
+                                if (exit == true) {
+                                    break;
+                                }
+                            }
+                            if (exit == true) {
+                                break;
+                            }
+                        }
+                        if (exit == true) {
+                            break;
+                        }
+                    }
+                    continue;
                 }
-                continue;
+                if (inLine.indexOf("EmailFeatures") != -1) {
+                    prodTTV.setEmailFeatures("EmailFeatures");
+                    continue;
+                }
+                if (inLine.indexOf("UnlimitedUsage") != -1) {
+                    prodTTV.setUnlimitedUsage("UnlimitedUsage");
+                    continue;
+                }
             }
-            if (inLine.indexOf("quotaAmt") != -1) {
-
-                if (quotaAmtInit == 1) {
-                    continue;
-                }
-                String valueSt = outputList.get(j + 1);
-                if (valueSt.indexOf("value") == -1) {
-                    continue;
-                }
-
-                if (valueSt.indexOf("B") == -1) {
-                    ;
-                } else {
-                    continue;
-                }
-                quotaAmtInit = 1;
-                valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
-                valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
-
-                prodTTV.setOffer(valueSt);
-
-                valueSt = outputList.get(j - 3);
-                if (valueSt.indexOf("value") == -1) {
-                    continue;
-                }
-                valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
-                valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
-                valueSt = ServiceAFweb.replaceAll(" ", "-", valueSt);
-                prodTTV.setProductCd(valueSt);
-                continue;
+            String featTTV = APP_PRODUCT_TYPE_HSIC;
+            featTTV += ":" + oper;
+            String fifa = "fifa";
+            if (prodTTV.getIsFIFA() == 0) {
+                fifa = "comp";
             }
+            featTTV += ":" + fifa;
+            featTTV += ":" + prodTTV.getPrimaryPricePlan();
+            featTTV += ":" + prodTTV.getSecurityBundle();
+            featTTV += ":" + "email";
+            if (prodTTV.getEmailFeatures().length() > 0) {
+                featTTV += ":" + "Y";
+            } else {
+                featTTV += ":" + "N";
+            }
+            featTTV += ":" + "UnlimitedUsage";
+            if (prodTTV.getUnlimitedUsage().length() > 0) {
+                featTTV += ":" + "Y";
+            } else {
+                featTTV += ":" + "N";
+            }
+            prodTTV.setFeatTTV(featTTV);
+
+            return prodTTV;
+        } catch (Exception ex) {
 
         }
-
-        String featTTV = APP_PRODUCT_TYPE_HSIC;
-        featTTV += ":" + oper;
-        String fifa = "fifa";
-        if (prodTTV.getIsFIFA() == 0) {
-            fifa = "comp";
-        }
-        featTTV += ":" + fifa;
-        featTTV += ":" + prodTTV.getOffer();
-        featTTV += ":" + prodTTV.getProductCd();
-
-        prodTTV.setFeatTTV(featTTV);
-
-        return prodTTV;
+        return null;
     }
 
-    public boolean updateSsnsProdiuctInventoryTTV(String banid, ProductData pData, SsnsData dataObj) {
+    public boolean updateSsnsProdiuctInventoryTTV(String banid, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
             String featTTV = "";
             String outputSt = SsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, SsnsService.APP_PRODUCT_TYPE_TTV);
@@ -776,13 +911,16 @@ public class SsnsService {
 
             pData.setFlow(flow);
 
-            SsnsAcc NAccObj = new SsnsAcc();
             NAccObj.setName(prodTTV.getFeatTTV());
             NAccObj.setBanid(banid);
+            NAccObj.setCusid(dataObj.getCusid());
             NAccObj.setUid(dataObj.getUid());
             NAccObj.setApp(dataObj.getApp());
-            NAccObj.setOper(dataObj.getOper());
-            NAccObj.setDown(dataObj.getDown());
+
+            NAccObj.setOper(NAccObj.getOper());
+            NAccObj.setDown(NAccObj.getDown());
+            NAccObj.setTiid(NAccObj.getTiid());
+
             NAccObj.setRet(dataObj.getRet());
             NAccObj.setExec(dataObj.getExec());
 
@@ -792,21 +930,6 @@ public class SsnsService {
             NAccObj.setUpdatedatedisplay(new java.sql.Date(dateNow.getTimeInMillis()));
             NAccObj.setUpdatedatel(dateNow.getTimeInMillis());
 
-//            
-            ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
-            boolean exist = false;
-            if (ssnsAccObjList != null) {
-                if (ssnsAccObjList.size() != 0) {
-                    exist = true;
-                    return false;
-                }
-            }
-            if (exist == false) {
-                int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
-                if (ret == 1) {
-                    return true;
-                }
-            }
         } catch (Exception ex) {
             logger.info("> updateSsnsProdiuctInventory TTV Exception" + ex.getMessage());
         }
@@ -823,7 +946,10 @@ public class SsnsService {
         int ChannelListInit = 0;
         int offerInit = 0;
         int fifaInit = 0;
-
+        int regionInit = 0;
+        prodTTV.setProductCd("Essentials");
+        prodTTV.setRegion("NoRegion");
+        
         ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
         for (int j = 0; j < outputList.size(); j++) {
             String inLine = outputList.get(j);
@@ -850,17 +976,28 @@ public class SsnsService {
                 offerInit = 1;
                 String valueSt = outputList.get(j + 1);
                 if (valueSt.indexOf("MediaroomTV-HS2.0") != -1) {
-                    prodTTV.setOffer("HS2.0");
+                    prodTTV.setOffer("Mediaroom20");
                     continue;
                 }
                 if (valueSt.indexOf("MediaroomTV-HS") != -1) {
-                    prodTTV.setOffer("HS");
+                    prodTTV.setOffer("Mediaroom");
                     continue;
                 }
                 if (valueSt.indexOf("TVX") != -1) {
                     prodTTV.setOffer("TVX");
                 }
+                continue;
+            }
 
+            if (inLine.indexOf("region") != -1) {
+                if (regionInit == 1) {
+                    continue;
+                }
+                regionInit = 1;
+                String valueSt = outputList.get(j + 1);
+                valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
+                prodTTV.setRegion(valueSt);
                 continue;
             }
             if (inLine.indexOf("productCd") != -1) {
@@ -896,8 +1033,10 @@ public class SsnsService {
             fifa = "comp";
         }
         featTTV += ":" + fifa;
+        featTTV += ":" + prodTTV.getRegion();
         featTTV += ":" + prodTTV.getOffer();
         featTTV += ":" + prodTTV.getProductCd();
+
         String chann = "chlist:N";
         if (prodTTV.getChannelList() == 1) {
             chann = "chlist:Y";
@@ -952,7 +1091,7 @@ public class SsnsService {
                 if (response != null) {
                     return response;
                 }
-                AFSleep1Sec(i);
+                ServiceAFweb.AFSleep1Sec(i);
             } catch (Exception ex) {
                 logger.info("sendRequest " + method + " Rety " + (i + 1));
             }

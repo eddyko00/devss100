@@ -220,7 +220,7 @@ public class IndexController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             return null;
         }
-        String oper = SsnsService.APP_1;
+        String oper = SsnsService.APP_GET_APP;
         ArrayList<String> ret = afWebService.getSsnsprodAppByIdRT(username, idSt, pidSt, SsnsService.APP_APP, oper);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
@@ -239,7 +239,7 @@ public class IndexController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             return null;
         }
-        String oper = SsnsService.APP_3;
+        String oper = SsnsService.APP_GET_TIMES;
         ArrayList<String> ret = afWebService.getSsnsprodAppByIdRT(username, idSt, pidSt, SsnsService.APP_APP, oper);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;

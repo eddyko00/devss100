@@ -11,11 +11,86 @@ package com.afweb.model.ssns;
  */
 public class ProductTTV {
 
+    /**
+     * @return the region
+     */
+    public String getRegion() {
+        return region;
+    }
+
+    /**
+     * @param region the region to set
+     */
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    /**
+     * @return the PrimaryPricePlan
+     */
+    public String getPrimaryPricePlan() {
+        return PrimaryPricePlan;
+    }
+
+    /**
+     * @param PrimaryPricePlan the PrimaryPricePlan to set
+     */
+    public void setPrimaryPricePlan(String PrimaryPricePlan) {
+        this.PrimaryPricePlan = PrimaryPricePlan;
+    }
+
+    /**
+     * @return the UnlimitedUsage
+     */
+    public String getUnlimitedUsage() {
+        return UnlimitedUsage;
+    }
+
+    /**
+     * @param UnlimitedUsage the UnlimitedUsage to set
+     */
+    public void setUnlimitedUsage(String UnlimitedUsage) {
+        this.UnlimitedUsage = UnlimitedUsage;
+    }
+
+    /**
+     * @return the EmailFeatures
+     */
+    public String getEmailFeatures() {
+        return EmailFeatures;
+    }
+
+    /**
+     * @param EmailFeatures the EmailFeatures to set
+     */
+    public void setEmailFeatures(String EmailFeatures) {
+        this.EmailFeatures = EmailFeatures;
+    }
+
+    /**
+     * @return the SecurityBundle
+     */
+    public String getSecurityBundle() {
+        return SecurityBundle;
+    }
+
+    /**
+     * @param SecurityBundle the SecurityBundle to set
+     */
+    public void setSecurityBundle(String SecurityBundle) {
+        this.SecurityBundle = SecurityBundle;
+    }
+
     private String featTTV = "";
     private int isFIFA = 0;
     private String offer = "";
     private String productCd = "";
     private int ChannelList = 0;
+    private String region="";
+    private String SecurityBundle = "";
+    private String EmailFeatures="";
+    private String UnlimitedUsage="";
+    private String PrimaryPricePlan="";
 
     /**
      * @return the featTTV
