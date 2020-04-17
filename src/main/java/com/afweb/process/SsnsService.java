@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.util.Map;
+import java.util.logging.Level;
 
 import java.util.logging.Logger;
+import javax.net.ssl.HttpsURLConnection;
 import org.apache.commons.codec.binary.Base64;
 import static org.apache.http.protocol.HTTP.USER_AGENT;
 
@@ -442,8 +444,7 @@ public class SsnsService {
 
     public String SsnsTimeslot(String ProductURL, String appTId, String banid, String cust, String host) {
 
-//        String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
-        String url = "http://localhost:8080/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
+        String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
 
         HashMap newbodymap = new HashMap();
         newbodymap.put("customerId", cust);
@@ -1359,7 +1360,128 @@ public class SsnsService {
         return response;
     }
 
-    private String sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, Map<String, String> bodyParams)
+    private String sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, Map<String, String> bodyParams) {
+        try {
+            if (subResourcePath.indexOf("https") != -1) {
+                return this.https_sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams);
+            }
+            return this.http_sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams);
+        } catch (Exception ex) {
+            Logger.getLogger(SsnsService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    private String https_sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, Map<String, String> bodyParams)
+            throws Exception {
+        try {
+
+            String URLPath = subResourcePath;
+
+            String webResourceString = "";
+            // assume only one param
+            if (queryParams != null && !queryParams.isEmpty()) {
+                for (String key : queryParams.keySet()) {
+                    webResourceString = "?" + key + "=" + queryParams.get(key);
+                }
+            }
+
+            String bodyElement = "";
+            if (bodyParams != null) {
+                bodyElement = new ObjectMapper().writeValueAsString(bodyParams);
+            }
+
+            URLPath += webResourceString;
+            URL request = new URL(URLPath);
+
+            HttpsURLConnection con = null; //(HttpURLConnection) request.openConnection();
+
+            if (CKey.PROXY == true) {
+                //////Add Proxy 
+                Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(ServiceAFweb.PROXYURL, 8080));
+                con = (HttpsURLConnection) request.openConnection(proxy);
+                //////Add Proxy 
+            } else {
+                con = (HttpsURLConnection) request.openConnection();
+            }
+
+//            if (URLPath.indexOf(":8080") == -1) {
+            String authStr = "APP_SELFSERVEUSGBIZSVC" + ":" + "soaorgid";
+            // encode data on your side using BASE64
+            byte[] bytesEncoded = Base64.encodeBase64(authStr.getBytes());
+            String authEncoded = new String(bytesEncoded);
+            con.setRequestProperty("Authorization", "Basic " + authEncoded);
+//            }
+
+            if (method.equals(METHOD_POST)) {
+                con.setRequestMethod("POST");
+            } else if (method.equals(METHOD_GET)) {
+                con.setRequestMethod("GET");
+            }
+            con.setRequestProperty("User-Agent", USER_AGENT);
+//            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setRequestProperty("Accept", "application/json");
+
+            if (method.equals(METHOD_POST)) {
+
+//                con.setRequestMethod("POST");
+//                con.addRequestProperty("Accept", "application/json");
+//                con.addRequestProperty("Connection", "close");
+//                con.addRequestProperty("Content-Encoding", "gzip"); // We gzip our request
+//                con.addRequestProperty("Content-Length", String.valueOf(bodyElement.length()));
+//                con.setRequestProperty("Content-Type", "application/json"); // We send our data in JSON format
+
+                con.setDoInput(true);
+                // For POST only - START                
+                con.setDoOutput(true);
+                OutputStream os = con.getOutputStream();
+                byte[] input = bodyElement.getBytes("utf-8");
+                os.write(input, 0, input.length);
+                os.flush();
+                os.close();
+                // For POST only - END
+            }
+
+            int responseCode = con.getResponseCode();
+            if (responseCode != 200) {
+                System.out.println("Response Code:: " + responseCode);
+            }
+            if (responseCode >= 200 && responseCode < 300) {
+                ;
+
+            } else {
+//                System.out.println("Response Code:: " + responseCode);
+//                System.out.println("bodyElement :: " + bodyElement);
+                return null;
+            }
+
+            if (responseCode == HttpURLConnection.HTTP_OK) { //success
+                BufferedReader in = new BufferedReader(new InputStreamReader(
+                        con.getInputStream()));
+                String inputLine;
+
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+
+                    response.append(inputLine);
+                }
+                in.close();
+                // print result
+                return response.toString();
+            } else {
+                logger.info("POST request not worked");
+            }
+
+        } catch (Exception e) {
+            logger.info("Error sending REST request:" + e);
+            throw e;
+        }
+        return null;
+    }
+
+    private String http_sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, Map<String, String> bodyParams)
             throws Exception {
         try {
 
@@ -1407,17 +1529,19 @@ public class SsnsService {
             }
             con.setRequestProperty("User-Agent", USER_AGENT);
 //            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
-            con.setRequestProperty("Content-Type", "application/json; utf-8");
+//            con.setRequestProperty("Content-Type", "application/json; utf-8");
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setRequestProperty("Accept", "application/json");
 
             if (method.equals(METHOD_POST)) {
-                // For POST only - START
                 con.setDoOutput(true);
-                OutputStream os = con.getOutputStream();
-                byte[] input = bodyElement.getBytes("utf-8");
-                os.write(input, 0, input.length);
-                os.flush();
-                os.close();
-                // For POST only - END
+                try (OutputStream os = con.getOutputStream()) {
+                    byte[] input = bodyElement.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                    os.flush();
+                    os.close();
+                }
+
             }
 
             int responseCode = con.getResponseCode();

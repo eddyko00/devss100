@@ -667,7 +667,7 @@ public class ServiceAFweb {
             }
         } catch (Exception ex) {
         }
-        removeNameLock(LockName, ConstantKey.FE_LOCKTYPE);
+        removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
         return result;
 
     }
@@ -740,7 +740,7 @@ public class ServiceAFweb {
             }
         } catch (Exception ex) {
         }
-        removeNameLock(LockName, ConstantKey.FE_LOCKTYPE);
+        removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
         return result;
 
     }
