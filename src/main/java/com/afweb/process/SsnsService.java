@@ -186,7 +186,7 @@ public class SsnsService {
                     return "";
                 }
             }
-            logger.info(dataSt);
+//            logger.info(dataSt);
 
 /////////////
             //call devop to get customer id
@@ -582,7 +582,7 @@ public class SsnsService {
             if (banid.equals("null")) {
                 return "";
             }
-            logger.info(daSt);
+//            logger.info(daSt);
 
 /////////////
             if (oper.equals(PROD_GET_BYID)) {

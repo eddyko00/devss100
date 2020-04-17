@@ -469,6 +469,8 @@ public class SsnsDataDB {
 
             if (type == ConstantKey.SRV_LOCKTYPE) {
                 allowTime = 10; // 10 minutes 
+            } else if (type == ConstantKey.ETL_LOCKTYPE) {
+                allowTime = MaxMinuteAdminSignalTrading; // 90 minutes 
             } else if (type == ConstantKey.H2_LOCKTYPE) {
                 allowTime = Max2HAdmin; // 100 minutes 
 

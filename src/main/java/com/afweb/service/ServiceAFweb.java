@@ -626,9 +626,16 @@ public class ServiceAFweb {
         int result = 0;
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
-        String LockName = "FEATURE_" + ServiceAFweb.getServerObj().getServerName();
+        String LockName = "ETL";
 
         try {
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureApp");
+            if (CKey.NN_DEBUG == true) {
+                lockReturn = 1;
+            }
+            if (lockReturn == 0) {
+                return 0;
+            }
             if ((appNameArray == null) || (appNameArray.size() == 0)) {
                 return 0;
             }
@@ -648,20 +655,13 @@ public class ServiceAFweb {
                     break;
                 }
 
-                int lockReturn = setLockNameProcess(LockName, ConstantKey.FE_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureTTV");
-                if (CKey.NN_DEBUG == true) {
-                    lockReturn = 1;
-                }
-                if (lockReturn == 0) {
-                    return 0;
-                }
                 String idSt = (String) appNameArray.get(0);
                 appNameArray.remove(0);
                 SsnsService ss = new SsnsService();
                 int id = Integer.parseInt(idSt);
                 SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
                 String feature = ss.getFeatureSsnsAppointment(data);
-                logger.info("> feature " + i + " " + feature);
+//                logger.info("> feature " + i + " " + feature);
 
                 AFSleep();
             }
@@ -698,9 +698,17 @@ public class ServiceAFweb {
         int result = 0;
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
-        String LockName = "FEATURE_" + ServiceAFweb.getServerObj().getServerName();
 
+        String LockName = "ETL";
         try {
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureProd");
+            if (CKey.NN_DEBUG == true) {
+                lockReturn = 1;
+            }
+            if (lockReturn == 0) {
+                return 0;
+            }
+
             if ((prodNameArray == null) || (prodNameArray.size() == 0)) {
                 return 0;
             }
@@ -720,20 +728,13 @@ public class ServiceAFweb {
                     break;
                 }
 
-                int lockReturn = setLockNameProcess(LockName, ConstantKey.FE_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureTTV");
-                if (CKey.NN_DEBUG == true) {
-                    lockReturn = 1;
-                }
-                if (lockReturn == 0) {
-                    return 0;
-                }
                 String idSt = (String) prodNameArray.get(0);
                 prodNameArray.remove(0);
                 SsnsService ss = new SsnsService();
                 int id = Integer.parseInt(idSt);
                 SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
                 String feature = ss.getFeatureSsnsProdiuctInventory(data);
-                logger.info("> feature " + i + " " + feature);
+//                logger.info("> feature " + i + " " + feature);
 
                 AFSleep();
             }
