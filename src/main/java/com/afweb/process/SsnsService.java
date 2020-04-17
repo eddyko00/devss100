@@ -471,6 +471,9 @@ public class SsnsService {
         String outputSt = null;
         if (Oper == APP_GET_APP) {
             outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+            if (outputSt == null) {
+                return "";
+            }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             outputList.addAll(outList);
             ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
@@ -478,6 +481,9 @@ public class SsnsService {
             return prodTTV.getFeatTTV();
         } else if (Oper == APP_GET_TIMES) {
             outputSt = SsnsTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+            if (outputSt == null) {
+                return "";
+            }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             outputList.addAll(outList);
             String feat = dataObj.getName();
@@ -504,9 +510,6 @@ public class SsnsService {
                 newFeat += ":" + line;
             }
             return newFeat;
-        }
-        if (outputSt == null) {
-            return "";
         }
 
         return "";
