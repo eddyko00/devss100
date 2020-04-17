@@ -277,12 +277,18 @@ public class SsnsService {
             logger.info("> updateSsnsAppointment featTTV " + featTTV);
 /////////////TTV   
             if (NAccObj.getDown().equals("splunkflow")) {
-                ArrayList<String> flow = getSsnsFlowTrace(dataObj);
+
+                ArrayList<String> flow = new ArrayList();
+                int faulure = getSsnsFlowTrace(dataObj, flow);
                 if (flow == null) {
                     logger.info("> updateSsnsAppointment skip no flow");
                     return false;
                 }
                 pData.setFlow(flow);
+
+                if (faulure == 1) {
+                    featTTV += ":failed";
+                }
             }
 
             NAccObj.setName(featTTV);
@@ -1045,14 +1051,18 @@ public class SsnsService {
 
             logger.info("> updateSsnsProdiuctInventory feat " + featTTV);
 /////////////TTV   
-            ArrayList<String> flow = getSsnsFlowTrace(dataObj);
+            ArrayList<String> flow = new ArrayList();
+            int faulure = getSsnsFlowTrace(dataObj, flow);
             if (flow == null) {
                 logger.info("> updateSsnsProdiuctInventory skip no flow");
                 return false;
             }
 
             pData.setFlow(flow);
-
+            pData.setFlow(flow);
+            if (faulure == 1) {
+                featTTV += ":failed";
+            }
             NAccObj.setName(featTTV);
             NAccObj.setBanid(banid);
             NAccObj.setCusid(dataObj.getCusid());
@@ -1107,16 +1117,20 @@ public class SsnsService {
 
             featTTV = prodTTV.getFeatTTV();
             logger.info("> updateSsnsProdiuctInventory feat " + featTTV);
-/////////////TTV   
-            ArrayList<String> flow = getSsnsFlowTrace(dataObj);
+/////////////TTV  
+            ArrayList<String> flow = new ArrayList();
+            int faulure = getSsnsFlowTrace(dataObj, flow);
             if (flow == null) {
                 logger.info("> updateSsnsProdiuctInventory skip no flow");
                 return false;
             }
 
             pData.setFlow(flow);
-
-            NAccObj.setName(prodTTV.getFeatTTV());
+            String feat = prodTTV.getFeatTTV();
+            if (faulure == 1) {
+                feat += ":failed";
+            }
+            NAccObj.setName(feat);
             NAccObj.setBanid(banid);
             NAccObj.setCusid(dataObj.getCusid());
             NAccObj.setUid(dataObj.getUid());
@@ -1291,9 +1305,12 @@ public class SsnsService {
         return null;
     }
 
-    public ArrayList<String> getSsnsFlowTrace(SsnsData dataObj) {
-        ArrayList<String> flow = new ArrayList();
-        ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjListByUid(dataObj.getApp(), dataObj.getUid());
+    public int getSsnsFlowTrace(SsnsData dataObj, ArrayList<String> flow) {
+
+        String uid = dataObj.getUid();
+        int failure = 0;
+
+        ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjListByUid(dataObj.getApp(), uid);
         if (ssnsList != null) {
 //            logger.info("> ssnsList " + ssnsList.size());
             for (int i = 0; i < ssnsList.size(); i++) {
@@ -1303,11 +1320,19 @@ public class SsnsService {
                     flowSt = data.getOper();
                 }
                 flowSt += ":" + data.getExec();
+                String dataTxt = data.getData();
+                if (dataTxt.indexOf("stacktrace") != -1) {
+                    failure = 1;
+                }
+                String http = data.getRet();
+                if (http.indexOf("httpCd=500") != -1) {
+                    failure = 1;
+                }
 //                logger.info("> flow " + flowSt);
                 flow.add(flowSt);
             }
         }
-        return flow;
+        return failure;
     }
 
     /////////////////////////////////////////////////////////////
