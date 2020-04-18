@@ -182,7 +182,8 @@ public class SsnsService {
                 logger.info("> getFeatureSsnsAppointment Other oper " + oper);
             }
             if (oper.equals(APP_GET_APP)) {
-                // for testing
+                // for testing ignore APP_GET_APP becase alwasy no info
+                getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
                 return "";
                 // for testing
             } else {
@@ -1433,7 +1434,6 @@ public class SsnsService {
 //                con.addRequestProperty("Content-Encoding", "gzip"); // We gzip our request
 //                con.addRequestProperty("Content-Length", String.valueOf(bodyElement.length()));
 //                con.setRequestProperty("Content-Type", "application/json"); // We send our data in JSON format
-
                 con.setDoInput(true);
                 // For POST only - START                
                 con.setDoOutput(true);
