@@ -64,7 +64,9 @@ public class SsnsDataImp {
     public int deleteSsnsAccApp(String app) {
         return ssnsdb.deleteSsnsAccApp(app);
     }
-
+    public int deleteSsnsDataApp(String app) {
+        return ssnsdb.deleteSsnsDataApp(app);
+    }
     public int deleteSsnsData(String name) {
         return ssnsdb.deleteSsnsData(name);
     }

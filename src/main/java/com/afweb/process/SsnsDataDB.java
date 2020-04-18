@@ -517,6 +517,15 @@ public class SsnsDataDB {
             String deleteSQL = "delete from ssnsacc where app='" + app + "'";
             return processUpdateDB(deleteSQL);
         } catch (Exception e) {
+            logger.info("> deleteSsnsAccApp exception " + e.getMessage());
+        }
+        return 0;
+    }
+    public int deleteSsnsDataApp(String app) {
+        try {
+            String deleteSQL = "delete from ssnsdata where app='" + app + "'";
+            return processUpdateDB(deleteSQL);
+        } catch (Exception e) {
             logger.info("> deleteSsnsData exception " + e.getMessage());
         }
         return 0;
