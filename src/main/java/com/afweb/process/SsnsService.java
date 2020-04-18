@@ -1329,12 +1329,15 @@ public class SsnsService {
                 String dataTxt = data.getData();
                 if (dataTxt.indexOf("stacktrace") != -1) {
                     failure = 1;
-                }
+                } 
                 String http = data.getRet();
                 if (http.indexOf("httpCd=500") != -1) {
                     failure = 1;
                 }
 //                logger.info("> flow " + flowSt);
+                if (failure == 1)  {
+                    flowSt += ":failed"; 
+                }
                 flow.add(flowSt);
             }
         }
