@@ -182,7 +182,9 @@ public class SsnsService {
                 logger.info("> getFeatureSsnsAppointment Other oper " + oper);
             }
             if (oper.equals(APP_GET_APP)) {
-                ;
+                // for testing
+                return "";
+                // for testing
             } else {
                 if (appTId.equals("")) {
                     return "";

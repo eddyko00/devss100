@@ -408,7 +408,7 @@ public class ServiceAFweb {
                     }
 /////////
 /////////
-                    boolean appflag = false;
+                    boolean appflag = true;
                     if (appflag == true) {
                         SsnsService ss = new SsnsService();
                         String feature = "";
@@ -628,10 +628,10 @@ public class ServiceAFweb {
             if ((appNameArray == null) || (appNameArray.size() == 0)) {
                 return 0;
             }
-            logger.info("processFeatureTTV for 1 minutes size " + appNameArray.size());
+            logger.info("processFeatureApp for 2 minutes size " + appNameArray.size());
 
             long currentTime = System.currentTimeMillis();
-            long lockDate1Min = TimeConvertion.addMinutes(currentTime, 1);
+            long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
 
             for (int i = 0; i < 5; i++) {
                 currentTime = System.currentTimeMillis();
@@ -701,10 +701,10 @@ public class ServiceAFweb {
             if ((prodNameArray == null) || (prodNameArray.size() == 0)) {
                 return 0;
             }
-            logger.info("processFeatureProd for 1 minutes size " + prodNameArray.size());
+            logger.info("processFeatureProd for 2 minutes size " + prodNameArray.size());
 
             long currentTime = System.currentTimeMillis();
-            long lockDate1Min = TimeConvertion.addMinutes(currentTime, 1);
+            long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
 
             for (int i = 0; i < 5; i++) {
                 currentTime = System.currentTimeMillis();
