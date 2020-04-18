@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 package com.afweb.service;
-
+ 
 import com.afweb.model.*;
 import com.afweb.service.db.*;
 import com.afweb.util.CKey;
