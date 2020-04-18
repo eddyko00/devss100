@@ -490,22 +490,11 @@ public class ServiceAFweb {
                 //////require to save memory
                 System.gc();
                 //////require to save memory
-                if (processETLmaint == 0) {
-                    String LockN = "ETL";
-                    AFLockObject lock = getLockName(LockN, ConstantKey.ETL_LOCKTYPE);
-                    if (lock == null) {
-                        processFeatureProd();
-                    }
-                }
-            } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
-                if (processETLmaint == 0) {
 
-                    String LockN = "ETL";
-                    AFLockObject lock = getLockName(LockN, ConstantKey.ETL_LOCKTYPE);
-                    if (lock == null) {
-                        processFeatureApp();
-                    }
-                }
+                processFeatureProd();
+            } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
+                processFeatureApp();
+
             } else if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                 //10 Sec * 5 ~ 1 minutes
                 processETL();
@@ -828,7 +817,7 @@ public class ServiceAFweb {
     }
 
     public boolean processETLsplunkTTV(String app, int length) {
-        processETLmaint = 1;
+
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
         String LockName = "ETL_TTV";
@@ -940,7 +929,6 @@ public class ServiceAFweb {
         int st = proceSssendRequestObj(writeSQLArray);
         logger.info("> processETLsplunkTTV done add:" + numAdd + " fail:" + numFail + " dup:" + numDup + " file:" + file);
         removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
-        processETLmaint = 0;
         return false;
     }
 
@@ -1057,10 +1045,7 @@ public class ServiceAFweb {
         }
 
     }
-    public static int processETLmaint = 0;
-
     public boolean processETLsplunk(String app, int length) {
-        processETLmaint = 1;
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
         String LockName = "ETL";
