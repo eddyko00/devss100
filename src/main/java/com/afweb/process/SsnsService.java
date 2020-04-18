@@ -37,7 +37,7 @@ import static org.apache.http.protocol.HTTP.USER_AGENT;
  */
 public class SsnsService {
 
-    protected static Logger logger = Logger.getLogger("AccountDB");
+    protected static Logger logger = Logger.getLogger("SsnsService");
 
     public static String APP_WIFI = "wifi";
     public static String APP_APP = "appointment";
