@@ -1259,7 +1259,7 @@ public class SsnsService {
             fifa = "comp";
         }
         featTTV += ":" + fifa;
-        featTTV += ":" + prodTTV.getRegion();
+//        featTTV += ":" + prodTTV.getRegion();
         featTTV += ":" + prodTTV.getOffer();
         featTTV += ":" + prodTTV.getProductCd();
 
