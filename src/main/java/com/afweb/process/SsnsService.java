@@ -1367,7 +1367,7 @@ public class SsnsService {
             }
             return this.http_sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams);
         } catch (Exception ex) {
-            Logger.getLogger(SsnsService.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(SsnsService.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
@@ -1475,7 +1475,7 @@ public class SsnsService {
             }
 
         } catch (Exception e) {
-            logger.info("Error sending REST request:" + e);
+//            logger.info("Error sending REST request:" + e);
             throw e;
         }
         return null;
@@ -1574,7 +1574,7 @@ public class SsnsService {
             }
 
         } catch (Exception e) {
-            logger.info("Error sending REST request:" + e);
+//            logger.info("Error sending REST request:" + e);
             throw e;
         }
         return null;

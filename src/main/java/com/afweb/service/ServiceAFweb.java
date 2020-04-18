@@ -827,12 +827,23 @@ public class ServiceAFweb {
 
     }
 
-    void processETLsplunkTTV(String app, int length) {
+    public boolean processETLsplunkTTV(String app, int length) {
+        processETLmaint = 1;
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        long lockDateValue = dateNow.getTimeInMillis();
+        String LockName = "ETL_TTV";
+        int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processETLsplunk");
+        if (CKey.NN_DEBUG == true) {
+            lockReturn = 1;
+        }
+        if (lockReturn == 0) {
+            return false;
+        }
 
         String file = CKey.FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == false) {
             logger.info("> No File exist " + file);
-            return;
+            return false;
         }
         int numAdd = 0;
         int numFail = 0;
@@ -927,11 +938,13 @@ public class ServiceAFweb {
             }
         }
         int st = proceSssendRequestObj(writeSQLArray);
-
         logger.info("> processETLsplunkTTV done add:" + numAdd + " fail:" + numFail + " dup:" + numDup + " file:" + file);
+        removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
+        processETLmaint = 0;
+        return false;
     }
 
-    void processETLsplunkTTV1(SsnsData item, String spSt) {
+    private void processETLsplunkTTV1(SsnsData item, String spSt) {
         try {
             String oper = "";
             String down = "";
@@ -1046,7 +1059,7 @@ public class ServiceAFweb {
     }
     public static int processETLmaint = 0;
 
-    void processETLsplunk(String app, int length) {
+    public boolean processETLsplunk(String app, int length) {
         processETLmaint = 1;
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
@@ -1056,199 +1069,194 @@ public class ServiceAFweb {
             lockReturn = 1;
         }
         if (lockReturn == 0) {
-            return;
+            return false;
         }
 
-        try {
-            String file = CKey.FileLocalPath + app + "data.csv";
-            if (FileUtil.FileTest(file) == false) {
-                logger.info("> No File exist " + file);
-                return;
-            }
-            int numAdd = 0;
-            int numFail = 0;
-            int numDup = 0;
-            ArrayList<String> writeArray = new ArrayList();
-            FileUtil.FileReadTextArray(file, writeArray);
+        String file = CKey.FileLocalPath + app + "data.csv";
+        if (FileUtil.FileTest(file) == false) {
+            logger.info("> No File exist " + file);
+            return false;
+        }
+        int numAdd = 0;
+        int numFail = 0;
+        int numDup = 0;
+        ArrayList<String> writeArray = new ArrayList();
+        FileUtil.FileReadTextArray(file, writeArray);
 
-            ArrayList<String> writeSQLArray = new ArrayList();
-            logger.info("> ETLsplunkProcess " + app + " " + writeArray.size());
-            String spSt = "";
-            int size = writeArray.size();
-            if (length == 0) {
-                size = writeArray.size();
-            } else {
-                if (size > length) {
-                    size = length;
-                }
+        ArrayList<String> writeSQLArray = new ArrayList();
+        logger.info("> ETLsplunkProcess " + app + " " + writeArray.size());
+        String spSt = "";
+        int size = writeArray.size();
+        if (length == 0) {
+            size = writeArray.size();
+        } else {
+            if (size > length) {
+                size = length;
             }
-            for (int i = 0; i < size; i++) {
-                try {
-                    String daSt = "";
-                    String timeSt = "";
-                    String oper = "";
-                    String down = "";
-                    String execSt = "";
-                    long exec = 0;
-                    String tran = "";
-                    String status = "";
-                    String ret = "";
-                    long datel = 0;
-                    spSt = writeArray.get(i);
-                    boolean processFlag = true;
-                    String[] spList = spSt.split(" ");
-                    for (int j = 0; j < spList.length; j++) {
-                        if (spList.length < 3) {
+        }
+        for (int i = 0; i < size; i++) {
+            try {
+                String daSt = "";
+                String timeSt = "";
+                String oper = "";
+                String down = "";
+                String execSt = "";
+                long exec = 0;
+                String tran = "";
+                String status = "";
+                String ret = "";
+                long datel = 0;
+                spSt = writeArray.get(i);
+                boolean processFlag = true;
+                String[] spList = spSt.split(" ");
+                for (int j = 0; j < spList.length; j++) {
+                    if (spList.length < 3) {
+                        processFlag = false;
+                        break;
+                    }
+//                    logger.info("splunk " + j + " " + spList[j]);
+
+                    String inLine = spList[j];
+                    if (j == 0) {
+                        daSt = spList[j];
+                        daSt = daSt.replaceAll("\"", "");
+                        timeSt = spList[j + 1];
+                        Calendar c = parseDateTime(daSt, timeSt);
+
+                        if (c == null) {
                             processFlag = false;
                             break;
                         }
-//                    logger.info("splunk " + j + " " + spList[j]);
+                        datel = c.getTimeInMillis();
+                        continue;
+                    }
 
-                        String inLine = spList[j];
-                        if (j == 0) {
-                            daSt = spList[j];
-                            daSt = daSt.replaceAll("\"", "");
-                            timeSt = spList[j + 1];
-                            Calendar c = parseDateTime(daSt, timeSt);
+                    if (inLine.indexOf("operation=") != -1) {
+                        oper = inLine.replace("operation=", "");
+                        continue;
+                    }
+                    if (inLine.indexOf("clientOperation=") != -1) {
+                        down = inLine.replace("clientOperation=", "");
+                        continue;
+                    }
+                    if (inLine.indexOf("executionTime=") != -1) {
+                        execSt = inLine.replace("executionTime=", "");
+                        if (execSt.length() > 0) {
+                            exec = Long.parseLong(execSt);
+                        }
+                        continue;
+                    }
 
-                            if (c == null) {
-                                processFlag = false;
-                                break;
-                            }
-                            datel = c.getTimeInMillis();
-                            continue;
-                        }
-
-                        if (inLine.indexOf("operation=") != -1) {
-                            oper = inLine.replace("operation=", "");
-                            continue;
-                        }
-                        if (inLine.indexOf("clientOperation=") != -1) {
-                            down = inLine.replace("clientOperation=", "");
-                            continue;
-                        }
-                        if (inLine.indexOf("executionTime=") != -1) {
-                            execSt = inLine.replace("executionTime=", "");
-                            if (execSt.length() > 0) {
-                                exec = Long.parseLong(execSt);
-                            }
-                            continue;
-                        }
-
-                        if (inLine.indexOf("httpCd=") != -1) {
+                    if (inLine.indexOf("httpCd=") != -1) {
 //                        ret = inLine.replace("httpCd=", "");
-                            ret = inLine;
-                            continue;
+                        ret = inLine;
+                        continue;
+                    }
+                    if (inLine.indexOf("stacktrace=") != -1) {
+                        status = inLine;
+                        continue;
+                    }
+                    if (inLine.indexOf("transactionId=") != -1) {
+                        tran = inLine.replace("transactionId=", "");
+                        continue;
+                    }
+                    if (inLine.indexOf("status=") != -1) {
+                        status = inLine.replace("status=", "");
+                        int beg = spSt.indexOf("status=");
+                        String temSt = spSt.substring(beg + 7, spSt.length());
+                        int end = temSt.indexOf("}");
+                        if (end != -1) {
+                            status = temSt.substring(0, end + 1);
                         }
-                        if (inLine.indexOf("stacktrace=") != -1) {
-                            status = inLine;
-                            continue;
-                        }
-                        if (inLine.indexOf("transactionId=") != -1) {
-                            tran = inLine.replace("transactionId=", "");
-                            continue;
-                        }
-                        if (inLine.indexOf("status=") != -1) {
-                            status = inLine.replace("status=", "");
-                            int beg = spSt.indexOf("status=");
-                            String temSt = spSt.substring(beg + 7, spSt.length());
-                            int end = temSt.indexOf("}");
-                            if (end != -1) {
-                                status = temSt.substring(0, end + 1);
-                            }
-                            continue;
-                        }
-                        if (inLine.indexOf("parameter=") != -1) {
-                            status = inLine.replace("parameter=", "");
-                            String parmSt = spSt;
-                            int beg = parmSt.indexOf("parameter=");
+                        continue;
+                    }
+                    if (inLine.indexOf("parameter=") != -1) {
+                        status = inLine.replace("parameter=", "");
+                        String parmSt = spSt;
+                        int beg = parmSt.indexOf("parameter=");
 
-                            String temSt = parmSt.substring(beg + 10, parmSt.length());
-                            int end = temSt.indexOf("]");
-                            if (end != -1) {
-                                status = temSt.substring(0, end + 1);
-                            }
+                        String temSt = parmSt.substring(beg + 10, parmSt.length());
+                        int end = temSt.indexOf("]");
+                        if (end != -1) {
+                            status = temSt.substring(0, end + 1);
+                        }
 
-                            if (parmSt.indexOf("callbackNotification") != -1) {
+                        if (parmSt.indexOf("callbackNotification") != -1) {
 //                            logger.info("splunk " + i + " " + spSt);
-                                status = replaceAll("\"", "", status);
-                                status = replaceAll("\\n", "", status);
-                                status = replaceAll("\\", "\"", status);
+                            status = replaceAll("\"", "", status);
+                            status = replaceAll("\\n", "", status);
+                            status = replaceAll("\\", "\"", status);
 
-                                ret = "callbackNotification";
-                            } else {
+                            ret = "callbackNotification";
+                        } else {
 
-                                status = replaceAll("\"\"", "\"", status);
-                                ret = "parameter";
-                            }
-                            continue;
+                            status = replaceAll("\"\"", "\"", status);
+                            ret = "parameter";
                         }
-
-                    }
-                    if (processFlag == false) {
-                        continue;
-                    }
-                    if (datel == 0) {
-                        continue;
-                    }
-                    if (tran.length() == 0) {
-//                    logger.info("splunk " + i + " " + spSt);
                         continue;
                     }
 
-                    SsnsData item = new SsnsData();
-                    if (oper.equals(SsnsService.APP_GET_APP) || oper.equals(SsnsService.APP_CAN_APP) || oper.equals(SsnsService.APP_GET_TIMES) || oper.equals(SsnsService.APP_UPDATE)) {
-                        app = SsnsService.APP_APP;
-                    } else if (oper.equals(SsnsService.PROD_GET_BYID) || oper.equals(SsnsService.PROD_GET_PROD)) {
-                        app = SsnsService.APP_PRODUCT;
-                    } else if (oper.equals(SsnsService.WI_1) || oper.equals(SsnsService.WI_2) || oper.equals(SsnsService.WI_3) || oper.equals(SsnsService.WI_4)) {
-                        app = SsnsService.APP_WIFI;
-                    } else {
-                        return;
-                    }
-
-                    item.setUid(tran);
-                    item.setApp(app);
-                    item.setOper(oper);
-                    item.setDown(down);
-                    item.setRet(ret);
-                    item.setExec(exec);
-                    item.setData(status);
-                    item.setUpdatedatel(datel);
-                    item.setUpdatedatedisplay(new java.sql.Date(datel));
-
-                    String key = item.getUid() + item.getUpdatedatel();
-                    item.setName(key);
-                    String sql = SsnsDataDB.insertSsnsDataObjectSQL(item);
-//                logger.info("SsnsdDataDB " + i + " " + sql);
-                    SsnsData ssnsObj = getSsnsDataImp().getSsnsDataObj(key);
-                    if (ssnsObj == null) {
-                        writeSQLArray.add(sql);
-                        if (writeSQLArray.size() > 100) {
-                            proceSssendRequestObj(writeSQLArray);
-                            ServiceAFweb.AFSleep();
-                            writeSQLArray.clear();
-                        }
-                        if ((numAdd % 500) == 0) {
-                            logger.info("> ETLsplunkProcess  " + numAdd);
-                        }
-                        numAdd++;
-                    } else {
-                        numDup++;
-                    }
-                } catch (Exception e) {
-                    logger.info("> ETLsplunkProcess exception " + e.getMessage() + " " + spSt);
-                    numFail++;
                 }
-            }
-            int st = proceSssendRequestObj(writeSQLArray);
-            logger.info("> ETLsplunkProcess done add:" + numAdd + " fail:" + numFail + " dup:" + numDup + " file:" + file);
-        } catch (Exception ex) {
-            logger.info("> ETLsplunkProcess Exception" + ex.getMessage());
-        }
+                if (processFlag == false) {
+                    continue;
+                }
+                if (datel == 0) {
+                    continue;
+                }
+                if (tran.length() == 0) {
+//                    logger.info("splunk " + i + " " + spSt);
+                    continue;
+                }
 
+                SsnsData item = new SsnsData();
+                if (oper.equals(SsnsService.APP_GET_APP) || oper.equals(SsnsService.APP_CAN_APP) || oper.equals(SsnsService.APP_GET_TIMES) || oper.equals(SsnsService.APP_UPDATE)) {
+                    app = SsnsService.APP_APP;
+                } else if (oper.equals(SsnsService.PROD_GET_BYID) || oper.equals(SsnsService.PROD_GET_PROD)) {
+                    app = SsnsService.APP_PRODUCT;
+                } else if (oper.equals(SsnsService.WI_1) || oper.equals(SsnsService.WI_2) || oper.equals(SsnsService.WI_3) || oper.equals(SsnsService.WI_4)) {
+                    app = SsnsService.APP_WIFI;
+                } else {
+                    continue;
+                }
+
+                item.setUid(tran);
+                item.setApp(app);
+                item.setOper(oper);
+                item.setDown(down);
+                item.setRet(ret);
+                item.setExec(exec);
+                item.setData(status);
+                item.setUpdatedatel(datel);
+                item.setUpdatedatedisplay(new java.sql.Date(datel));
+
+                String key = item.getUid() + item.getUpdatedatel();
+                item.setName(key);
+                String sql = SsnsDataDB.insertSsnsDataObjectSQL(item);
+//                logger.info("SsnsdDataDB " + i + " " + sql);
+                SsnsData ssnsObj = getSsnsDataImp().getSsnsDataObj(key);
+                if (ssnsObj == null) {
+                    writeSQLArray.add(sql);
+                    if (writeSQLArray.size() > 100) {
+                        proceSssendRequestObj(writeSQLArray);
+                        ServiceAFweb.AFSleep();
+                        writeSQLArray.clear();
+                    }
+                    if ((numAdd % 500) == 0) {
+                        logger.info("> ETLsplunkProcess  " + numAdd);
+                    }
+                    numAdd++;
+                } else {
+                    numDup++;
+                }
+            } catch (Exception e) {
+                logger.info("> ETLsplunkProcess exception " + e.getMessage() + " " + spSt);
+                numFail++;
+            }
+        }
+        int st = proceSssendRequestObj(writeSQLArray);
+        logger.info("> ETLsplunkProcess done add:" + numAdd + " fail:" + numFail + " dup:" + numDup + " file:" + file);
         removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
-        processETLmaint = 0;
+        return true;
     }
 
     public static String replaceAll(String oldStr, String newStr, String inString) {
