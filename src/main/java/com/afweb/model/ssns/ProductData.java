@@ -14,6 +14,20 @@ import java.util.ArrayList;
 public class ProductData {
 
     /**
+     * @return the pWIFI
+     */
+    public ProductApp getpWIFI() {
+        return pWIFI;
+    }
+
+    /**
+     * @param pWIFI the pWIFI to set
+     */
+    public void setpWIFI(ProductApp pWIFI) {
+        this.pWIFI = pWIFI;
+    }
+
+    /**
      * @return the pSING
      */
     public ProductTTV getpSING() {
@@ -45,6 +59,7 @@ public class ProductData {
     private ProductTTV pTTV;
     private ProductTTV pHSIC;
     private ProductApp pAPP;
+    private ProductApp pWIFI;    
     private ArrayList<String> flow;
 
     /**

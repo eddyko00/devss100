@@ -411,7 +411,24 @@ public class ServiceAFweb {
                     }
 /////////
 /////////
-                    boolean appflag = true;
+                    boolean wififlag = true;
+                    if (wififlag == true) {
+                        SsnsService ss = new SsnsService();
+                        String feature = "";
+                        ArrayList appNameArrayTemp = getAllOpenWifiArray();
+                        if (appNameArrayTemp != null) {
+                            for (int i = 0; i < appNameArrayTemp.size(); i++) {
+                                String idSt = (String) appNameArrayTemp.get(i);
+
+                                int id = Integer.parseInt(idSt);
+                                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                                feature = ss.getFeatureSsnsWifi(data);
+                            }
+                        }
+                    }                    
+/////////
+/////////
+                    boolean appflag = false;
                     if (appflag == true) {
                         SsnsService ss = new SsnsService();
                         String feature = "";
@@ -591,7 +608,82 @@ public class ServiceAFweb {
 //            output.add("  ");
         }
     }
+////////////////////////////////
+    ArrayList<String> getAllOpenWifiArray() {
+        String app = SsnsService.APP_WIFI;
+        String ret = "parameter";
+        int status = ConstantKey.OPEN;
+        return getSsnsDataImp().getSsnsDataIDList(app, ret, status);
+    }
 
+    ArrayList<String> wifiNameArray = new ArrayList();
+
+    private ArrayList updateWifiNameArray() {
+        if (wifiNameArray != null && wifiNameArray.size() > 0) {
+            return wifiNameArray;
+        }
+        ArrayList ttvNameArrayTemp = getAllOpenAppArray();
+        if (ttvNameArrayTemp != null) {
+            wifiNameArray = ttvNameArrayTemp;
+        }
+        return wifiNameArray;
+    }
+
+    public int processFeatureWifi() {
+
+        updateWifiNameArray();
+        if ((wifiNameArray == null) || (wifiNameArray.size() == 0)) {
+            return 0;
+        }
+        int result = 0;
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        long lockDateValue = dateNow.getTimeInMillis();
+        String LockName = "ETL";
+
+        try {
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureApp");
+            if (CKey.NN_DEBUG == true) {
+                lockReturn = 1;
+            }
+            if (lockReturn == 0) {
+                return 0;
+            }
+
+            logger.info("processFeatureApp for 2 minutes size " + wifiNameArray.size());
+
+            long currentTime = System.currentTimeMillis();
+            long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
+
+            for (int i = 0; i < 5; i++) {
+                currentTime = System.currentTimeMillis();
+//                if (CKey.NN_DEBUG != true) {
+                if (lockDate1Min < currentTime) {
+                    break;
+                }
+//                }
+                if (wifiNameArray.size() == 0) {
+                    break;
+                }
+
+                String idSt = (String) wifiNameArray.get(0);
+                wifiNameArray.remove(0);
+                SsnsService ss = new SsnsService();
+                int id = Integer.parseInt(idSt);
+                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                String feature = ss.getFeatureSsnsWifi(data);
+//                logger.info("> feature " + i + " " + feature);
+
+                AFSleep();
+            }
+        } catch (Exception ex) {
+        }
+        removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
+        return result;
+
+    }
+
+    
+/////////////////////////////////
     ArrayList<String> getAllOpenAppArray() {
         String app = SsnsService.APP_APP;
         String ret = "parameter";
@@ -664,7 +756,7 @@ public class ServiceAFweb {
         return result;
 
     }
-
+////////////////////////////////////
     ArrayList<String> getAllOpenProductArray() {
         String app = SsnsService.APP_PRODUCT;
         String ret = "parameter";
@@ -1219,7 +1311,7 @@ public class ServiceAFweb {
                     app = SsnsService.APP_APP;
                 } else if (oper.equals(SsnsService.PROD_GET_BYID) || oper.equals(SsnsService.PROD_GET_PROD)) {
                     app = SsnsService.APP_PRODUCT;
-                } else if (oper.equals(SsnsService.WI_1) || oper.equals(SsnsService.WI_2) || oper.equals(SsnsService.WI_3) || oper.equals(SsnsService.WI_4)) {
+                } else if (oper.equals(SsnsService.WI_GetDeviceStatus) || oper.equals(SsnsService.WI_Callback) || oper.equals(SsnsService.WI_Getdev) || oper.equals(SsnsService.WI_config)) {
                     app = SsnsService.APP_WIFI;
                 } else {
                     continue;

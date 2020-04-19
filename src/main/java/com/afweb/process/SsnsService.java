@@ -50,6 +50,7 @@ public class SsnsService {
     public static String APP_PRODUCT_TYPE_HSIC = "HSIC";
     public static String APP_PRODUCT_TYPE_SING = "SING";
     public static String APP_PRODUCT_TYPE_APP = "APP";
+    public static String APP_PRODUCT_TYPE_WIFI = "WIFI";
 
     public static String APP_GET_APP = "getAppointment";
     public static String APP_CAN_APP = "cancelAppointment";
@@ -59,13 +60,353 @@ public class SsnsService {
     public static String PROD_GET_PROD = "getProductList";
     public static String PROD_GET_BYID = "getProductById";
 
-    public static String WI_1 = "getDeviceStatus";
-    public static String WI_2 = "callbackNotification";
-    public static String WI_3 = "getDevices";
-    public static String WI_4 = "configureDeviceStatus";
+    public static String WI_GetDeviceStatus = "getDeviceStatus";
+    public static String WI_Callback = "callbackNotification";
+    public static String WI_Getdev = "getDevices";
+    public static String WI_config = "configureDeviceStatus";
 
     private SsnsDataImp ssnsDataImp = new SsnsDataImp();
+////////////////////////////////////////////    
 
+    public String getFeatureSsnsWifi(SsnsData dataObj) {
+        ProductData pData = new ProductData();
+        if (dataObj == null) {
+            return "";
+        }
+        String appTId = "";
+
+        String cust = "";
+        String host = "";
+
+        String banid = "";
+        String uniquid = "";
+        String prodClass = "";
+        String serialid = "";
+        String parm = "";
+        String postParm = "";
+
+        String dataSt = "";
+        try {
+            String oper = dataObj.getOper();
+            if (oper.equals(WI_GetDeviceStatus)) { //"updateAppointment")) {
+
+                dataSt = dataObj.getData();
+                dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+                String[] operList = dataSt.split(",");
+                if (operList.length > 3) {
+                    banid = operList[0];
+                    uniquid = operList[1];
+                    prodClass = operList[2];
+                    serialid = operList[3];
+                    parm = operList[4];
+                    if (operList.length > 5) {
+                        dataSt = dataObj.getData();
+                        dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                        int beg = dataSt.indexOf("{");
+                        postParm = dataSt.substring(beg);
+                        //missing }  ???
+                        postParm += "}";
+                    }                    
+                }
+            } else if (oper.equals(WI_config)) { //"timeslot")) {
+                dataSt = dataObj.getData();
+                dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+                String[] operList = dataSt.split(",");
+                if (operList.length > 3) {
+                    banid = operList[0];
+                    uniquid = operList[1];
+                    prodClass = operList[2];
+                    serialid = operList[3];
+                    parm = operList[4];
+
+                    if (operList.length > 5) {
+//                      {connectDeviceList":[{"macAddressTxt":"C0:21:0D:E0:5D:24","statusCd":"pause"}]
+                        dataSt = dataObj.getData();
+                        dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                        int beg = dataSt.indexOf("{");
+                        postParm = dataSt.substring(beg);
+                        //missing }  ???
+                        postParm += "}";
+                    }
+                }
+
+            } else if (oper.equals(WI_Callback)) {//"cancelAppointment")) {
+                dataSt = dataObj.getData();
+                dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+                String[] operList = dataSt.split(",");
+                if (operList.length > 3) {
+                    appTId = operList[0];
+                    banid = operList[1];
+                    if (banid.equals("null")) {
+                        banid = "";
+                    }
+                    cust = operList[2];
+                    if (cust.equals("null")) {
+                        cust = "";
+                    }
+                    host = operList[3];
+
+                }
+
+            } else {
+                logger.info("> getFeatureSsnsAppointment Other oper " + oper);
+            }
+            if (oper.equals(WI_Getdev)) {
+                // for testing ignore WI_Getdev becase alwasy no info
+                getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+                return "";
+                // for testing
+            } else {
+                if (serialid.equals("")) {
+                    return "";
+                }
+            }
+            logger.info(dataSt);
+
+/////////////
+            //call devop to get customer id
+            SsnsAcc NAccObj = new SsnsAcc();
+            NAccObj.setDown("splunkflow");
+            boolean stat = this.updateSsnsWifi(oper, banid, uniquid, prodClass, serialid, parm, pData, dataObj, NAccObj);
+            if (stat == true) {
+                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                boolean exist = false;
+                if (ssnsAccObjList != null) {
+                    if (ssnsAccObjList.size() != 0) {
+                        SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                        if (ssnsObj.getDown().equals("splunkflow")) {
+                            exist = true;
+                        }
+                    }
+                }
+                if (exist == false) {
+                    int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
+                }
+
+            }
+
+            if (stat == true) {
+                getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+            } else {
+                if (oper.equals(APP_GET_APP)) {
+                    getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+                }
+            }
+            return NAccObj.getName();
+        } catch (Exception ex) {
+            logger.info("> getFeatureSsnsAppointment Exception" + ex.getMessage());
+        }
+        return "";
+    }
+
+    public boolean updateSsnsWifi(String oper, String banid, String uniquid, String prodClass, String serialid, String parm, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
+        try {
+            String featTTV = "";
+
+            if (oper.equals(WI_GetDeviceStatus) || oper.equals(WI_Callback) || oper.equals(WI_config)) {
+                if ((banid.length() == 0) && (serialid.length() == 0)) {
+                    return false;
+                } else {
+                    String outputSt = null;
+                    if (oper.equals(WI_GetDeviceStatus)) {
+                        outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, oper, banid, uniquid, prodClass, serialid, parm, null);
+                    } else if (oper.equals(WI_config)) {
+                        outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, oper, banid, uniquid, prodClass, serialid, parm, null);
+                    }
+                    if (outputSt == null) {
+                        return false;
+                    }
+                    if (outputSt.length() < 80) {  // or test 
+                        return false;
+                    }
+                    ProductApp prodTTV = parseWifiFeature(outputSt, oper);
+                    pData.setpWIFI(prodTTV);
+                    featTTV = prodTTV.getFeat();
+                }
+            } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
+                featTTV = APP_PRODUCT_TYPE_APP;
+                featTTV += ":" + oper;
+//                featTTV += ":" + host;
+//                if ((banid.length() == 0) && (cust.length() == 0)) {
+//                    featTTV += ":ContactEng";
+//                }
+            } else {
+                return false;
+            }
+
+            logger.info("> updateSsnsAppointment feat " + featTTV);
+/////////////TTV   
+            if (NAccObj.getDown().equals("splunkflow")) {
+
+                ArrayList<String> flow = new ArrayList();
+                int faulure = getSsnsFlowTrace(dataObj, flow);
+                if (flow == null) {
+                    logger.info("> updateSsnsAppointment skip no flow");
+                    return false;
+                }
+                pData.setFlow(flow);
+
+                if (faulure == 1) {
+                    featTTV += ":splunkfailed";
+                }
+            }
+
+            NAccObj.setName(featTTV);
+            NAccObj.setBanid(banid);
+            NAccObj.setCusid(dataObj.getCusid());
+            String deviceInfo = uniquid + ":" + prodClass + ":" + serialid + ":" + parm;
+            NAccObj.setTiid(deviceInfo);
+
+            NAccObj.setUid(dataObj.getUid());
+            NAccObj.setApp(dataObj.getApp());
+            NAccObj.setOper(oper);
+
+//          NAccObj.setDown(""); // set by NAccObj
+            NAccObj.setRet(dataObj.getRet());
+            NAccObj.setExec(dataObj.getExec());
+
+            String nameSt = new ObjectMapper().writeValueAsString(pData);
+            NAccObj.setData(nameSt);
+
+            NAccObj.setUpdatedatel(dataObj.getUpdatedatel());
+            NAccObj.setUpdatedatedisplay(new java.sql.Date(dataObj.getUpdatedatel()));
+
+            return true;
+        } catch (Exception ex) {
+            logger.info("> updateSsnsAppointment Exception" + ex.getMessage());
+        }
+        return false;
+    }
+
+    public static ProductApp parseWifiFeature(String outputSt, String oper) {
+
+        if (outputSt == null) {
+            return null;
+        }
+        ProductApp prodTTV = new ProductApp();
+        int smartInit = 0;
+        int catInit = 0;
+        int cujoInit = 0;
+
+        ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
+        for (int j = 0; j < outputList.size(); j++) {
+            String inLine = outputList.get(j);
+//            logger.info("" + inLine);
+
+            if (inLine.indexOf("smartSteeringEnabledInd") != -1) {
+                if (catInit == 1) {
+                    continue;
+                }
+                catInit = 1;
+                String valueSt = inLine;
+                valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                valueSt = ServiceAFweb.replaceAll("smartSteeringEnabledInd:", "", valueSt);
+                valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
+                prodTTV.setSmartSteering(valueSt);
+
+                continue;
+            }
+            if (inLine.indexOf("guestDevice") != -1) {
+                if (smartInit == 1) {
+                    continue;
+                }
+
+                smartInit = 1;
+                prodTTV.setGuestDevice(1);
+                continue;
+            }
+            if (inLine.indexOf("wirelessRadioFrequencyTxt") != -1) {
+
+                String valueSt = inLine;
+                valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                valueSt = ServiceAFweb.replaceAll("wirelessRadioFrequencyTxt:", "", valueSt);
+                valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
+                String freq = prodTTV.getFrequency();
+                if (freq.length() == 0) {
+                    freq += valueSt;
+                } else {
+                    freq += " " + valueSt;
+                }
+                prodTTV.setFrequency(freq);
+                continue;
+            }
+            if (inLine.indexOf("cujoAgentEnabledInd") != -1) {
+                if (cujoInit == 1) {
+                    continue;
+                }
+                cujoInit = 1;
+                prodTTV.setCujoAgent(1);;
+                continue;
+            }
+        }
+
+        String featTTV = APP_PRODUCT_TYPE_WIFI;
+        featTTV += ":" + oper;
+        String sm = prodTTV.getSmartSteering();
+        if (sm.length() == 0) {
+            sm = "noSmartSteering";
+        } else {
+            sm = "SmartSteering " + sm;
+        }
+        featTTV += ":" + sm;
+
+        String freq = prodTTV.getFrequency();
+        if (freq.length() == 0) {
+            freq = "noFrequency";
+        } else {
+            freq = "Freq " + freq;
+        }
+        featTTV += ":" + freq;
+
+        String guest = "noGuestDevice";
+        if (prodTTV.getGuestDevice() == 1) {
+            guest = "GuestDevice";
+        }
+        featTTV += ":" + guest;
+        String cujo = "noCujoAgent";
+        if (prodTTV.getCujoAgent() == 1) {
+            cujo = "CujoAgent";
+        }
+        featTTV += ":" + cujo;
+
+        prodTTV.setFeat(featTTV);
+
+        return prodTTV;
+    }
+
+    public String SendSsnsWifi(String ProductURL, String oper, String banid, String uniquid, String prodClass, String serialid, String parm, ArrayList<String> inList) {
+
+        String url = ProductURL + "/v1/cmo/selfmgmt/wifimanagement/account/" + banid
+                + "/device/organizationuniqueid/" + uniquid
+                + "/productclass/" + prodClass
+                + "/serialnumber/" + serialid
+                + "/status";
+
+        try {
+            if (inList != null) {
+                inList.add(url);
+            }
+            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);
+            return output;
+        } catch (Exception ex) {
+            logger.info("> SsnsAppointment exception " + ex.getMessage());
+        }
+        return null;
+    }
+
+////////////////////////////////////////////    
     public String getFeatureSsnsAppointment(SsnsData dataObj) {
         ProductData pData = new ProductData();
         if (dataObj == null) {
@@ -231,7 +572,7 @@ public class SsnsService {
                     getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
                 }
             }
-
+            return NAccObj.getName();
         } catch (Exception ex) {
             logger.info("> getFeatureSsnsAppointment Exception" + ex.getMessage());
         }
@@ -480,7 +821,7 @@ public class SsnsService {
 
             outputSt = SendSsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, inList);
             if (outputSt == null) {
-                
+
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
@@ -651,8 +992,9 @@ public class SsnsService {
                 }
             }
 //            
+            SsnsAcc NAccObj = new SsnsAcc();
             if (oper.equals(PROD_GET_PROD)) {
-                SsnsAcc NAccObj = new SsnsAcc();
+
                 NAccObj.setTiid(prodid);
                 NAccObj.setRet(APP_PRODUCT_TYPE_SING);
                 NAccObj.setDown("splunkflow");
@@ -719,7 +1061,7 @@ public class SsnsService {
             }
             //update to complete so will not process again
             getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
-
+            return NAccObj.getName();
         } catch (Exception ex) {
             logger.info("> getFeatureSsnsProdiuctInventory Exception" + ex.getMessage());
         }

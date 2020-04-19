@@ -12,6 +12,62 @@ package com.afweb.model.ssns;
 public class ProductApp {
 
     /**
+     * @return the cujoAgent
+     */
+    public int getCujoAgent() {
+        return cujoAgent;
+    }
+
+    /**
+     * @param cujoAgent the cujoAgent to set
+     */
+    public void setCujoAgent(int cujoAgent) {
+        this.cujoAgent = cujoAgent;
+    }
+
+    /**
+     * @return the frequency
+     */
+    public String getFrequency() {
+        return frequency;
+    }
+
+    /**
+     * @param frequency the frequency to set
+     */
+    public void setFrequency(String frequency) {
+        this.frequency = frequency;
+    }
+
+    /**
+     * @return the guestDevice
+     */
+    public int getGuestDevice() {
+        return guestDevice;
+    }
+
+    /**
+     * @param guestDevice the guestDevice to set
+     */
+    public void setGuestDevice(int guestDevice) {
+        this.guestDevice = guestDevice;
+    }
+
+    /**
+     * @return the smartSteering
+     */
+    public String getSmartSteering() {
+        return smartSteering;
+    }
+
+    /**
+     * @param smartSteering the smartSteering to set
+     */
+    public void setSmartSteering(String smartSteering) {
+        this.smartSteering = smartSteering;
+    }
+
+    /**
      * @return the appid
      */
     public String getAppid() {
@@ -101,4 +157,8 @@ public class ProductApp {
     private String categoryCd = "";
     private String host = "";
     private String appid = "";
+    private String smartSteering="";
+    private int guestDevice=0;
+    private String frequency="";
+    private int cujoAgent=0;    
 }
