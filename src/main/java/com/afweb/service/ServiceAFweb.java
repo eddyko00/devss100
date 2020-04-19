@@ -336,7 +336,7 @@ public class ServiceAFweb {
         }
     }
     //////////
-    private long lastProcessTimer = 0;
+
     public boolean debugFlag = false;
 
     private void processTimer() {

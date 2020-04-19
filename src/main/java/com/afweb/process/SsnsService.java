@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.util.Map;
-import java.util.logging.Level;
 
 import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
@@ -831,11 +830,19 @@ public class SsnsService {
             featTTV += ":" + fifa;
             String vm = "voicemail";
             if (prodTTV.getIsFIFA() == 0) {
-                vm = "noVM";
+                vm = "noVoliceMail";
             }
             featTTV += ":" + vm;
-            featTTV += ":" + prodTTV.getPrimaryPricePlan();
-            featTTV += ":" + prodTTV.getCallControl();
+            String plan = prodTTV.getPrimaryPricePlan();
+            if (plan.length() == 0) {
+                plan = "noPlan";
+            }
+            featTTV += ":" + plan;
+            String callC = prodTTV.getCallControl();
+            if (callC.length() == 0) {
+                callC = "noCallControl";
+            }
+            featTTV += ":" + callC;
             prodTTV.setFeatTTV(featTTV);
 
             return prodTTV;
@@ -1008,19 +1015,23 @@ public class SsnsService {
             }
             featTTV += ":" + fifa;
             featTTV += ":" + prodTTV.getPrimaryPricePlan();
-            featTTV += ":" + prodTTV.getSecurityBundle();
-            featTTV += ":" + "email";
-            if (prodTTV.getEmailFeatures().length() > 0) {
-                featTTV += ":" + "Y";
-            } else {
-                featTTV += ":" + "N";
+            String security = prodTTV.getSecurityBundle();
+            if (security.length() == 0) {
+                security = "noSecurity";
             }
-            featTTV += ":" + "UnlimitedUsage";
-            if (prodTTV.getUnlimitedUsage().length() > 0) {
-                featTTV += ":" + "Y";
-            } else {
-                featTTV += ":" + "N";
+            featTTV += ":" + security;
+
+            String mail = prodTTV.getEmailFeatures();
+            if (mail.length() == 0) {
+                mail = "noemail";
             }
+            featTTV += ":" + mail;
+
+            String unlimit = prodTTV.getUnlimitedUsage();
+            if (unlimit.length() == 0) {
+                unlimit = "noUnlimitedUsage";
+            }
+            featTTV += ":" + unlimit;
             prodTTV.setFeatTTV(featTTV);
 
             return prodTTV;
@@ -1329,14 +1340,15 @@ public class SsnsService {
                 String dataTxt = data.getData();
                 if (dataTxt.indexOf("stacktrace") != -1) {
                     failure = 1;
-                } 
-                String http = data.getRet();
-                if (http.indexOf("httpCd=500") != -1) {
-                    failure = 1;
+                } else {
+                    dataTxt = data.getRet();
+                    if (dataTxt.indexOf("httpCd=500") != -1) {
+                        failure = 1;
+                    }
                 }
 //                logger.info("> flow " + flowSt);
-                if (failure == 1)  {
-                    flowSt += ":failed"; 
+                if (failure == 1) {
+                    flowSt += ":failed:" + data.getData();
                 }
                 flow.add(flowSt);
             }
