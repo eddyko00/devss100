@@ -110,7 +110,7 @@ public class SsnsService {
                         postParm = dataSt.substring(beg);
                         //missing }  ???
                         postParm += "}";
-                    }                    
+                    }
                 }
             } else if (oper.equals(WI_config)) { //"timeslot")) {
                 dataSt = dataObj.getData();
@@ -231,7 +231,7 @@ public class SsnsService {
                     if (outputSt.length() < 80) {  // or test 
                         return false;
                     }
-                    ProductApp prodTTV = parseWifiFeature(outputSt, oper);
+                    ProductApp prodTTV = parseWifiFeature(outputSt, oper, prodClass);
                     pData.setpWIFI(prodTTV);
                     featTTV = prodTTV.getFeat();
                 }
@@ -290,7 +290,7 @@ public class SsnsService {
         return false;
     }
 
-    public static ProductApp parseWifiFeature(String outputSt, String oper) {
+    public static ProductApp parseWifiFeature(String outputSt, String oper, String prodClass) {
 
         if (outputSt == null) {
             return null;
@@ -354,6 +354,8 @@ public class SsnsService {
 
         String featTTV = APP_PRODUCT_TYPE_WIFI;
         featTTV += ":" + oper;
+        featTTV += ":" + prodClass;
+
         String sm = prodTTV.getSmartSteering();
         if (sm.length() == 0) {
             sm = "noSmartSteering";
