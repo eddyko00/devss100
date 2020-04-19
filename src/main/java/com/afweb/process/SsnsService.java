@@ -480,6 +480,7 @@ public class SsnsService {
 
             outputSt = SendSsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, inList);
             if (outputSt == null) {
+                
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);

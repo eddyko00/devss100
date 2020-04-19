@@ -521,6 +521,7 @@ public class SsnsDataDB {
         }
         return 0;
     }
+
     public int deleteSsnsDataApp(String app) {
         try {
             String deleteSQL = "delete from ssnsdata where app='" + app + "'";
@@ -580,17 +581,16 @@ public class SsnsDataDB {
         return sqlCMD;
     }
 
-    public int insertSsnsDataObject(SsnsData nData) {
-        try {
-            String sqlCMD = insertSsnsDataObjectSQL(nData);
-            return processUpdateDB(sqlCMD);
-
-        } catch (Exception e) {
-            logger.info("> insertSsnsDataObject exception " + nData.getName() + " - " + e.getMessage());
-        }
-        return 0;
-    }
-
+//    public int insertSsnsDataObject(SsnsData nData) {
+//        try {
+//            String sqlCMD = insertSsnsDataObjectSQL(nData);
+//            return processUpdateDB(sqlCMD);
+//
+//        } catch (Exception e) {
+//            logger.info("> insertSsnsDataObject exception " + nData.getName() + " - " + e.getMessage());
+//        }
+//        return 0;
+//    }
     public static String insertSsnsAccObjectSQL(SsnsAcc nData) {
         String dataSt = nData.getData();
         dataSt = dataSt.replaceAll("|", "");
@@ -626,20 +626,30 @@ public class SsnsDataDB {
         return 0;
     }
 
-    public int insertSsnsDataObject(String name, int type, String dataSt, long updatedatel) {
+//    public int insertSsnsDataObject(String name, int type, String dataSt, long updatedatel) {
+//        try {
+//            dataSt = dataSt.replaceAll("|", "");
+//            dataSt = dataSt.replaceAll("'", "");
+//            dataSt = dataSt.replaceAll("\"", "#");
+//            String sqlCMD = "insert into ssnsdata (name, status, type, uid,cusid,banid,tiid,app,oper,down,ret,exec, data, updatedatedisplay, updatedatel) VALUES "
+//                    + "('" + name + "'," + ConstantKey.OPEN + "," + type
+//                    + ",'','','','','','','','',0"
+//                    + ",'" + dataSt + "'"
+//                    + ",'" + new java.sql.Date(updatedatel) + "'," + updatedatel + ")";
+//            return processUpdateDB(sqlCMD);
+//
+//        } catch (Exception e) {
+//            logger.info("> insertSsnsDataObject exception " + name + " - " + e.getMessage());
+//        }
+//        return 0;
+//    }
+    public int updatSsnsAccNameStatusTypeById(int id, String name, int status, int type) {
         try {
-            dataSt = dataSt.replaceAll("|", "");
-            dataSt = dataSt.replaceAll("'", "");
-            dataSt = dataSt.replaceAll("\"", "#");
-            String sqlCMD = "insert into ssnsdata (name, status, type, uid,cusid,banid,tiid,app,oper,down,ret,exec, data, updatedatedisplay, updatedatel) VALUES "
-                    + "('" + name + "'," + ConstantKey.OPEN + "," + type
-                    + ",'','','','','','','','',0"
-                    + ",'" + dataSt + "'"
-                    + ",'" + new java.sql.Date(updatedatel) + "'," + updatedatel + ")";
+            String sqlCMD = "update ssnsacc set name='" + name + "', status=" + status + ", type=" + type
+                    + " where id=" + id;
             return processUpdateDB(sqlCMD);
-
         } catch (Exception e) {
-            logger.info("> insertSsnsDataObject exception " + name + " - " + e.getMessage());
+            logger.info("> updatSsnsAccNameStatusById exception " + e.getMessage());
         }
         return 0;
     }

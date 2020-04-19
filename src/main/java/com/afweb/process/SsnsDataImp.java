@@ -60,19 +60,24 @@ public class SsnsDataImp {
     public int updateSsnsDataAllOpenStatus() {
         return ssnsdb.updateSsnsDataAllOpenStatus();
     }
-        
+
     public int deleteSsnsAccApp(String app) {
         return ssnsdb.deleteSsnsAccApp(app);
     }
+
     public int deleteSsnsDataApp(String app) {
         return ssnsdb.deleteSsnsDataApp(app);
     }
+
     public int deleteSsnsData(String name) {
         return ssnsdb.deleteSsnsData(name);
     }
 
-    public int insertSsnsDataObject(SsnsData Data) {
-        return ssnsdb.insertSsnsDataObject(Data);
+//    public int insertSsnsDataObject(SsnsData Data) {
+//        return ssnsdb.insertSsnsDataObject(Data);
+//    }
+    public int updatSsnsAccNameStatusTypeById(int id, String name, int status, int type) {
+        return ssnsdb.updatSsnsAccNameStatusTypeById(id, name, status, type);
     }
 
     public int insertSsnsAccObject(SsnsAcc nData) {

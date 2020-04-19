@@ -223,7 +223,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.APP_GET_APP;
-        ArrayList<String> ret = afWebService.getSsnsprodAppByIdRT(username, idSt, pidSt, SsnsService.APP_APP, oper);
+        ArrayList<String> ret = afWebService.testSsnsprodAppByIdRT(username, idSt, pidSt, SsnsService.APP_APP, oper);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -242,7 +242,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.APP_GET_TIMES;
-        ArrayList<String> ret = afWebService.getSsnsprodAppByIdRT(username, idSt, pidSt, SsnsService.APP_APP, oper);
+        ArrayList<String> ret = afWebService.testSsnsprodAppByIdRT(username, idSt, pidSt, SsnsService.APP_APP, oper);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -338,7 +338,7 @@ public class IndexController {
             return null;
         }
 
-        ArrayList<String> ret = afWebService.getSsnsprodByIdRT(username, idSt, pidSt, SsnsService.APP_PRODUCT);
+        ArrayList<String> ret = afWebService.testSsnsprodByIdRT(username, idSt, pidSt, SsnsService.APP_PRODUCT);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
