@@ -277,7 +277,7 @@ public class SsnsService {
                 return false;
             }
 
-            logger.info("> updateSsnsAppointment featTTV " + featTTV);
+            logger.info("> updateSsnsAppointment feat " + featTTV);
 /////////////TTV   
             if (NAccObj.getDown().equals("splunkflow")) {
 
@@ -1023,7 +1023,7 @@ public class SsnsService {
 
             String mail = prodTTV.getEmailFeatures();
             if (mail.length() == 0) {
-                mail = "noemail";
+                mail = "noEmail";
             }
             featTTV += ":" + mail;
 
@@ -1274,9 +1274,9 @@ public class SsnsService {
         featTTV += ":" + prodTTV.getOffer();
         featTTV += ":" + prodTTV.getProductCd();
 
-        String chann = "chlist:N";
+        String chann = "ChListfailed";
         if (prodTTV.getChannelList() == 1) {
-            chann = "chlist:Y";
+            chann = "ChannelList";
         }
         featTTV += ":" + chann;
         prodTTV.setFeatTTV(featTTV);

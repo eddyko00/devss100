@@ -615,6 +615,9 @@ public class ServiceAFweb {
     public int processFeatureApp() {
 
         updateAppNameArray();
+        if ((appNameArray == null) || (appNameArray.size() == 0)) {
+            return 0;
+        }
         int result = 0;
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
@@ -628,9 +631,7 @@ public class ServiceAFweb {
             if (lockReturn == 0) {
                 return 0;
             }
-            if ((appNameArray == null) || (appNameArray.size() == 0)) {
-                return 0;
-            }
+
             logger.info("processFeatureApp for 2 minutes size " + appNameArray.size());
 
             long currentTime = System.currentTimeMillis();
@@ -687,6 +688,9 @@ public class ServiceAFweb {
     public int processFeatureProd() {
 
         updateProdNameArray();
+        if ((prodNameArray == null) || (prodNameArray.size() == 0)) {
+            return 0;
+        }
         int result = 0;
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
@@ -701,9 +705,6 @@ public class ServiceAFweb {
                 return 0;
             }
 
-            if ((prodNameArray == null) || (prodNameArray.size() == 0)) {
-                return 0;
-            }
             logger.info("processFeatureProd for 2 minutes size " + prodNameArray.size());
 
             long currentTime = System.currentTimeMillis();
@@ -749,40 +750,50 @@ public class ServiceAFweb {
         String app = SsnsService.APP_WIFI; //"wifi";
         file = CKey.FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            processETLsplunk(app, 20000);
-            FileUtil.FileDelete(file);
+            boolean ret = processETLsplunk(app, 10000);
+            if (ret == true) {
+                FileUtil.FileDelete(file);
+            }
             return;
         }
 
         app = SsnsService.APP_PRODUCT;  //"product"
         file = CKey.FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            processETLsplunk(app, 20000);
-            FileUtil.FileDelete(file);
+            boolean ret = processETLsplunk(app, 10000);
+            if (ret == true) {
+                FileUtil.FileDelete(file);
+            }
             return;
         }
 
         app = SsnsService.APP_APP;  //"appointment"
         file = CKey.FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            processETLsplunk(app, 0);
-            FileUtil.FileDelete(file);
+            boolean ret = processETLsplunk(app, 0);
+            if (ret == true) {
+                FileUtil.FileDelete(file);
+            }
             return;
         }
 
         String appTTV = SsnsService.APP_TTVSUB;  //ttvsub"
         file = CKey.FileLocalPath + appTTV + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            processETLsplunkTTV(appTTV, 0);
-            FileUtil.FileDelete(file);
+            boolean ret =  processETLsplunkTTV(appTTV, 0);
+            if (ret == true) {
+                FileUtil.FileDelete(file);
+            }
             return;
         }
 
         appTTV = SsnsService.APP_TTVREQ; //"ttvreq";
         file = CKey.FileLocalPath + appTTV + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            processETLsplunkTTV(appTTV, 0);
-            FileUtil.FileDelete(file);
+            boolean ret = processETLsplunkTTV(appTTV, 0);
+            if (ret == true) {
+                FileUtil.FileDelete(file);
+            }
             return;
         }
     }
@@ -824,7 +835,7 @@ public class ServiceAFweb {
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
         String LockName = "ETL_TTV";
-        int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processETLsplunk");
+        int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processETLsplunkTTV " + app);
         if (CKey.NN_DEBUG == true) {
             lockReturn = 1;
         }
@@ -921,6 +932,11 @@ public class ServiceAFweb {
                         logger.info("> ETLsplunkProcess  " + numAdd);
                     }
                     numAdd++;
+                    ////////just for testing
+                    if (numAdd > 3000) {
+                        break;
+                    }
+                    ////////just for testing                    
                 } else {
                     numDup++;
                 }
@@ -1048,11 +1064,12 @@ public class ServiceAFweb {
         }
 
     }
+
     public boolean processETLsplunk(String app, int length) {
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
         String LockName = "ETL";
-        int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processETLsplunk");
+        int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processETLsplunk " + app);
         if (CKey.NN_DEBUG == true) {
             lockReturn = 1;
         }
@@ -1065,6 +1082,7 @@ public class ServiceAFweb {
             logger.info("> No File exist " + file);
             return false;
         }
+
         int numAdd = 0;
         int numFail = 0;
         int numDup = 0;
@@ -1233,6 +1251,11 @@ public class ServiceAFweb {
                         logger.info("> ETLsplunkProcess  " + numAdd);
                     }
                     numAdd++;
+                    ////////just for testing
+                    if (numAdd > 3000) {
+                        break;
+                    }
+                    ////////just for testing
                 } else {
                     numDup++;
                 }

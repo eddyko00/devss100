@@ -20,8 +20,11 @@ public class CKey {
     //
     //////////////////////
     //
-    public static boolean PROXY = false; //false; //true; 
+    //always false
+    public static boolean PROXY = false; //always false; 
     public static String PROXYURL_TMP = "webproxystatic-on.tslabc.tabceluabcs.com";
+    //always false 
+    
     public static String URL_PRODUCT_TMP = "https://sabcoa-mp-rmsabck-prabc.tsabcl.teabclus.com";
 
     public static boolean NN_DEBUG = false; //false; //true; 
