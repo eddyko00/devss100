@@ -1672,7 +1672,7 @@ public class ServiceAFweb {
                 String feat = "";
 
                 if ((Oper == SsnsService.APP_GET_APP) || (Oper == SsnsService.APP_GET_TIMES)) {
-                    feat = ss.getFeatureSsnsProdTestingApp(ssnsAccObj, outputList, Oper);
+                    feat = ss.TestFeatureSsnsProdApp(ssnsAccObj, outputList, Oper);
                     logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
                 }
                 return outputList;
@@ -1698,7 +1698,7 @@ public class ServiceAFweb {
                 String feat = "";
                 if (prod == SsnsService.APP_PRODUCT) {
                     String oper = ssnsAccObj.getRet();
-                    feat = ss.getFeatureSsnsProdTestingProdttv(ssnsAccObj, outputList, oper);
+                    feat = ss.TestFeatureSsnsProductInventory(ssnsAccObj, outputList, oper);
                 } else {
 
                 }

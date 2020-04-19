@@ -252,9 +252,9 @@ public class SsnsService {
                     String outputSt = null;
                     if (oper.equals(APP_GET_TIMES)) {  //"searchTimeSlot";
 //                        not sure why it does not work so just call get appointment to get the feature
-                        outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+                        outputSt = SendSsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
                     } else {
-                        outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+                        outputSt = SendSsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
                     }
                     if (outputSt == null) {
                         return false;
@@ -290,7 +290,7 @@ public class SsnsService {
                 pData.setFlow(flow);
 
                 if (faulure == 1) {
-                    featTTV += ":failed";
+                    featTTV += ":splunkfailed";
                 }
             }
 
@@ -444,7 +444,7 @@ public class SsnsService {
         return null;
     }
 
-    public String SsnsTimeslot(String ProductURL, String appTId, String banid, String cust, String host) {
+    public String SendSsnsTimeslot(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
 
         String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
 
@@ -453,6 +453,9 @@ public class SsnsService {
         newbodymap.put("id", appTId);
         newbodymap.put("hostSystemCd", host);
         try {
+            if (inList != null) {
+                inList.add(url);
+            }
             String output = this.sendRequest_Ssns(METHOD_POST, url, null, newbodymap);
             return output;
         } catch (Exception ex) {
@@ -461,7 +464,7 @@ public class SsnsService {
         return null;
     }
 
-    public String getFeatureSsnsProdTestingApp(SsnsAcc dataObj, ArrayList<String> outputList, String Oper) {
+    public String TestFeatureSsnsProdApp(SsnsAcc dataObj, ArrayList<String> outputList, String Oper) {
         if (dataObj == null) {
             return "";
         }
@@ -472,22 +475,26 @@ public class SsnsService {
         String cust = dataObj.getCusid();
         String host = dataObj.getRet();
         String outputSt = null;
+        ArrayList<String> inList = new ArrayList();
         if (Oper == APP_GET_APP) {
-            outputSt = SsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+
+            outputSt = SendSsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, inList);
             if (outputSt == null) {
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+            outputList.addAll(inList);
             outputList.addAll(outList);
             ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
 
             return prodTTV.getFeatTTV();
         } else if (Oper == APP_GET_TIMES) {
-            outputSt = SsnsTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+            outputSt = SendSsnsTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, inList);
             if (outputSt == null) {
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+            outputList.addAll(inList);
             outputList.addAll(outList);
             String feat = dataObj.getName();
             int NumofStart = 0;
@@ -518,7 +525,7 @@ public class SsnsService {
         return "";
     }
 
-    public String SsnsAppointment(String ProductURL, String appTId, String banid, String cust, String host) {
+    public String SendSsnsAppointment(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
         if (host.length() > 0) {
             host = host.replace("9", ""); // remove OMS9
         }
@@ -530,6 +537,9 @@ public class SsnsService {
             }
         }
         try {
+            if (inList != null) {
+                inList.add(url);
+            }
             String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);
             return output;
         } catch (Exception ex) {
@@ -538,17 +548,19 @@ public class SsnsService {
         return null;
     }
 
-    public String getFeatureSsnsProdTestingProdttv(SsnsAcc dataObj, ArrayList<String> outputList, String oper) {
+    public String TestFeatureSsnsProductInventory(SsnsAcc dataObj, ArrayList<String> outputList, String oper) {
         if (dataObj == null) {
             return "";
         }
 
         String banid = dataObj.getBanid();
         String prodid = dataObj.getTiid();
-        String outputSt = SsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, prodid, oper);
+        ArrayList<String> inList = new ArrayList();
+        String outputSt = SendSsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, prodid, oper, inList);
         if (outputSt == null) {
             return "";
         }
+        outputList.addAll(inList);
         ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
         outputList.addAll(outList);
         ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
@@ -593,7 +605,7 @@ public class SsnsService {
 /////////////
             if (oper.equals(PROD_GET_BYID)) {
 
-                String outputSt = SsnsProdiuctInventoryByProdId(ServiceAFweb.URL_PRODUCT, banid, prodid);
+                String outputSt = SendSsnsProdiuctInventoryByProdId(ServiceAFweb.URL_PRODUCT, banid, prodid);
                 if (outputSt == null) {
                     return "";
                 }
@@ -1047,7 +1059,7 @@ public class SsnsService {
             String featTTV = "";
             String outputSt = null;
 
-            outputSt = SsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, prodid, oper);
+            outputSt = SendSsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, prodid, oper, null);
             if (outputSt == null) {
                 return false;
             }
@@ -1112,7 +1124,7 @@ public class SsnsService {
             String featTTV = "";
             String outputSt = null;
 
-            outputSt = SsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, prodid, oper);
+            outputSt = SendSsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, prodid, oper, null);
             if (outputSt == null) {
                 return false;
             }
@@ -1284,7 +1296,7 @@ public class SsnsService {
         return prodTTV;
     }
 
-    public String SsnsProdiuctInventoryByProdId(String ProductURL, String ban, String prodid) {
+    public String SendSsnsProdiuctInventoryByProdId(String ProductURL, String ban, String prodid) {
         String url = ProductURL + "/v1/cmo/selfmgmt/productinventory/product/" + prodid + "?billingAccount.id=" + ban;
         try {
             String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);
@@ -1295,7 +1307,7 @@ public class SsnsService {
         return null;
     }
 
-    public String SsnsProdiuctInventory(String ProductURL, String ban, String prodid, String productType) {
+    public String SendSsnsProdiuctInventory(String ProductURL, String ban, String prodid, String productType, ArrayList<String> inList) {
         String url = "";
         if (prodid.length() == 0) {
             url = ProductURL + "/v1/cmo/selfmgmt/productinventory/product?billingAccount.id=" + ban
@@ -1313,7 +1325,11 @@ public class SsnsService {
                 url += "&fields=product.characteristic.voicemail";
             }
         }
+
         try {
+            if (inList != null) {
+                inList.add(url);
+            }
             String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);
             return output;
         } catch (Exception ex) {
