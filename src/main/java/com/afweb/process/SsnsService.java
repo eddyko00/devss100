@@ -72,7 +72,6 @@ public class SsnsService {
         String feat = "";
         try {
             feat = getFeatureSsnsWifiProcess(dataObj);
-            getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
         } catch (Exception ex) {
             logger.info("> getFeatureSsnsWifi Exception" + ex.getMessage());
         }
@@ -262,11 +261,12 @@ public class SsnsService {
                     featTTV += ":splunkfailed";
                 }
             }
-
+            pData.setPostParam(postParm);
             NAccObj.setName(featTTV);
             NAccObj.setBanid(banid);
             NAccObj.setCusid(dataObj.getCusid());
-            String deviceInfo = uniquid + "~" + prodClass + "~" + serialid + "~" + parm + "~" + postParm;
+
+            String deviceInfo = uniquid + "~" + prodClass + "~" + serialid + "~" + parm;
             NAccObj.setTiid(deviceInfo);
 
             NAccObj.setUid(dataObj.getUid());
@@ -461,13 +461,23 @@ public class SsnsService {
     }
 
     public String SendSsnsWifi(String ProductURL, String oper, String banid, String uniquid, String prodClass, String serialid, String parm, ArrayList<String> inList) {
+//        https://soa-mp-rmsk-pr.tsl.telus.com:443/v1/cmo/selfmgmt/wifimanagement/account/208679328/device/
 
-        String url = ProductURL + "/v1/cmo/selfmgmt/wifimanagement/account/" + banid
-                + "/device/organizationuniqueid/" + uniquid
-                + "/productclass/" + prodClass
-                + "/serialnumber/" + serialid
-                + "/status";
+        String url = "";
 
+        if (oper.equals(WI_Getdev)) {
+            url = ProductURL + "/v1/cmo/selfmgmt/wifimanagement/account/" + banid
+                    + "/device";
+        } else if (oper.equals(WI_GetDeviceStatus)) {
+
+            url = ProductURL + "/v1/cmo/selfmgmt/wifimanagement/account/" + banid
+                    + "/device/organizationuniqueid/" + uniquid
+                    + "/productclass/" + prodClass
+                    + "/serialnumber/" + serialid
+                    + "/status";
+        } else {
+            return "";
+        }
         try {
             if (inList != null) {
                 inList.add(url);
@@ -480,12 +490,76 @@ public class SsnsService {
         return null;
     }
 
+    public String TestFeatureSsnsProdWifi(SsnsAcc dataObj, ArrayList<String> outputList, String Oper) {
+        if (dataObj == null) {
+            return "";
+        }
+
+        dataObj.getData();
+        String banid = dataObj.getBanid();
+        String appTId = dataObj.getTiid();
+        if (appTId.length() == 0) {
+            return "";
+        }
+        String WifiparL[] = appTId.split("~");
+
+        String uniquid = WifiparL[0];
+        String prodClass = WifiparL[1];
+        String serialid = WifiparL[2];
+
+        String outputSt = null;
+        ArrayList<String> inList = new ArrayList();
+        if (Oper == WI_GetDeviceStatus) {
+            outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, Oper, banid, uniquid, prodClass, serialid, Oper, inList);
+            if (outputSt == null) {
+
+                return "";
+            }
+            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+            ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
+            outputList.add(prodTTV.getFeatTTV());
+            outputList.addAll(inList);
+            outputList.addAll(outList);
+
+            return prodTTV.getFeatTTV();
+        } else if (Oper == WI_Getdev) {
+
+            outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, Oper, banid, uniquid, prodClass, serialid, Oper, inList);
+            if (outputSt == null) {
+                return "";
+            }
+
+            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+
+            String feat = dataObj.getName();
+            for (int i = 0; i < outList.size(); i++) {
+                String inLine = outList.get(i);
+                inLine = ServiceAFweb.replaceAll("\"", "", inLine);
+                inLine = ServiceAFweb.replaceAll(",", "", inLine);
+
+                if (inLine.indexOf("deviceTypeCd") != -1) {
+                    String dCd = ServiceAFweb.replaceAll("deviceTypeCd:", "", inLine);
+                    feat += ":" + dCd;
+                }
+                if (inLine.indexOf("productClassId") != -1) {
+                    String dCd = ServiceAFweb.replaceAll("productClassId:", "", inLine);
+                    feat += ":" + dCd;
+                }
+            }
+            outputList.add(feat);
+            outputList.addAll(inList);
+            outputList.addAll(outList);
+            return feat;
+        }
+
+        return "";
+    }
+
 ////////////////////////////////////////////    
     public String getFeatureSsnsAppointment(SsnsData dataObj) {
         String feat = "";
         try {
             feat = getFeatureSsnsAppointmentProcess(dataObj);
-            getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
         } catch (Exception ex) {
             logger.info("> getFeatureSsnsAppointment Exception" + ex.getMessage());
         }
@@ -897,9 +971,10 @@ public class SsnsService {
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+            ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
+            outputList.add(prodTTV.getFeatTTV());
             outputList.addAll(inList);
             outputList.addAll(outList);
-            ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
 
             return prodTTV.getFeatTTV();
         } else if (Oper == APP_GET_TIMES) {
@@ -908,12 +983,12 @@ public class SsnsService {
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            outputList.addAll(inList);
-            outputList.addAll(outList);
+
             String feat = dataObj.getName();
             int NumofStart = 0;
             for (int i = 0; i < outList.size(); i++) {
                 String inLine = outList.get(i);
+                inLine = ServiceAFweb.replaceAll("\"", "", inLine);
                 if (inLine.indexOf("startDate") != -1) {
                     NumofStart++;
                 }
@@ -933,6 +1008,9 @@ public class SsnsService {
                 }
                 newFeat += ":" + line;
             }
+            outputList.add(newFeat);
+            outputList.addAll(inList);
+            outputList.addAll(outList);
             return newFeat;
         }
 
@@ -974,25 +1052,29 @@ public class SsnsService {
         if (outputSt == null) {
             return "";
         }
-        outputList.addAll(inList);
+
         ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-        outputList.addAll(outList);
         ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
+        outputList.add(prodTTV.getFeatTTV());
+        outputList.addAll(inList);
+        outputList.addAll(outList);
+
         return prodTTV.getFeatTTV();
     }
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////    
+
     public String getFeatureSsnsProdiuctInventory(SsnsData dataObj) {
         String feat = "";
         try {
             feat = getFeatureSsnsProdiuctInventoryProcess(dataObj);
-            getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
         } catch (Exception ex) {
             logger.info("> getFeatureSsnsAppointment Exception" + ex.getMessage());
         }
         getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
         return feat;
     }
+
     public String getFeatureSsnsProdiuctInventoryProcess(SsnsData dataObj) {
 
         ProductData pData = new ProductData();

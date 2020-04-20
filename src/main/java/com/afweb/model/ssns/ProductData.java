@@ -14,6 +14,20 @@ import java.util.ArrayList;
 public class ProductData {
 
     /**
+     * @return the postParam
+     */
+    public String getPostParam() {
+        return postParam;
+    }
+
+    /**
+     * @param postParam the postParam to set
+     */
+    public void setPostParam(String postParam) {
+        this.postParam = postParam;
+    }
+
+    /**
      * @return the pSSNS
      */
     public ProductApp getpSSNS() {
@@ -43,7 +57,8 @@ public class ProductData {
     private ProductTTV pSING;    
     private ProductTTV pTTV;
     private ProductTTV pHSIC;
-    private ProductApp pSSNS;   
+    private ProductApp pSSNS; 
+    private String postParam="";
     private ArrayList<String> flow;
 
     /**

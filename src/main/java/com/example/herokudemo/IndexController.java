@@ -55,12 +55,19 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/prod/featureall");
         arrayString.add("/cust/{username}/id/{id}/prod/feature?name=");
 
-
         arrayString.add("/cust/{username}/id/{id}/app?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/app/id/{pid}");
-        arrayString.add("/cust/{username}/id/{id}/app/id/{pid}/rt");
+        arrayString.add("/cust/{username}/id/{id}/app/id/{pid}/rt/getapp");
+        arrayString.add("/cust/{username}/id/{id}/app/id/{pid}/rt/gettimeslot");
         arrayString.add("/cust/{username}/id/{id}/app/featureall");
         arrayString.add("/cust/{username}/id/{id}/app/feature?name=");
+
+        arrayString.add("/cust/{username}/id/{id}/wifi?length={0 for all}");
+        arrayString.add("/cust/{username}/id/{id}/wifi/id/{pid}");
+        arrayString.add("/cust/{username}/id/{id}/wifi/id/{pid}/rt/getdevie");
+        arrayString.add("/cust/{username}/id/{id}/wifi/id/{pid}/rt/getdevicestatus");
+        arrayString.add("/cust/{username}/id/{id}/wifi/featureall");
+        arrayString.add("/cust/{username}/id/{id}/wifi/feature?name=");
 
         arrayString.add("/cust/{username}/sys/stop");
         arrayString.add("/cust/{username}/sys/clearlock");
@@ -164,14 +171,12 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return loginObj;
     }
-//        arrayString.add("/cust/{username}/id/{id}/app?length={0 for all}");
-//        arrayString.add("/cust/{username}/id/{id}/app/id/{pid}");
-//        arrayString.add("/cust/{username}/id/{id}/app/id/{pid}/rt");
-//        arrayString.add("/cust/{username}/id/{id}/app/feature?name=");
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/app", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+/////////////////////////////////////
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/wifi", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
-    ArrayList<SsnsAcc> getapp(
+    ArrayList<SsnsAcc> getwifiprod(
             @PathVariable("username") String username,
             @PathVariable("id") String idSt,
             @RequestParam(value = "length", required = false) String lengthSt,
@@ -186,7 +191,123 @@ public class IndexController {
         if (lengthSt != null) {
             length = Integer.parseInt(lengthSt);
         }
-        ArrayList<SsnsAcc> ret = afWebService.getapp(username, idSt, length);
+        ArrayList<SsnsAcc> ret = afWebService.getSsnsprod(username, idSt, length, SsnsService.APP_WIFI);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/wifi/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    SsnsAcc getwifipid(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @PathVariable("pid") String pidSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        SsnsAcc ret = afWebService.getappById(username, idSt, pidSt);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/wifi/id/{pid}/rt/getdevice", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList getwifiidrt(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @PathVariable("pid") String pidSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        String oper = SsnsService.WI_Getdev;
+        ArrayList<String> ret = afWebService.testSsnsprodWifiByIdRT(username, idSt, pidSt, SsnsService.APP_WIFI, oper);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/wifi/id/{pid}/rt/getdevicestatus", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList getwifiidrtstatus(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @PathVariable("pid") String pidSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        String oper = SsnsService.WI_GetDeviceStatus;
+        ArrayList<String> ret = afWebService.testSsnsprodWifiByIdRT(username, idSt, pidSt, SsnsService.APP_WIFI, oper);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/wifi/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    NameData getwififeature(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        NameData ret = afWebService.getSsnsprodByFeature(username, idSt, SsnsService.APP_WIFI);
+
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/wifi/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<SsnsAcc> getwififeature(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "name", required = true) String name,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        ArrayList<SsnsAcc> ret = afWebService.getSsnsprodByFeatureName(username, idSt, name, SsnsService.APP_WIFI);
+
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+/////////////////////////////////////    
+    @RequestMapping(value = "/cust/{username}/id/{id}/app", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<SsnsAcc> getappprod(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "length", required = false) String lengthSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;
+        if (lengthSt != null) {
+            length = Integer.parseInt(lengthSt);
+        }
+        ArrayList<SsnsAcc> ret = afWebService.getSsnsprod(username, idSt, length, SsnsService.APP_APP);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -259,7 +380,7 @@ public class IndexController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             return null;
         }
-        NameData ret = afWebService.getappByFeature(username, idSt);
+        NameData ret = afWebService.getSsnsprodByFeature(username, idSt, SsnsService.APP_APP);
 
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
@@ -278,12 +399,13 @@ public class IndexController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             return null;
         }
-        ArrayList<SsnsAcc> ret = afWebService.getappByFeature(username, idSt, name);
+        ArrayList<SsnsAcc> ret = afWebService.getSsnsprodByFeatureName(username, idSt, name, SsnsService.APP_APP);
 
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
 ////////////////////////////////////
+
     @RequestMapping(value = "/cust/{username}/id/{id}/prod", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getprodttv(
@@ -343,7 +465,6 @@ public class IndexController {
         return ret;
     }
 
- 
     @RequestMapping(value = "/cust/{username}/id/{id}/prod/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     NameData getprodttvfeature(

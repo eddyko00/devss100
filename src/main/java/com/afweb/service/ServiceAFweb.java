@@ -355,15 +355,14 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////
                     boolean clearssnsflag = false;
                     if (clearssnsflag == true) {
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
 
-//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_APP);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
+//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_APP);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
 //                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WIFI);
-                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
-                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
                     }
 
                     boolean ETLsplunkFlat = false;
@@ -379,6 +378,16 @@ public class ServiceAFweb {
                         }
 
                     }
+/////////
+/////////                    
+                    boolean procallflag = false;
+                    if (procallflag == true) {
+                        for (int i = 0; i < 10; i++) {
+                            processFeatureApp();
+                            processFeatureProd();
+                            processFeatureWifi();
+                        }
+                    }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
 
@@ -386,6 +395,7 @@ public class ServiceAFweb {
 /////////
                     boolean procflag = false;
                     if (procflag == true) {
+
                         SsnsService ss = new SsnsService();
                         String feature = "";
                         boolean prodflag = true;
@@ -404,7 +414,7 @@ public class ServiceAFweb {
                     }
 /////////
 /////////
-                    boolean wififlag = true;
+                    boolean wififlag = false;
                     if (wififlag == true) {
                         SsnsService ss = new SsnsService();
                         String feature = "";
@@ -616,7 +626,7 @@ public class ServiceAFweb {
         if (wifiNameArray != null && wifiNameArray.size() > 0) {
             return wifiNameArray;
         }
-        ArrayList ttvNameArrayTemp = getAllOpenAppArray();
+        ArrayList ttvNameArrayTemp = getAllOpenWifiArray();
         if (ttvNameArrayTemp != null) {
             wifiNameArray = ttvNameArrayTemp;
         }
@@ -632,7 +642,7 @@ public class ServiceAFweb {
         int result = 0;
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
-        String LockName = "ETL";
+        String LockName = "ETL_" + SsnsService.APP_WIFI;
 
         try {
             int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureApp");
@@ -706,7 +716,7 @@ public class ServiceAFweb {
         int result = 0;
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
-        String LockName = "ETL";
+        String LockName = "ETL_" + SsnsService.APP_APP;
 
         try {
             int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureApp");
@@ -781,7 +791,7 @@ public class ServiceAFweb {
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
 
-        String LockName = "ETL";
+        String LockName = "ETL_" + SsnsService.APP_PRODUCT;
         try {
             int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureProd");
             if (CKey.NN_DEBUG == true) {
@@ -920,7 +930,7 @@ public class ServiceAFweb {
 
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
-        String LockName = "ETL_TTV";
+        String LockName = "ETL_" + app;;
         int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processETLsplunkTTV " + app);
         if (CKey.NN_DEBUG == true) {
             lockReturn = 1;
@@ -1144,7 +1154,7 @@ public class ServiceAFweb {
     public boolean processETLsplunk(String app, int length) {
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
-        String LockName = "ETL";
+        String LockName = "ETL_" + app;
         int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processETLsplunk " + app);
         if (CKey.NN_DEBUG == true) {
             lockReturn = 1;
@@ -1708,20 +1718,20 @@ public class ServiceAFweb {
 
     }
 
-    public ArrayList<SsnsAcc> getappByFeature(String EmailUserName, String IDSt, String name) {
-        if (getServerObj().isSysMaintenance() == true) {
-            return null;
-        }
-        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
-        if (IDSt != null) {
-            if (IDSt.equals(custObj.getId() + "") != true) {
-                return null;
-            }
-        }
-        ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(SsnsService.APP_APP, name);
-        return SsnsAcclist;
-
-    }
+//    public ArrayList<SsnsAcc> getappByFeature(String EmailUserName, String IDSt, String name) {
+//        if (getServerObj().isSysMaintenance() == true) {
+//            return null;
+//        }
+//        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+//        if (IDSt != null) {
+//            if (IDSt.equals(custObj.getId() + "") != true) {
+//                return null;
+//            }
+//        }
+//        ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(SsnsService.APP_APP, name);
+//        return SsnsAcclist;
+//
+//    }
 
     public ArrayList<SsnsAcc> getSsnsprodByFeatureName(String EmailUserName, String IDSt, String name, String prod) {
         if (getServerObj().isSysMaintenance() == true) {
@@ -1738,21 +1748,22 @@ public class ServiceAFweb {
 
     }
 
-    public NameData getappByFeature(String EmailUserName, String IDSt) {
-        if (getServerObj().isSysMaintenance() == true) {
-            return null;
-        }
-        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
-        if (IDSt != null) {
-            if (IDSt.equals(custObj.getId() + "") != true) {
-                return null;
-            }
-        }
-        ArrayList<String> namelist = getSsnsDataImp().getSsnsAccObjListByFeature(SsnsService.APP_APP);
-        NameData nameData = new NameData();
-        nameData.setName(namelist);
-        return nameData;
-    }
+    
+//    public NameData getappByFeature(String EmailUserName, String IDSt) {
+//        if (getServerObj().isSysMaintenance() == true) {
+//            return null;
+//        }
+//        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+//        if (IDSt != null) {
+//            if (IDSt.equals(custObj.getId() + "") != true) {
+//                return null;
+//            }
+//        }
+//        ArrayList<String> namelist = getSsnsDataImp().getSsnsAccObjListByFeature(SsnsService.APP_APP);
+//        NameData nameData = new NameData();
+//        nameData.setName(namelist);
+//        return nameData;
+//    }
 
     public NameData getSsnsprodByFeature(String EmailUserName, String IDSt, String prod) {
         if (getServerObj().isSysMaintenance() == true) {
@@ -1811,6 +1822,57 @@ public class ServiceAFweb {
         return null;
     }
 
+    public ArrayList<String> testSsnsprodWifiByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(prod, PIDSt);
+        if (ssnsAccObjList != null) {
+            if (ssnsAccObjList.size() > 0) {
+                SsnsAcc ssnsAccObj = (SsnsAcc) ssnsAccObjList.get(0);
+                ArrayList<String> outputList = new ArrayList();
+                SsnsService ss = new SsnsService();
+                String feat = "";
+
+                if ((Oper == SsnsService.WI_Getdev) || (Oper == SsnsService.WI_GetDeviceStatus)) {
+                    feat = ss.TestFeatureSsnsProdWifi(ssnsAccObj, outputList, Oper);
+                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
+                    if ((feat == null) || (feat.length() == 0)) {
+                        // disabled this Acc Obj
+                        int type = ssnsAccObj.getType();
+                        String name = ssnsAccObj.getName();
+                        int status = ssnsAccObj.getStatus();
+                        type = type + 1; // increate error count
+                        if (type > 2) {
+                            if (name.indexOf("~testfailed") != -1) {
+                                name += "~testfailed";
+                            }
+                        }
+                        this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
+                    } else {
+                        String name = ssnsAccObj.getName();
+                        if (name.indexOf("~testfailed") != -1) {
+                            int type = ssnsAccObj.getType();
+                            int status = ssnsAccObj.getStatus();
+                            type = 0; // increate error count
+                            name = ServiceAFweb.replaceAll("~testfailed", "", name);
+                            this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
+
+                        }
+                    }
+                }
+                return outputList;
+            }
+        }
+        return null;
+    }
+        
     public ArrayList<String> testSsnsprodAppByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
