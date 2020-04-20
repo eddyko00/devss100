@@ -1985,7 +1985,17 @@ public class SsnsService {
             }
             if (responseCode >= 200 && responseCode < 300) {
                 ;
-
+            } else if (responseCode == 500) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(
+                        con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+                // print result
+                return response.toString();
             } else {
 //                System.out.println("Response Code:: " + responseCode);
 //                System.out.println("bodyElement :: " + bodyElement);

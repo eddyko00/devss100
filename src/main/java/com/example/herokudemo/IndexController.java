@@ -73,7 +73,7 @@ public class IndexController {
         arrayString.add("/cust/{username}/sys/clearlock");
         arrayString.add("/cust/{username}/sys/start");
         arrayString.add("/cust/{username}/sys/lock");
-
+        arrayString.add("/cust/{username}/sys/reopenssnsdata");
         arrayString.add("/cust/{username}/sys/custlist");
         arrayString.add("/cust/{username}/sys/cust/{customername}/status/{status}/substatus/{substatus}");
 
@@ -550,6 +550,30 @@ public class IndexController {
         return null;
     }
 
+    @RequestMapping(value = "/cust/{username}/sys/reopendata", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    WebStatus SystemReopen(@PathVariable("username") String username) {
+        WebStatus msg = new WebStatus();
+        // remote is stopped
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            if (username.toLowerCase().equals(CKey.ADMIN_USERNAME.toLowerCase())) {
+                msg.setResponse(afWebService.SystemClearLock());
+                msg.setResult(true);
+                return msg;
+            }
+        }
+        CustomerObj cust = afWebService.getCustomerIgnoreMaintenance(username, null);
+        if (cust != null) {
+            if (cust.getType() == CustomerObj.INT_ADMIN_USER) {
+                msg.setResponse(afWebService.SystemReOpenData());
+                msg.setResult(true);
+                return msg;
+            }
+        }
+
+        return null;
+    }        
+        
     @RequestMapping(value = "/cust/{username}/sys/clearlock", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     WebStatus SystemClearLock(@PathVariable("username") String username) {

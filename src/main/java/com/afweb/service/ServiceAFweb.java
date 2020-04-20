@@ -2521,6 +2521,14 @@ public class ServiceAFweb {
         return "" + retSatus;
     }
 
+    public String SystemReOpenData() {
+        int retSatus = 0;
+        if (getServerObj().isLocalDBservice() == true) {
+            retSatus = getSsnsDataImp().updateSsnsDataAllOpenStatus();
+        }
+        return "" + retSatus;
+    }
+    
     public String SystemClearLock() {
         int retSatus = 0;
         if (getServerObj().isLocalDBservice() == true) {
