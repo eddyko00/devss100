@@ -361,7 +361,8 @@ public class ServiceAFweb {
 
 //                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_APP);
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
-                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WIFI);
+//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WIFI);
+                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
                         getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
                     }
 

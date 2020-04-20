@@ -69,6 +69,18 @@ public class SsnsService {
 ////////////////////////////////////////////    
 
     public String getFeatureSsnsWifi(SsnsData dataObj) {
+        String feat = "";
+        try {
+            feat = getFeatureSsnsWifiProcess(dataObj);
+            getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+        } catch (Exception ex) {
+            logger.info("> getFeatureSsnsWifi Exception" + ex.getMessage());
+        }
+        getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+        return feat;
+    }
+
+    public String getFeatureSsnsWifiProcess(SsnsData dataObj) {
         ProductData pData = new ProductData();
         if (dataObj == null) {
             return "";
@@ -102,11 +114,17 @@ public class SsnsService {
                     if (operList.length > 5) {
                         dataSt = dataObj.getData();
                         dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
-                        int beg = dataSt.indexOf("{");
-                        if (beg != -1) {
-                            postParm = dataSt.substring(beg);
-                            //missing }  ???
-                            postParm += "}";
+                        if (dataSt.indexOf("asynchronousRequest") == -1) {
+                            int beg = dataSt.indexOf("{");
+                            if (beg != -1) {
+                                postParm = dataSt.substring(beg, dataSt.length() - 1);
+                            }
+                        } else {
+                            int beg = dataSt.indexOf("{");
+                            if (beg != -1) {
+                                postParm = dataSt.substring(beg);
+                                postParm += "]";
+                            }
                         }
                     }
                 }
@@ -126,14 +144,19 @@ public class SsnsService {
                     parm = operList[4];
 
                     if (operList.length > 5) {
-//                      {connectDeviceList":[{"macAddressTxt":"C0:21:0D:E0:5D:24","statusCd":"pause"}]
                         dataSt = dataObj.getData();
                         dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
-                        int beg = dataSt.indexOf("{");
-                        if (beg != -1) {
-                            postParm = dataSt.substring(beg);
-                            //missing }  ???
-                            postParm += "}";
+                        if (dataSt.indexOf("asynchronousRequest") != -1) {
+                            int beg = dataSt.indexOf("{");
+                            if (beg != -1) {
+                                postParm = dataSt.substring(beg, dataSt.length() - 1);
+                            }
+                        } else {
+                            int beg = dataSt.indexOf("{");
+                            if (beg != -1) {
+                                postParm = dataSt.substring(beg);
+                                postParm += "}";
+                            }
                         }
                     }
                 }
@@ -149,25 +172,23 @@ public class SsnsService {
 
             } else {
                 logger.info("> getFeatureSsnsAppointment Other oper " + oper);
+                return "";
             }
             if (oper.equals(WI_Getdev)) {
-                // for testing ignore WI_Getdev becase alwasy no info
-                getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+                // for testing ignore WI_Getdev becase always no info
                 return "";
                 // for testing
             } else {
                 if (serialid.equals("")) {
-                    getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
                     return "";
                 }
             }
-            logger.info(dataSt);
-
+//            logger.info(dataSt);
 /////////////
             //call devop to get customer id
             SsnsAcc NAccObj = new SsnsAcc();
             NAccObj.setDown("splunkflow");
-            boolean stat = this.updateSsnsWifi(oper, banid, uniquid, prodClass, serialid, parm, pData, dataObj, NAccObj);
+            boolean stat = this.updateSsnsWifi(oper, banid, uniquid, prodClass, serialid, parm, postParm, pData, dataObj, NAccObj);
             if (stat == true) {
                 ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                 boolean exist = false;
@@ -182,24 +203,15 @@ public class SsnsService {
                 if (exist == false) {
                     int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
                 }
-
-            }
-
-            if (stat == true) {
-                getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
-            } else {
-                if (oper.equals(APP_GET_APP)) {
-                    getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
-                }
             }
             return NAccObj.getName();
         } catch (Exception ex) {
-            logger.info("> getFeatureSsnsAppointment Exception" + ex.getMessage());
+            logger.info("> getFeatureSsnsWifiProcess Exception" + ex.getMessage());
         }
         return "";
     }
 
-    public boolean updateSsnsWifi(String oper, String banid, String uniquid, String prodClass, String serialid, String parm, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
+    public boolean updateSsnsWifi(String oper, String banid, String uniquid, String prodClass, String serialid, String parm, String postParm, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
             String featTTV = "";
 
@@ -220,7 +232,7 @@ public class SsnsService {
                         return false;
                     }
                     ProductApp prodTTV = parseWifiFeature(outputSt, oper, prodClass);
-                    pData.setpWIFI(prodTTV);
+                    pData.setpSSNS(prodTTV);
                     featTTV = prodTTV.getFeat();
                 }
             } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
@@ -254,7 +266,7 @@ public class SsnsService {
             NAccObj.setName(featTTV);
             NAccObj.setBanid(banid);
             NAccObj.setCusid(dataObj.getCusid());
-            String deviceInfo = uniquid + ":" + prodClass + ":" + serialid + ":" + parm;
+            String deviceInfo = uniquid + "~" + prodClass + "~" + serialid + "~" + parm + "~" + postParm;
             NAccObj.setTiid(deviceInfo);
 
             NAccObj.setUid(dataObj.getUid());
@@ -470,6 +482,18 @@ public class SsnsService {
 
 ////////////////////////////////////////////    
     public String getFeatureSsnsAppointment(SsnsData dataObj) {
+        String feat = "";
+        try {
+            feat = getFeatureSsnsAppointmentProcess(dataObj);
+            getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+        } catch (Exception ex) {
+            logger.info("> getFeatureSsnsAppointment Exception" + ex.getMessage());
+        }
+        getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+        return feat;
+    }
+
+    public String getFeatureSsnsAppointmentProcess(SsnsData dataObj) {
         ProductData pData = new ProductData();
         if (dataObj == null) {
             return "";
@@ -503,7 +527,6 @@ public class SsnsService {
                             host = host.replace("hostSystemCd:", "");
                         }
                     }
-
                 }
             } else if (oper.equals(APP_GET_TIMES)) { //"timeslot")) {
                 dataSt = dataObj.getData();
@@ -514,7 +537,6 @@ public class SsnsService {
                 dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
                 String[] operList = dataSt.split(",");
                 if (operList.length > 3) {
-
                     int custInti = 0;
                     for (int k = 0; k < operList.length; k++) {
                         String inLine = operList[k];
@@ -577,25 +599,20 @@ public class SsnsService {
                         cust = "";
                     }
                     host = operList[3];
-
                 }
-
             } else {
-                logger.info("> getFeatureSsnsAppointment Other oper " + oper);
+                logger.info("> getFeatureSsnsAppointmentProcess Other oper " + oper);
             }
             if (oper.equals(APP_GET_APP)) {
                 // for testing ignore APP_GET_APP becase alwasy no info
-                getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
                 return "";
                 // for testing
             } else {
                 if (appTId.equals("")) {
-                    getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
                     return "";
                 }
             }
 //            logger.info(dataSt);
-
 /////////////
             //call devop to get customer id
             if ((banid.length() == 0) && (cust.length() == 0)) {
@@ -627,17 +644,9 @@ public class SsnsService {
                 }
 
             }
-
-            if (stat == true) {
-                getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
-            } else {
-                if (oper.equals(APP_GET_APP)) {
-                    getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
-                }
-            }
             return NAccObj.getName();
         } catch (Exception ex) {
-            logger.info("> getFeatureSsnsAppointment Exception" + ex.getMessage());
+            logger.info("> getFeatureSsnsAppointmentProcess Exception" + ex.getMessage());
         }
         return "";
     }
@@ -667,7 +676,7 @@ public class SsnsService {
                         return false;
                     }
                     ProductApp prodTTV = parseAppointmentFeature(outputSt, oper);
-                    pData.setpAPP(prodTTV);
+                    pData.setpSSNS(prodTTV);
                     featTTV = prodTTV.getFeat();
                 }
             } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
@@ -973,8 +982,18 @@ public class SsnsService {
     }
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////    
-
     public String getFeatureSsnsProdiuctInventory(SsnsData dataObj) {
+        String feat = "";
+        try {
+            feat = getFeatureSsnsProdiuctInventoryProcess(dataObj);
+            getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+        } catch (Exception ex) {
+            logger.info("> getFeatureSsnsAppointment Exception" + ex.getMessage());
+        }
+        getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+        return feat;
+    }
+    public String getFeatureSsnsProdiuctInventoryProcess(SsnsData dataObj) {
 
         ProductData pData = new ProductData();
         if (dataObj == null) {
@@ -1003,11 +1022,9 @@ public class SsnsService {
                 logger.info("> getFeatureSsnsProdiuctInventory Other oper " + oper);
             }
             if (banid.equals("null")) {
-                getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
                 return "";
             }
 //            logger.info(daSt);
-
 /////////////
             if (oper.equals(PROD_GET_BYID)) {
 
@@ -1015,7 +1032,6 @@ public class SsnsService {
                 if (outputSt == null) {
                     return "";
                 }
-
                 ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
                 String valueSt = "";
                 for (int j = 0; j < outputList.size(); j++) {
@@ -1123,11 +1139,9 @@ public class SsnsService {
                     }
                 }
             }
-            //update to complete so will not process again
-            getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
             return NAccObj.getName();
         } catch (Exception ex) {
-            logger.info("> getFeatureSsnsProdiuctInventory Exception" + ex.getMessage());
+            logger.info("> getFeatureSsnsProdiuctInventoryProcess Exception" + ex.getMessage());
         }
         return "";
     }

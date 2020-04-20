@@ -14,19 +14,18 @@ import java.util.ArrayList;
 public class ProductData {
 
     /**
-     * @return the pWIFI
+     * @return the pSSNS
      */
-    public ProductApp getpWIFI() {
-        return pWIFI;
+    public ProductApp getpSSNS() {
+        return pSSNS;
     }
 
     /**
-     * @param pWIFI the pWIFI to set
+     * @param pSSNS the pSSNS to set
      */
-    public void setpWIFI(ProductApp pWIFI) {
-        this.pWIFI = pWIFI;
+    public void setpSSNS(ProductApp pSSNS) {
+        this.pSSNS = pSSNS;
     }
-
     /**
      * @return the pSING
      */
@@ -41,25 +40,10 @@ public class ProductData {
         this.pSING = pSING;
     }
 
-    /**
-     * @return the pAPP
-     */
-    public ProductApp getpAPP() {
-        return pAPP;
-    }
-
-    /**
-     * @param pAPP the pAPP to set
-     */
-    public void setpAPP(ProductApp pAPP) {
-        this.pAPP = pAPP;
-    }
-
     private ProductTTV pSING;    
     private ProductTTV pTTV;
     private ProductTTV pHSIC;
-    private ProductApp pAPP;
-    private ProductApp pWIFI;    
+    private ProductApp pSSNS;   
     private ArrayList<String> flow;
 
     /**
