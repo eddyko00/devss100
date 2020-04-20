@@ -73,11 +73,7 @@ public class SsnsService {
         if (dataObj == null) {
             return "";
         }
-        String appTId = "";
-
         String cust = "";
-        String host = "";
-
         String banid = "";
         String uniquid = "";
         String prodClass = "";
@@ -107,12 +103,14 @@ public class SsnsService {
                         dataSt = dataObj.getData();
                         dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
                         int beg = dataSt.indexOf("{");
-                        postParm = dataSt.substring(beg);
-                        //missing }  ???
-                        postParm += "}";
+                        if (beg != -1) {
+                            postParm = dataSt.substring(beg);
+                            //missing }  ???
+                            postParm += "}";
+                        }
                     }
                 }
-            } else if (oper.equals(WI_config)) { //"timeslot")) {
+            } else if (oper.equals(WI_config)) {
                 dataSt = dataObj.getData();
                 dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
                 dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
@@ -132,9 +130,11 @@ public class SsnsService {
                         dataSt = dataObj.getData();
                         dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
                         int beg = dataSt.indexOf("{");
-                        postParm = dataSt.substring(beg);
-                        //missing }  ???
-                        postParm += "}";
+                        if (beg != -1) {
+                            postParm = dataSt.substring(beg);
+                            //missing }  ???
+                            postParm += "}";
+                        }
                     }
                 }
 
@@ -145,20 +145,7 @@ public class SsnsService {
                 dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
                 dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
                 dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
-                String[] operList = dataSt.split(",");
-                if (operList.length > 3) {
-                    appTId = operList[0];
-                    banid = operList[1];
-                    if (banid.equals("null")) {
-                        banid = "";
-                    }
-                    cust = operList[2];
-                    if (cust.equals("null")) {
-                        cust = "";
-                    }
-                    host = operList[3];
-
-                }
+                // skip no information
 
             } else {
                 logger.info("> getFeatureSsnsAppointment Other oper " + oper);
@@ -170,6 +157,7 @@ public class SsnsService {
                 // for testing
             } else {
                 if (serialid.equals("")) {
+                    getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
                     return "";
                 }
             }
@@ -251,7 +239,7 @@ public class SsnsService {
             if (NAccObj.getDown().equals("splunkflow")) {
 
                 ArrayList<String> flow = new ArrayList();
-                int faulure = getSsnsFlowTrace(dataObj, flow);
+                int faulure = getSsnsFlowTraceWifi(dataObj, flow);
                 if (flow == null) {
                     logger.info("> updateSsnsAppointment skip no flow");
                     return false;
@@ -386,6 +374,78 @@ public class SsnsService {
         prodTTV.setFeat(featTTV);
 
         return prodTTV;
+    }
+
+    public int getSsnsFlowTraceWifi(SsnsData dataObj, ArrayList<String> flow) {
+
+        String uid = dataObj.getUid();
+        int failure = 0;
+
+        ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjListByUid(dataObj.getApp(), uid);
+        if (ssnsList != null) {
+//            logger.info("> ssnsList " + ssnsList.size());
+            for (int i = 0; i < ssnsList.size(); i++) {
+                SsnsData data = ssnsList.get(i);
+                String flowSt = data.getDown();
+                if (flowSt.length() == 0) {
+                    flowSt = data.getOper();
+                }
+                flowSt += ":" + data.getExec();
+                String dataTxt = data.getData();
+                if (dataTxt.indexOf("stacktrace") != -1) {
+                    failure = 1;
+                } else {
+                    dataTxt = data.getRet();
+                    if (dataTxt.indexOf("httpCd=500") != -1) {
+                        failure = 1;
+                    }
+                }
+//                logger.info("> flow " + flowSt);
+                if (failure == 1) {
+                    flowSt += ":failed:" + data.getData();
+                }
+                flow.add(flowSt);
+            }
+        }
+
+        if (dataObj.getOper().equals(WI_config)) {
+            String dataSt = dataObj.getData();
+            dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+            dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+            dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+            dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+            dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+            String[] dataList = dataSt.split(",");
+            String callUid = "";
+            for (int i = 0; i < dataList.length; i++) {
+                String inLine = dataList[i];
+                if (inLine.indexOf("operationId") != -1) {
+                    String valueSt = inLine;
+                    valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                    valueSt = ServiceAFweb.replaceAll("operationId:", "", valueSt);
+                    if (valueSt.length() >= 36) {
+                        callUid = valueSt.substring(0, 36);  // overrid uuid for call back
+                        break;
+                    }
+                }
+            }
+            if (callUid.length() > 0) {
+                ssnsList = getSsnsDataImp().getSsnsDataObjListByUid(dataObj.getApp(), callUid);
+                if (ssnsList != null) {
+                    for (int i = 0; i < ssnsList.size(); i++) {
+                        SsnsData data = ssnsList.get(i);
+                        String flowSt = data.getDown();
+                        if (flowSt.length() == 0) {
+                            flowSt = data.getOper();
+                        }
+                        flowSt += ":" + data.getExec();
+                        flowSt += ":" + data.getData();
+                        flow.add(flowSt);
+                    }
+                }
+            }
+        }
+        return failure;
     }
 
     public String SendSsnsWifi(String ProductURL, String oper, String banid, String uniquid, String prodClass, String serialid, String parm, ArrayList<String> inList) {
@@ -530,6 +590,7 @@ public class SsnsService {
                 // for testing
             } else {
                 if (appTId.equals("")) {
+                    getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
                     return "";
                 }
             }
@@ -942,6 +1003,7 @@ public class SsnsService {
                 logger.info("> getFeatureSsnsProdiuctInventory Other oper " + oper);
             }
             if (banid.equals("null")) {
+                getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
                 return "";
             }
 //            logger.info(daSt);

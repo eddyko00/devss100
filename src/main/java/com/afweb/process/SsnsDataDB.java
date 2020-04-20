@@ -835,9 +835,11 @@ public class SsnsDataDB {
         return entries;
     }
 
-    public ArrayList getSsnsDataIDList(String app, String ret, int status) {
+    public ArrayList getSsnsDataIDList(String app, String ret, int status, int length) {
         String sql = "select id as name from ssnsdata where app='" + app + "' and ret='" + ret + "' and status=" + status
                 + " order by updatedatel asc";
+
+        sql = ServiceAFweb.getSQLLengh(sql, length);
         ArrayList array = getAllNameSQL(sql);
         return array;
     }

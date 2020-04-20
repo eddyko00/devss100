@@ -102,8 +102,8 @@ public class SsnsDataImp {
         return ssnsdb.getSsnsDataObjListByUid(app, uid);
     }
 
-    public ArrayList getSsnsDataIDList(String app, String ret, int status) {
-        return ssnsdb.getSsnsDataIDList(app, ret, status);
+    public ArrayList getSsnsDataIDList(String app, String ret, int status, int length) {
+        return ssnsdb.getSsnsDataIDList(app, ret, status, length);
     }
 
     public ArrayList<SsnsData> getSsnsDataObjList(String app, String ret, int status, int length) {

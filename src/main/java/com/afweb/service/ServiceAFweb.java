@@ -353,6 +353,18 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
+                    boolean clearssnsflag = false;
+                    if (clearssnsflag == true) {
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
+//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
+
+//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_APP);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
+                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WIFI);
+                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
+                    }
+
                     boolean ETLsplunkFlat = false;
                     if (ETLsplunkFlat == true) {
 
@@ -360,35 +372,15 @@ public class ServiceAFweb {
                         if (clearsplunkflag == true) {
                             this.getSsnsDataImp().deleteAllSsnsData(0);
                         }
+
                         for (int i = 0; i < 10; i++) {
                             processETL();
                         }
 
-//                        String app = SsnsService.APP_WIFI;
-//                        processETLsplunk(app, 30000);
-//                        app = SsnsService.APP_PRODUCT;
-//                        processETLsplunk(app, 20000);
-//                        app = SsnsService.APP_APP;
-//                        processETLsplunk(app, 0);
-//
-//                        String appTTV = SsnsService.APP_TTVSUB; // "ttvsub";
-//                        processETLsplunkTTV(appTTV, 0);
-//                        appTTV = SsnsService.APP_TTVREQ; //"ttvreq";
-//                        processETLsplunkTTV(appTTV, 0);
-////                        
-//                        this.getSsnsDataImp().deleteAllSsnsData(1);
                     }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
-                    boolean clearssnsflag = false;
-                    if (clearssnsflag == true) {
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
-//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
 
-                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_APP);
-                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
-                    }
 /////////
 /////////
                     boolean procflag = false;
@@ -425,7 +417,7 @@ public class ServiceAFweb {
                                 feature = ss.getFeatureSsnsWifi(data);
                             }
                         }
-                    }                    
+                    }
 /////////
 /////////
                     boolean appflag = false;
@@ -609,11 +601,12 @@ public class ServiceAFweb {
         }
     }
 ////////////////////////////////
+
     ArrayList<String> getAllOpenWifiArray() {
         String app = SsnsService.APP_WIFI;
         String ret = "parameter";
         int status = ConstantKey.OPEN;
-        return getSsnsDataImp().getSsnsDataIDList(app, ret, status);
+        return getSsnsDataImp().getSsnsDataIDList(app, ret, status, 15);
     }
 
     ArrayList<String> wifiNameArray = new ArrayList();
@@ -682,13 +675,12 @@ public class ServiceAFweb {
 
     }
 
-    
 /////////////////////////////////
     ArrayList<String> getAllOpenAppArray() {
         String app = SsnsService.APP_APP;
         String ret = "parameter";
         int status = ConstantKey.OPEN;
-        return getSsnsDataImp().getSsnsDataIDList(app, ret, status);
+        return getSsnsDataImp().getSsnsDataIDList(app, ret, status, 15);
     }
 
     ArrayList<String> appNameArray = new ArrayList();
@@ -757,11 +749,12 @@ public class ServiceAFweb {
 
     }
 ////////////////////////////////////
+
     ArrayList<String> getAllOpenProductArray() {
         String app = SsnsService.APP_PRODUCT;
         String ret = "parameter";
         int status = ConstantKey.OPEN;
-        return getSsnsDataImp().getSsnsDataIDList(app, ret, status);
+        return getSsnsDataImp().getSsnsDataIDList(app, ret, status, 15);
     }
 
     ArrayList<String> prodNameArray = new ArrayList();
@@ -1119,18 +1112,8 @@ public class ServiceAFweb {
                     if (end != -1) {
                         status = temSt.substring(0, end + 1);
                     }
-
-                    if (parmSt.indexOf("callbackNotification") != -1) {
-                        status = replaceAll("\"", "", status);
-                        status = replaceAll("\\n", "", status);
-                        status = replaceAll("\\", "\"", status);
-
-                        ret = "callbackNotification";
-                    } else {
-
-                        status = replaceAll("\"\"", "\"", status);
-                        ret = "parameter";
-                    }
+                    status = replaceAll("\"\"", "\"", status);
+                    ret = "parameter";
 
                     continue;
                 }
@@ -1269,6 +1252,72 @@ public class ServiceAFweb {
                         continue;
                     }
                     if (inLine.indexOf("parameter=") != -1) {
+                        if (app.equals(SsnsService.APP_WIFI)) {
+                            if (oper.equals(SsnsService.WI_Callback)) {
+                                String parmSt = spSt;
+                                int beg = parmSt.indexOf("parameter=");
+
+                                String temSt = parmSt.substring(beg + 10, parmSt.length());
+                                int end = temSt.indexOf("]");
+                                if (end != -1) {
+                                    status = temSt.substring(0, end + 1);
+                                }
+                                status = replaceAll("\"", "", status);
+                                status = replaceAll("\\n", "", status);
+                                status = replaceAll("\\", "\"", status);
+                                String[] statusL = status.split(" ");
+                                String tranUid = "";
+                                if (statusL.length > 0) {
+                                    for (int k = 0; k < statusL.length; k++) {
+                                        String inL = statusL[k];
+                                        if (inL.indexOf("CallbackID") != -1) {
+                                            for (int m = 0; m < statusL.length; m++) {
+                                                String inLL = statusL[m];
+                                                if (inLL.indexOf("<Value>") != -1) {
+                                                    String cUid = ServiceAFweb.replaceAll("<Value>", "", inLL);
+                                                    if (cUid.length() >= 36) {
+                                                        tranUid = cUid.substring(0, 36);
+                                                    }
+                                                    if (tranUid.length() > 0) {
+                                                        break;
+                                                    }
+                                                }
+                                                if (tranUid.length() > 0) {
+                                                    break;
+                                                }
+                                            }
+                                            if (tranUid.length() > 0) {
+                                                break;
+                                            }
+                                        }
+                                        if (tranUid.length() > 0) {
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (tranUid.length() > 0) {
+                                    tran = tranUid;
+                                    down = "TOCP";
+                                }
+                                ret = "parameter";
+                                continue;
+                            } else {
+                                String parmSt = spSt;
+                                int beg = parmSt.indexOf("parameter=");
+
+                                String temSt = parmSt.substring(beg + 10, parmSt.length());
+                                int end = temSt.indexOf("]");
+                                if (end != -1) {
+                                    status = temSt.substring(0, end + 1);
+                                }
+                                status = replaceAll("\"", "", status);
+                                status = replaceAll("\\n", "", status);
+                                status = replaceAll("\\", "\"", status);
+
+                                ret = "parameter";
+                                continue;
+                            }
+                        }
                         status = inLine.replace("parameter=", "");
                         String parmSt = spSt;
                         int beg = parmSt.indexOf("parameter=");
@@ -1278,19 +1327,9 @@ public class ServiceAFweb {
                         if (end != -1) {
                             status = temSt.substring(0, end + 1);
                         }
+                        status = replaceAll("\"\"", "\"", status);
+                        ret = "parameter";
 
-                        if (parmSt.indexOf("callbackNotification") != -1) {
-//                            logger.info("splunk " + i + " " + spSt);
-                            status = replaceAll("\"", "", status);
-                            status = replaceAll("\\n", "", status);
-                            status = replaceAll("\\", "\"", status);
-
-                            ret = "callbackNotification";
-                        } else {
-
-                            status = replaceAll("\"\"", "\"", status);
-                            ret = "parameter";
-                        }
                         continue;
                     }
 
@@ -1308,10 +1347,22 @@ public class ServiceAFweb {
 
                 SsnsData item = new SsnsData();
                 if (oper.equals(SsnsService.APP_GET_APP) || oper.equals(SsnsService.APP_CAN_APP) || oper.equals(SsnsService.APP_GET_TIMES) || oper.equals(SsnsService.APP_UPDATE)) {
+                    if (app.equals(SsnsService.APP_APP) == false) {
+                        logger.info("Wrong data file " + app + " detected:" + SsnsService.APP_APP);
+                        return true;
+                    }
                     app = SsnsService.APP_APP;
                 } else if (oper.equals(SsnsService.PROD_GET_BYID) || oper.equals(SsnsService.PROD_GET_PROD)) {
+                    if (app.equals(SsnsService.APP_PRODUCT) == false) {
+                        logger.info("Wrong data file " + app + " detected:" + SsnsService.APP_PRODUCT);
+                        return true;
+                    }
                     app = SsnsService.APP_PRODUCT;
                 } else if (oper.equals(SsnsService.WI_GetDeviceStatus) || oper.equals(SsnsService.WI_Callback) || oper.equals(SsnsService.WI_Getdev) || oper.equals(SsnsService.WI_config)) {
+                    if (app.equals(SsnsService.APP_WIFI) == false) {
+                        logger.info("Wrong data file " + app + " detected:" + SsnsService.APP_WIFI);
+                        return true;
+                    }
                     app = SsnsService.APP_WIFI;
                 } else {
                     continue;
