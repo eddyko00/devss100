@@ -809,8 +809,9 @@ public class SsnsDataDB {
         return entries;
     }
 
-    public ArrayList<SsnsAcc> getSsnsAccObjListByFeature(String app, String name) {
+    public ArrayList<SsnsAcc> getSsnsAccObjListByFeature(String app, String name, int length) {
         String sql = "select * from ssnsacc where app='" + app + "' and name='" + name + "'";
+        sql = ServiceAFweb.getSQLLengh(sql, length);
         ArrayList entries = getAllSsnsAccSQL(sql, 0);
         return entries;
     }

@@ -12,10 +12,16 @@ import com.afweb.service.ServiceAFweb;
 import com.afweb.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import java.io.BufferedReader;
+import java.io.InputStream;
 
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -24,11 +30,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.util.Map;
+import java.util.logging.Level;
 
 import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
 import org.apache.commons.codec.binary.Base64;
 import static org.apache.http.protocol.HTTP.USER_AGENT;
+
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  *
@@ -222,12 +235,18 @@ public class SsnsService {
                     if (oper.equals(WI_GetDeviceStatus)) {
                         outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, oper, banid, uniquid, prodClass, serialid, parm, null);
                     } else if (oper.equals(WI_config)) {
-                        outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, oper, banid, uniquid, prodClass, serialid, parm, null);
+                        outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, WI_GetDeviceStatus, banid, uniquid, prodClass, serialid, parm, null);
                     }
                     if (outputSt == null) {
                         return false;
                     }
-                    if (outputSt.length() < 80) {  // or test 
+                    if (outputSt.length() == 0) {
+                        return false;
+                    }
+//                    if (outputSt.length() < 80) {  // or test 
+//                        return false;
+//                    }
+                    if (outputSt.indexOf("responseCode:400500") != -1) {
                         return false;
                     }
                     ProductApp prodTTV = parseWifiFeature(outputSt, oper, prodClass);
@@ -245,7 +264,7 @@ public class SsnsService {
                 return false;
             }
 
-            logger.info("> updateSsnsAppointment feat " + featTTV);
+            logger.info("> updateSsnsWifi feat " + featTTV);
 /////////////TTV   
             if (NAccObj.getDown().equals("splunkflow")) {
 
@@ -739,17 +758,22 @@ public class SsnsService {
                     String outputSt = null;
                     if (oper.equals(APP_GET_TIMES)) {  //"searchTimeSlot";
 //                        not sure why it does not work so just call get appointment to get the feature
-                        outputSt = SendSsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
+                        outputSt = SendSsnsAppointmentGetApp(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
                     } else {
-                        outputSt = SendSsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
+                        outputSt = SendSsnsAppointmentGetApp(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
                     }
                     if (outputSt == null) {
                         return false;
                     }
-                    if (outputSt.length() < 80) {  // or test "appointmentList":[]
+                    if (outputSt.length() < 80) {
+                        // special case for no appointment {"status":{"statusCd":"200","statusTxt":"OK"},"appointmentList":[]}
+                        return false;
+                    }
+                    if (outputSt.indexOf("responseCode:400500") != -1) {
                         return false;
                     }
                     ProductApp prodTTV = parseAppointmentFeature(outputSt, oper);
+
                     pData.setpSSNS(prodTTV);
                     featTTV = prodTTV.getFeat();
                 }
@@ -886,6 +910,9 @@ public class SsnsService {
         featTTV += ":" + prodTTV.getStatusCd();
         featTTV += ":" + prodTTV.getCategoryCd();
 
+        if (featTTV.indexOf("::") != -1) {
+            logger.info("> parseAppointmentFeature " + featTTV);
+        }
         prodTTV.setFeat(featTTV);
 
         return prodTTV;
@@ -931,7 +958,7 @@ public class SsnsService {
         return null;
     }
 
-    public String SendSsnsTimeslot(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
+    public String SendSsnsAppointmentGetTimeslot(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
 
         String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
 
@@ -965,7 +992,7 @@ public class SsnsService {
         ArrayList<String> inList = new ArrayList();
         if (Oper == APP_GET_APP) {
 
-            outputSt = SendSsnsAppointment(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, inList);
+            outputSt = SendSsnsAppointmentGetApp(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, inList);
             if (outputSt == null) {
 
                 return "";
@@ -978,7 +1005,7 @@ public class SsnsService {
 
             return prodTTV.getFeatTTV();
         } else if (Oper == APP_GET_TIMES) {
-            outputSt = SendSsnsTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, inList);
+            outputSt = SendSsnsAppointmentGetTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, inList);
             if (outputSt == null) {
                 return "";
             }
@@ -1017,9 +1044,10 @@ public class SsnsService {
         return "";
     }
 
-    public String SendSsnsAppointment(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
+    public String SendSsnsAppointmentGetApp(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
         if (host.length() > 0) {
             host = host.replace("9", ""); // remove OMS9
+            host = host.replace("6", ""); // remove OMS9
         }
         String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/appointment?customerid=" + cust;
         if (banid.length() > 0) {
@@ -1566,7 +1594,9 @@ public class SsnsService {
             if (outputSt == null) {
                 return false;
             }
-
+            if (outputSt.indexOf("responseCode:400500") != -1) {
+                return false;
+            }
             if (oper.equals(APP_PRODUCT_TYPE_HSIC)) {
                 ProductTTV prodHSIC = parseProductInternetFeature(outputSt, dataObj.getOper());
                 pData.setpHSIC(prodHSIC);
@@ -1629,6 +1659,9 @@ public class SsnsService {
 
             outputSt = SendSsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, prodid, oper, null);
             if (outputSt == null) {
+                return false;
+            }
+            if (outputSt.indexOf("responseCode:400500") != -1) {
                 return false;
             }
             ProductTTV prodTTV = null;
@@ -1880,10 +1913,13 @@ public class SsnsService {
     private static final String METHOD_POST = "post";
     private static final String METHOD_GET = "get";
 
-    private String sendRequest_Ssns(String method, String subResourcePath, Map<String, String> queryParams, Map<String, String> bodyParams) throws Exception {
+    private String sendRequest_Ssns(String method, String subResourcePath, Map<String, String> queryParams,
+            Map<String, String> bodyParams) throws Exception {
         String response = null;
         for (int i = 0; i < 4; i++) {
+
             try {
+
                 response = sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams);
                 if (response != null) {
                     return response;
@@ -1893,6 +1929,7 @@ public class SsnsService {
                 logger.info("sendRequest " + method + " Rety " + (i + 1));
             }
         }
+
         response = sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams);
         return response;
     }
@@ -1981,21 +2018,26 @@ public class SsnsService {
 
             int responseCode = con.getResponseCode();
             if (responseCode != 200) {
-                System.out.println("Response Code:: " + responseCode);
+//                System.out.println("Response Code:: " + responseCode);
+
+                if ((responseCode == 400) || (responseCode == 500)) {
+                    InputStream inputstream = null;
+                    inputstream = con.getErrorStream();
+
+                    StringBuffer response = new StringBuffer();
+                    BufferedReader in = new BufferedReader(new InputStreamReader(inputstream));
+                    String line;
+                    response.append("responseCode:400500");
+                    while ((line = in.readLine()) != null) {
+                        response.append(line);
+                    }
+                    in.close();
+                    System.out.println(response.toString());
+                    return response.toString();
+                }
             }
             if (responseCode >= 200 && responseCode < 300) {
                 ;
-            } else if (responseCode == 500) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(
-                        con.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-                // print result
-                return response.toString();
             } else {
 //                System.out.println("Response Code:: " + responseCode);
 //                System.out.println("bodyElement :: " + bodyElement);
@@ -2092,7 +2134,21 @@ public class SsnsService {
 
             int responseCode = con.getResponseCode();
             if (responseCode != 200) {
-                System.out.println("Response Code:: " + responseCode);
+//                System.out.println("Response Code:: " + responseCode);
+                if ((responseCode == 400) || (responseCode == 500)) {
+                    InputStream inputstream = null;
+                    inputstream = con.getErrorStream();
+
+                    StringBuffer response = new StringBuffer();
+                    BufferedReader in = new BufferedReader(new InputStreamReader(inputstream));
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        response.append(line);
+                    }
+                    in.close();
+                    System.out.println(response.toString());
+                    return response.toString();
+                }
             }
             if (responseCode >= 200 && responseCode < 300) {
                 ;
@@ -2143,6 +2199,37 @@ public class SsnsService {
             return outString;
         }
         return inputStr.split("" + delimiter);
+    }
+
+    public String format(String unformattedXml) {
+        try {
+            final Document document = parseXmlFile(unformattedXml);
+
+            OutputFormat format = new OutputFormat(document);
+            format.setLineWidth(65);
+            format.setIndenting(true);
+            format.setIndent(2);
+            Writer out = new StringWriter();
+            XMLSerializer serializer = new XMLSerializer(out, format);
+            serializer.serialize(document);
+
+            return out.toString();
+        } catch (Exception e) {
+        }
+        return "";
+    }
+
+    private Document parseXmlFile(String in) {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            InputSource is = new InputSource(new StringReader(in));
+
+            return db.parse(is);
+
+        } catch (Exception e) {
+        }
+        return null;
     }
 
     /**

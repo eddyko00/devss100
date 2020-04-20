@@ -134,8 +134,8 @@ public class SsnsDataImp {
         return ssnsdb.getSsnsAccObjListByFeature(app);
     }
 
-    public ArrayList<SsnsAcc> getSsnsAccObjListByFeature(String app, String name) {
-        return ssnsdb.getSsnsAccObjListByFeature(app, name);
+    public ArrayList<SsnsAcc> getSsnsAccObjListByFeature(String app, String name, int length) {
+        return ssnsdb.getSsnsAccObjListByFeature(app, name, length);
     }
 
     public ArrayList<SsnsAcc> getSsnsAccObjListByID(String app, String pid) {

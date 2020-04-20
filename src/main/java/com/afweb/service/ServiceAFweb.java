@@ -517,7 +517,7 @@ public class ServiceAFweb {
                 processFeatureProd();
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
                 processFeatureApp();
-
+                processFeatureWifi();
             } else if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                 //10 Sec * 5 ~ 1 minutes
                 processETL();
@@ -1718,22 +1718,8 @@ public class ServiceAFweb {
 
     }
 
-//    public ArrayList<SsnsAcc> getappByFeature(String EmailUserName, String IDSt, String name) {
-//        if (getServerObj().isSysMaintenance() == true) {
-//            return null;
-//        }
-//        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
-//        if (IDSt != null) {
-//            if (IDSt.equals(custObj.getId() + "") != true) {
-//                return null;
-//            }
-//        }
-//        ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(SsnsService.APP_APP, name);
-//        return SsnsAcclist;
-//
-//    }
 
-    public ArrayList<SsnsAcc> getSsnsprodByFeatureName(String EmailUserName, String IDSt, String name, String prod) {
+    public ArrayList<SsnsAcc> getSsnsprodByFeatureName(String EmailUserName, String IDSt, String name, String prod, int length) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -1743,27 +1729,12 @@ public class ServiceAFweb {
                 return null;
             }
         }
-        ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(prod, name);
+        ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(prod, name, length);
         return SsnsAcclist;
 
     }
 
     
-//    public NameData getappByFeature(String EmailUserName, String IDSt) {
-//        if (getServerObj().isSysMaintenance() == true) {
-//            return null;
-//        }
-//        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
-//        if (IDSt != null) {
-//            if (IDSt.equals(custObj.getId() + "") != true) {
-//                return null;
-//            }
-//        }
-//        ArrayList<String> namelist = getSsnsDataImp().getSsnsAccObjListByFeature(SsnsService.APP_APP);
-//        NameData nameData = new NameData();
-//        nameData.setName(namelist);
-//        return nameData;
-//    }
 
     public NameData getSsnsprodByFeature(String EmailUserName, String IDSt, String prod) {
         if (getServerObj().isSysMaintenance() == true) {
@@ -1792,7 +1763,7 @@ public class ServiceAFweb {
                 return null;
             }
         }
-        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(SsnsService.APP_APP, PIDSt);
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(null, PIDSt);
         if (ssnsAccObjList != null) {
             if (ssnsAccObjList.size() > 0) {
                 SsnsAcc ssnsAccObj = (SsnsAcc) ssnsAccObjList.get(0);

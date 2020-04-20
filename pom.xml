@@ -108,6 +108,12 @@
             <version>1.18</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>apache</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.11.0</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
     <build>
