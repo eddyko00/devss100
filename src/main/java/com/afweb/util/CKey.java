@@ -14,14 +14,14 @@ public class CKey {
 
     public static final int POSTGRESQLDB = 1;
     public static final int MYSQLDB = 0;
-    public static int DB = POSTGRESQLDB;    
+    public static int DB = MYSQLDB;    
     
-    public static final int SQL_DATABASE = LOCAL_MYSQL;
+    public static final int SQL_DATABASE = REMOTE_MYSQL;
     //
     //////////////////////
     //
     //always false
-    public static boolean PROXY = false; //always false; 
+    public static boolean PROXY = true; //always false; 
     public static String PROXYURL_TMP = "webproxystatic-on.tslabc.tabceluabcs.com";
     //always false 
     
@@ -29,17 +29,16 @@ public class CKey {
 
     public static boolean NN_DEBUG = false; //false; //true; 
     public static boolean UI_ONLY = false;
-    public static boolean DEVOP = true;
+    public static boolean DEVOP = false;
 
 //    //
 //    //
     public static String WEBPOST_OP_PHP = "/health.php";
-    public static String URL_PATH_OP_DB_PHP1_TMP = "http://devphp-project000.paas-app-east-np.tabcsl.telabcus.com"; //eddyko00     
-//    public String URL_PATH_OP_DB_PHP1 = "";
-    public static final String URL_PATH_OP_TMP = "http://devssns-project000.paas-app-east-np.tabcsl.telabcus.com";
-//    public static final String URL_PATH_OP = "";
-//    public static String URL_PATH_OP_DB_PHP1 = "http://iiswebphp-web006.apps.us-east-1.starter.openshift-online.com"; //eddyko00     
-//    public static final String URL_PATH_OP = "http://iisweb-web006.apps.us-east-1.starter.openshift-online.com";
+//    public static String URL_PATH_OP_DB_PHP1_TMP = "http://devphp-project000.paas-app-east-np.tabcsl.telabcus.com"; //eddyko00     
+//    public static final String URL_PATH_OP_TMP = "http://devssns-project000.paas-app-east-np.tabcsl.telabcus.com";
+
+    public static String URL_PATH_OP_DB_PHP1_TMP = "http://iiswebphp-web006.apps.us-east-1.starter.openshift-online.com"; //eddyko00     
+    public static final String URL_PATH_OP_TMP = "http://iisweb-web006.apps.us-east-1.starter.openshift-online.com";
     //***********    
 //***********    
 //    public static final String SERVERDB_REMOTE_URL = URL_PATH_OP_DB_PHP1;  //LocalPCflag = false;

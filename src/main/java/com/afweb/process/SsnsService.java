@@ -2064,14 +2064,14 @@ public class SsnsService {
 
             HttpsURLConnection con = null; //(HttpURLConnection) request.openConnection();
 
-            if (CKey.PROXY == true) {
-                //////Add Proxy 
-                Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(ServiceAFweb.PROXYURL, 8080));
-                con = (HttpsURLConnection) request.openConnection(proxy);
-                //////Add Proxy 
-            } else {
+//            if (CKey.PROXY == true) {
+//                //////Add Proxy 
+//                Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(ServiceAFweb.PROXYURL, 8080));
+//                con = (HttpsURLConnection) request.openConnection(proxy);
+//                //////Add Proxy 
+//            } else {
                 con = (HttpsURLConnection) request.openConnection();
-            }
+//            }
 
 //            if (URLPath.indexOf(":8080") == -1) {
             String authStr = "APP_SELFSERVEUSGBIZSVC" + ":" + "soaorgid";
@@ -2167,6 +2167,7 @@ public class SsnsService {
             throws Exception {
         try {
 
+          
             String URLPath = subResourcePath;
 
             String webResourceString = "";
@@ -2187,14 +2188,14 @@ public class SsnsService {
 
             HttpURLConnection con = null; //(HttpURLConnection) request.openConnection();
 
-            if (CKey.PROXY == true) {
-                //////Add Proxy 
-                Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(ServiceAFweb.PROXYURL, 8080));
-                con = (HttpURLConnection) request.openConnection(proxy);
-                //////Add Proxy 
-            } else {
+//            if (CKey.PROXY == true) {
+//                //////Add Proxy 
+//                Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(ServiceAFweb.PROXYURL, 8080));
+//                con = (HttpURLConnection) request.openConnection(proxy);
+//                //////Add Proxy 
+//            } else {
                 con = (HttpURLConnection) request.openConnection();
-            }
+//            }
 
 //            if (URLPath.indexOf(":8080") == -1) {
             String authStr = "APP_SELFSERVEUSGBIZSVC" + ":" + "soaorgid";

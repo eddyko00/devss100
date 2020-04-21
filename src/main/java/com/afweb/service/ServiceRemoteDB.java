@@ -57,10 +57,6 @@ public class ServiceRemoteDB {
     public static String WEBPOST = "";
     private static String URL_PATH = "";
 
-    public ServiceRemoteDB() {
-
-        URL_PATH = ServiceAFweb.URL_PATH_OP_DB_PHP1 + CKey.WEBPOST_OP_PHP;
-    }
 
     /**
      * @return the URL_PATH
