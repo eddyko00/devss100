@@ -36,11 +36,11 @@ public class CKey {
 //    //
 //    //
     public static String WEBPOST_OP_PHP = "/health.php";
-//    public static String URL_PATH_OP_DB_PHP1_TMP = "http://devphp-project000.paas-app-east-np.tabcsl.telabcus.com"; //eddyko00     
-//    public static final String URL_PATH_OP_TMP = "http://devssns-project000.paas-app-east-np.tabcsl.telabcus.com";
+    public static String URL_PATH_OP_DB_PHP1_TMP = "http://devphp-project001.paas-app-east-np.tabcsl.telabcus.com"; //eddyko00     
+    public static final String URL_PATH_OP_TMP = "http://devssns-project001.paas-app-east-np.tabcsl.telabcus.com";
 
-    public static String URL_PATH_OP_DB_PHP1_TMP = "http://iiswebphp-web006.apps.us-east-1.starter.openshift-online.com"; //eddyko00     
-    public static final String URL_PATH_OP_TMP = "http://iisweb-web006.apps.us-east-1.starter.openshift-online.com";
+//    public static String URL_PATH_OP_DB_PHP1_TMP = "http://iiswebphp-web006.apps.us-east-1.starter.openshift-online.com"; //eddyko00     
+//    public static final String URL_PATH_OP_TMP = "http://iisweb-web006.apps.us-east-1.starter.openshift-online.com";
 
 //     public static String URL_PATH_OP_DB_PHP1_TMP = "http://iiswebphp-web006.apps.us-east-1.starter.openshift-online.com"; //eddyko00     
 //    public static final String URL_PATH_OP_TMP = "http://localhost:8080";
