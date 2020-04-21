@@ -491,8 +491,6 @@ public class SsnsService {
     }
 
     public String SendSsnsWifi(String ProductURL, String oper, String banid, String uniquid, String prodClass, String serialid, String parm, ArrayList<String> inList) {
-//        https://soa-mp-rmsk-pr.tsl.telus.com:443/v1/cmo/selfmgmt/wifimanagement/account/208679328/device/
-
         String url = "";
         if (banid.length() >= 10) {
             logger.info("> SendSsnsWifi Bandid is Phonenumber " + banid);
