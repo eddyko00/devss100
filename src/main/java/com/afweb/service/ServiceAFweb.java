@@ -376,7 +376,6 @@ public class ServiceAFweb {
                         for (int i = 0; i < 10; i++) {
                             processETL();
                         }
-
                     }
 /////////
 /////////                    
@@ -1914,7 +1913,7 @@ public class ServiceAFweb {
                 String feat = "";
                 if (prod == SsnsService.APP_PRODUCT) {
                     String oper = ssnsAccObj.getRet();
-                    if (oper.equals(ss))
+                   
                     feat = ss.TestFeatureSsnsProductInventory(ssnsAccObj, outputList, oper);
                     if ((feat == null) || (feat.length() == 0)) {
                         // disabled this Acc Obj
