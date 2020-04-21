@@ -2310,30 +2310,25 @@ public class ServiceAFweb {
         return msg;
     }
 
+    public String SystemRemoteUpdateMySQLList(String SQL) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return "";
+        }
+
+        String st = SQL;
+        String[] sqlList = st.split("~");
+        for (int i = 0; i < sqlList.length; i++) {
+            String sqlCmd = sqlList[i];
+            int ret = getSsnsDataImp().updateRemoteMYSQL(sqlCmd);
+        }
+        return ("" + sqlList.length);
+    }
+
     public String SystemRemoteUpdateMySQL(String SQL) {
         if (getServerObj().isSysMaintenance() == true) {
             return "";
         }
-        if (checkCallRemoteMysql() == true) {
-            RequestObj sqlObj = new RequestObj();
-            sqlObj.setCmd(ServiceAFweb.RemoteUpdateMySQL + "");
-            String st;
-            try {
-                st = new ObjectMapper().writeValueAsString(SQL);
-                sqlObj.setReq(st);
-                RequestObj sqlObjresp = SystemSQLRequest(sqlObj);
-                String output = sqlObjresp.getResp();
-                if (output == null) {
-                    return "";
 
-                }
-                String result = output;
-                return result;
-            } catch (Exception ex) {
-                logger.info("> SystemRemoteUpdateMySQL exception " + ex.getMessage());
-            }
-            return "";
-        }
         return getSsnsDataImp().updateRemoteMYSQL(SQL) + "";
     }
 
@@ -2341,26 +2336,7 @@ public class ServiceAFweb {
         if (getServerObj().isSysMaintenance() == true) {
             return "";
         }
-        if (checkCallRemoteMysql() == true) {
-            RequestObj sqlObj = new RequestObj();
-            sqlObj.setCmd(ServiceAFweb.RemoteGetMySQL + "");
-            String st;
-            try {
-                st = new ObjectMapper().writeValueAsString(SQL);
-                sqlObj.setReq(st);
-                RequestObj sqlObjresp = SystemSQLRequest(sqlObj);
-                String output = sqlObjresp.getResp();
-                if (output == null) {
-                    return "";
 
-                }
-                String result = output;
-                return result;
-            } catch (Exception ex) {
-                logger.info("> SystemRemoteGetMySQL exception " + ex.getMessage());
-            }
-            return "";
-        }
         return getSsnsDataImp().getRemoteMYSQL(SQL);
     }
 ///////////////////////////

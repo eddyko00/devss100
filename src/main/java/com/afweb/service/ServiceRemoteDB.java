@@ -222,24 +222,21 @@ public class ServiceRemoteDB {
                 return -1;
             }
             output = output.substring(beg + 3, end);
-            if (CKey.SQL_RemoveServerDB == true) {
-                ;
-            } else {
+
 //            String[] dataArray = output.split("~");
-                String[] dataArray = splitIncludeEmpty(output, '~');
-                output = "[";
-                int recSize = 1;
-                for (int i = 0; i < dataArray.length; i += recSize) {
-                    output += "{";
-                    output += "\"c\":\"" + dataArray[i] + "\"";
-                    if (i + recSize >= dataArray.length) {
-                        output += "}";
-                    } else {
-                        output += "},";
-                    }
+            String[] dataArray = splitIncludeEmpty(output, '~');
+            output = "[";
+            int recSize = 1;
+            for (int i = 0; i < dataArray.length; i += recSize) {
+                output += "{";
+                output += "\"c\":\"" + dataArray[i] + "\"";
+                if (i + recSize >= dataArray.length) {
+                    output += "}";
+                } else {
+                    output += "},";
                 }
-                output += "]";
             }
+            output += "]";
 
 //            log.info("getCountRowsInTable output " + output);
             ArrayList<CountRowsRDB> arrayDB = null;
@@ -519,7 +516,7 @@ public class ServiceRemoteDB {
             return getAllLockSqlRemoteDB_Process(output);
 
         } catch (Exception ex) {
-            log.info("getAllLockSqlRemoteDB exception " + ex);
+            log.info("getAllLockSqlRemoteDB_RemoteMysql exception " + ex);
             ServiceAFweb.getServerObj().setCntRESTexception(ServiceAFweb.getServerObj().getCntRESTexception() + 1);
             throw ex;
         }
@@ -560,7 +557,7 @@ public class ServiceRemoteDB {
             }
             return arrayReturn;
         } catch (IOException ex) {
-            log.info("getAllLockSqlRemoteDB exception " + output);
+            log.info("getAllLockSqlRemoteDB_Process exception " + output);
             return null;
         }
 

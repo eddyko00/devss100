@@ -917,11 +917,14 @@ public class SsnsDataDB {
     }
 
     public int updateRemoteMYSQL(String sqlCMD) throws Exception {
-        logger.info("> updateRemoteMYSQL " + sqlCMD);
-
-        getJdbcTemplate().execute(sqlCMD);
-//        getJdbcTemplate().update(sqlCMD);        
-        return 1;
+//        logger.info("> updateRemoteMYSQL " + sqlCMD);
+        try {
+            getJdbcTemplate().execute(sqlCMD);
+            return 1;
+        } catch (Exception e) {
+            logger.info("> updateRemoteMYSQL exception " + e.getMessage());
+        }
+        return 0;
     }
 
     public String getRemoteMYSQL(String sql) throws SQLException {
@@ -944,36 +947,29 @@ public class SsnsDataDB {
                 String columnName = metadata.getColumnName(i);
                 columns.add(columnName);
             }
-
             // Later we use the collected column names to get the value of the
             // column it self.
             StringBuilder retString = new StringBuilder();
-            retString.append("[");
-
             int firstList = 0;
             while (resultSet.next()) {
                 if (firstList > 0) {
-                    retString.append(",");
+                    retString.append("~");
                 }
                 firstList++;
-                retString.append("{");
                 int firstColumn = 0;
                 for (String columnName : columns) {
                     if (firstColumn > 0) {
-                        retString.append(",");
+                        retString.append("~");
                     }
                     firstColumn++;
                     String value = resultSet.getString(columnName);
-                    retString.append("\"" + columnName + "\"" + ":" + "\"" + value + "\"");
+                    retString.append(value);
                 }
-                retString.append("}");
             }
-            retString.append("]");
             String ret = retString.toString();
             return ret;
         } catch (SQLException e) {
             logger.info("> getRemoteMYSQL exception " + e.getMessage());
-
         } finally {
             if (con != null) {
                 con.close();
@@ -984,4 +980,65 @@ public class SsnsDataDB {
         }
         return "";
     }
+
+//    public String getRemoteMYSQL(String sql) throws SQLException {
+//        Statement stmt = null;
+//        Connection con = null;
+//        try {
+//            con = getDataSource().getConnection();
+//            stmt = con.createStatement();
+//            ResultSet resultSet = stmt.executeQuery(sql);
+//            // The ResultSetMetaData is where all metadata related information
+//            // for a result set is stored.
+//            ResultSetMetaData metadata = resultSet.getMetaData();
+//            int columnCount = metadata.getColumnCount();
+//
+//            // To get the column names we do a loop for a number of column count
+//            // returned above. And please remember a JDBC operation is 1-indexed
+//            // so every index begin from 1 not 0 as in array.
+//            ArrayList<String> columns = new ArrayList<String>();
+//            for (int i = 1; i < columnCount + 1; i++) {
+//                String columnName = metadata.getColumnName(i);
+//                columns.add(columnName);
+//            }
+//
+//            // Later we use the collected column names to get the value of the
+//            // column it self.
+//            StringBuilder retString = new StringBuilder();
+//            retString.append("[");
+//
+//            int firstList = 0;
+//            while (resultSet.next()) {
+//                if (firstList > 0) {
+//                    retString.append(",");
+//                }
+//                firstList++;
+//                retString.append("{");
+//                int firstColumn = 0;
+//                for (String columnName : columns) {
+//                    if (firstColumn > 0) {
+//                        retString.append(",");
+//                    }
+//                    firstColumn++;
+//                    String value = resultSet.getString(columnName);
+//                    retString.append("\"" + columnName + "\"" + ":" + "\"" + value + "\"");
+//                }
+//                retString.append("}");
+//            }
+//            retString.append("]");
+//            String ret = retString.toString();
+//            return ret;
+//        } catch (SQLException e) {
+//            logger.info("> getRemoteMYSQL exception " + e.getMessage());
+//
+//        } finally {
+//            if (con != null) {
+//                con.close();
+//            }
+//            if (stmt != null) {
+//                stmt.close();
+//            }
+//        }
+//        return "";
+//    }
 }

@@ -17,8 +17,8 @@ public class CKey {
     public static final int MYSQLDB = 0;
     public static int DB = MYSQLDB;
 
-    public static final int SQL_DATABASE = REMOTE_MYSQL;
-    public static final boolean SQL_RemoveServerDB = true; // using remote server not PHP 
+    public static final int SQL_DATABASE = MYSQL;
+    public static final boolean SQL_RemoveServerDB = false; // using remote server not PHP 
     //
     //////////////////////
     //
