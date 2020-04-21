@@ -816,6 +816,14 @@ public class SsnsDataDB {
         return entries;
     }
 
+    public String getSsnsAccObjListByFeatureCnt(String name) {
+
+        String sql = "SELECT COUNT(name) as name FROM ssnsacc where name='" + name + "' GROUP BY name";
+        ArrayList array = getAllNameSQL(sql);
+        String cnt = (String) array.get(0);
+        return cnt;
+    }
+
     public ArrayList<String> getSsnsAccObjListByFeature(String app) {
         String sql = "select DISTINCT name as name from ssnsacc where app='" + app + "' order by name asc";
         ArrayList array = getAllNameSQL(sql);

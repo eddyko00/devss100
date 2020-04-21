@@ -129,7 +129,9 @@ public class SsnsDataImp {
     public ArrayList<SsnsData> getSsnsDataObjList(String name, int type, long updatedatel) {
         return ssnsdb.getSsnsDataObj(name, type, updatedatel);
     }
-
+    public String getSsnsAccObjListByFeatureCnt(String name) {
+        return ssnsdb.getSsnsAccObjListByFeatureCnt(name);
+    }
     public ArrayList<String> getSsnsAccObjListByFeature(String app) {
         return ssnsdb.getSsnsAccObjListByFeature(app);
     }

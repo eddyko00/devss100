@@ -1717,7 +1717,6 @@ public class ServiceAFweb {
 
     }
 
-
     public ArrayList<SsnsAcc> getSsnsprodByFeatureName(String EmailUserName, String IDSt, String name, String prod, int length) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
@@ -1733,9 +1732,7 @@ public class ServiceAFweb {
 
     }
 
-    
-
-    public NameData getSsnsprodByFeature(String EmailUserName, String IDSt, String prod) {
+    public ArrayList<String> getSsnsprodByFeature(String EmailUserName, String IDSt, String prod) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -1746,10 +1743,17 @@ public class ServiceAFweb {
             }
         }
         ArrayList<String> namelist = getSsnsDataImp().getSsnsAccObjListByFeature(prod);
-        NameData nameData = new NameData();
-        nameData.setName(namelist);
-        return nameData;
 
+        ArrayList<String> retlist = new ArrayList();
+        if (namelist != null) {
+            for (int i = 0; i < namelist.size(); i++) {
+                String name = namelist.get(i);
+                retlist.add(name);
+                String cnt = getSsnsDataImp().getSsnsAccObjListByFeatureCnt(name);
+                 retlist.add(cnt);
+            }
+        }
+        return retlist;
     }
 
     public SsnsAcc getappById(String EmailUserName, String IDSt, String PIDSt) {
@@ -1842,7 +1846,7 @@ public class ServiceAFweb {
         }
         return null;
     }
-        
+
     public ArrayList<String> testSsnsprodAppByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
@@ -1913,7 +1917,7 @@ public class ServiceAFweb {
                 String feat = "";
                 if (prod == SsnsService.APP_PRODUCT) {
                     String oper = ssnsAccObj.getRet();
-                   
+
                     feat = ss.TestFeatureSsnsProductInventory(ssnsAccObj, outputList, oper);
                     if ((feat == null) || (feat.length() == 0)) {
                         // disabled this Acc Obj
@@ -2499,7 +2503,7 @@ public class ServiceAFweb {
         }
         return "" + retSatus;
     }
-    
+
     public String SystemClearLock() {
         int retSatus = 0;
         if (getServerObj().isLocalDBservice() == true) {

@@ -253,7 +253,7 @@ public class IndexController {
 
     @RequestMapping(value = "/cust/{username}/id/{id}/wifi/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
-    NameData getwififeature(
+    ArrayList<String> getwififeature(
             @PathVariable("username") String username,
             @PathVariable("id") String idSt,
             HttpServletRequest request, HttpServletResponse response
@@ -263,7 +263,7 @@ public class IndexController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             return null;
         }
-        NameData ret = afWebService.getSsnsprodByFeature(username, idSt, SsnsService.APP_WIFI);
+        ArrayList<String> ret = afWebService.getSsnsprodByFeature(username, idSt, SsnsService.APP_WIFI);
 
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
@@ -370,7 +370,7 @@ public class IndexController {
 
     @RequestMapping(value = "/cust/{username}/id/{id}/app/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
-    NameData getappfeature(
+    ArrayList<String> getappfeature(
             @PathVariable("username") String username,
             @PathVariable("id") String idSt,
             HttpServletRequest request, HttpServletResponse response
@@ -380,7 +380,7 @@ public class IndexController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             return null;
         }
-        NameData ret = afWebService.getSsnsprodByFeature(username, idSt, SsnsService.APP_APP);
+        ArrayList<String> ret = afWebService.getSsnsprodByFeature(username, idSt, SsnsService.APP_APP);
 
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
@@ -469,7 +469,7 @@ public class IndexController {
 
     @RequestMapping(value = "/cust/{username}/id/{id}/prod/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
-    NameData getprodttvfeature(
+    ArrayList<String> getprodttvfeature(
             @PathVariable("username") String username,
             @PathVariable("id") String idSt,
             HttpServletRequest request, HttpServletResponse response
@@ -479,7 +479,7 @@ public class IndexController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             return null;
         }
-        NameData ret = afWebService.getSsnsprodByFeature(username, idSt, SsnsService.APP_PRODUCT);
+        ArrayList<String> ret = afWebService.getSsnsprodByFeature(username, idSt, SsnsService.APP_PRODUCT);
 
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;

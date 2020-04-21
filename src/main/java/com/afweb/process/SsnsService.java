@@ -265,7 +265,7 @@ public class SsnsService {
                 return false;
             }
             if (banid.length() >= 10) {
-                featTTV += ":IncorrectBan";
+                featTTV += ":NotaBan";
             }
             logger.info("> updateSsnsWifi feat " + featTTV);
 /////////////TTV   
