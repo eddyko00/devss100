@@ -23,7 +23,7 @@ public class CKey {
     //////////////////////
     //
     //always false
-    public static boolean PROXY = true; //always false; 
+    public static boolean PROXY = false; //always false; 
     public static String PROXYURL_TMP = "webproxystatic-on.tslabc.tabceluabcs.com";
     //always false 
 
