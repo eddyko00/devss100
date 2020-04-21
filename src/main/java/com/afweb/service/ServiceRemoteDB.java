@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 package com.afweb.service;
- 
+
 import com.afweb.model.*;
 import com.afweb.service.db.*;
 import com.afweb.util.CKey;
@@ -30,15 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Logger;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.params.ConnRoutePNames;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 
 import static org.apache.http.protocol.HTTP.USER_AGENT;
 
@@ -56,7 +47,6 @@ public class ServiceRemoteDB {
 
     public static String WEBPOST = "";
     private static String URL_PATH = "";
-
 
     /**
      * @return the URL_PATH
@@ -232,21 +222,25 @@ public class ServiceRemoteDB {
                 return -1;
             }
             output = output.substring(beg + 3, end);
-
+            if (CKey.SQL_RemoveServerDB == true) {
+                ;
+            } else {
 //            String[] dataArray = output.split("~");
-            String[] dataArray = splitIncludeEmpty(output, '~');
-            output = "[";
-            int recSize = 1;
-            for (int i = 0; i < dataArray.length; i += recSize) {
-                output += "{";
-                output += "\"c\":\"" + dataArray[i] + "\"";
-                if (i + recSize >= dataArray.length) {
-                    output += "}";
-                } else {
-                    output += "},";
+                String[] dataArray = splitIncludeEmpty(output, '~');
+                output = "[";
+                int recSize = 1;
+                for (int i = 0; i < dataArray.length; i += recSize) {
+                    output += "{";
+                    output += "\"c\":\"" + dataArray[i] + "\"";
+                    if (i + recSize >= dataArray.length) {
+                        output += "}";
+                    } else {
+                        output += "},";
+                    }
                 }
+                output += "]";
             }
-            output += "]";
+
 //            log.info("getCountRowsInTable output " + output);
             ArrayList<CountRowsRDB> arrayDB = null;
             try {
@@ -571,6 +565,7 @@ public class ServiceRemoteDB {
         }
 
     }
+
     public ArrayList getAllSsnsAccSqlRemoteDB_RemoteMysql(String sqlCMD) throws Exception {
 
         ServiceAFweb.getServerObj().setCntRESTrequest(ServiceAFweb.getServerObj().getCntRESTrequest() + 1);
@@ -742,7 +737,7 @@ public class ServiceRemoteDB {
                 }
             }
             output += "]";
-            
+
             return getAllSsnsDataSqlRemoteDB_Process(output);
 
         } catch (Exception ex) {
@@ -1072,6 +1067,41 @@ public class ServiceRemoteDB {
     private String sendRequest_Process_Mysql(String method, String subResourcePath, Map<String, String> queryParams, Map<String, String> bodyParams)
             throws Exception {
         try {
+
+            boolean RemoteCallflag = CKey.SQL_RemoveServerDB;  // using remote server not PHP
+            if (RemoteCallflag == true) {
+                ServiceAFwebREST remoteREST = new ServiceAFwebREST();
+                RequestObj sqlObj = new RequestObj();
+                String cmd = "";
+                if (queryParams != null && !queryParams.isEmpty()) {
+                    for (String key : queryParams.keySet()) {
+                        cmd = queryParams.get(key);
+                        break;
+                    }
+                }
+                if (cmd.equals("1")) {
+                    ;
+                } else if (cmd.equals("2")) {
+                    ;
+                } else {
+                    return "";
+                }
+                sqlObj.setCmd(cmd);
+                String sql = "";
+                if (bodyParams != null && !bodyParams.isEmpty()) {
+                    String bodyTmp = "";
+                    for (String key : bodyParams.keySet()) {
+                        bodyTmp = bodyParams.get(key);
+                        sql = bodyTmp;
+                    }
+                }
+                sqlObj.setReq(sql);
+                String resp = remoteREST.getSQLRequest(sqlObj);
+                if (resp != null) {
+                    resp = "~~ " + resp + " ~~";
+                }
+                return resp;
+            }
             if (method.equals(METHOD_POST)) {
                 String URLPath = getURL_PATH() + subResourcePath;
 
@@ -1093,7 +1123,6 @@ public class ServiceRemoteDB {
                         bodyTmp = bodyTmp.replaceAll("%", "%25");
                         bodyElement = key + "=" + bodyTmp;
                     }
-
                 }
 
                 URLPath += webResourceString;
@@ -1174,7 +1203,6 @@ public class ServiceRemoteDB {
     }
 
     //////////////////////////
- 
     ////////
     public static String[] splitIncludeEmpty(String inputStr, char delimiter) {
         if (inputStr == null) {

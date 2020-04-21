@@ -6,6 +6,7 @@ public class CKey {
     public static String FileLocalPath = "C:\\TEMP\\";
     public static final boolean LocalPCflag = true; // true;
 
+
     //////////////////////
     // remember to update the application properties      
     public static final int LOCAL_MYSQL = 4; //jdbc:mysql://localhost:3306/db_sample     
@@ -14,9 +15,10 @@ public class CKey {
 
     public static final int POSTGRESQLDB = 1;
     public static final int MYSQLDB = 0;
-    public static int DB = MYSQLDB;    
-    
+    public static int DB = MYSQLDB;
+
     public static final int SQL_DATABASE = REMOTE_MYSQL;
+    public static final boolean SQL_RemoveServerDB = true; // using remote server not PHP 
     //
     //////////////////////
     //
@@ -24,7 +26,7 @@ public class CKey {
     public static boolean PROXY = true; //always false; 
     public static String PROXYURL_TMP = "webproxystatic-on.tslabc.tabceluabcs.com";
     //always false 
-    
+
     public static String URL_PRODUCT_TMP = "https://sabcoa-mp-rmsabck-prabc.tsabcl.teabclus.com";
 
     public static boolean NN_DEBUG = false; //false; //true; 
@@ -39,12 +41,14 @@ public class CKey {
 
     public static String URL_PATH_OP_DB_PHP1_TMP = "http://iiswebphp-web006.apps.us-east-1.starter.openshift-online.com"; //eddyko00     
     public static final String URL_PATH_OP_TMP = "http://iisweb-web006.apps.us-east-1.starter.openshift-online.com";
+
+//     public static String URL_PATH_OP_DB_PHP1_TMP = "http://iiswebphp-web006.apps.us-east-1.starter.openshift-online.com"; //eddyko00     
+//    public static final String URL_PATH_OP_TMP = "http://localhost:8080";
     //***********    
 //***********    
 //    public static final String SERVERDB_REMOTE_URL = URL_PATH_OP_DB_PHP1;  //LocalPCflag = false;
 //    public static final String SERVERDB_URL = URL_PATH_OP;
 //
-
     public static String dataSourceURL = "";
     public static final String ADMIN_USERNAME = "Admin1";
 ////////////////////////////  
