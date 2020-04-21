@@ -12,8 +12,7 @@ import com.afweb.service.ServiceAFweb;
 import com.afweb.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 
@@ -21,7 +20,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
+
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -37,11 +36,12 @@ import javax.net.ssl.HttpsURLConnection;
 import org.apache.commons.codec.binary.Base64;
 import static org.apache.http.protocol.HTTP.USER_AGENT;
 
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  *
@@ -283,7 +283,6 @@ public class SsnsService {
                     featTTV += ":splunkfailed";
                 }
             }
-
 
             pData.setPostParam(postParm);
             NAccObj.setName(featTTV);
@@ -1005,7 +1004,7 @@ public class SsnsService {
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            ProductApp prodTTV = parseAppointmentFeature(outputSt, Oper); 
+            ProductApp prodTTV = parseAppointmentFeature(outputSt, Oper);
             outputList.add(prodTTV.getFeat());
             outputList.addAll(inList);
             outputList.addAll(outList);
@@ -1087,14 +1086,24 @@ public class SsnsService {
         if (outputSt == null) {
             return "";
         }
-
+        String featTTV = "";
         ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-        ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
-        outputList.add(prodTTV.getFeatTTV());
+        if (oper.equals(APP_PRODUCT_TYPE_HSIC)) {
+            ProductTTV prodHSIC = parseProductInternetFeature(outputSt, dataObj.getOper());
+            featTTV = prodHSIC.getFeatTTV();
+        } else if (oper.equals(APP_PRODUCT_TYPE_TTV)) {
+            ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
+            featTTV = prodTTV.getFeatTTV();
+        } else if (oper.equals(APP_PRODUCT_TYPE_SING)) {
+            ProductTTV prodSING = parseProductPhoneFeature(outputSt, dataObj.getOper());
+            featTTV = prodSING.getFeatTTV();
+        }
+
+        outputList.add(featTTV);
         outputList.addAll(inList);
         outputList.addAll(outList);
 
-        return prodTTV.getFeatTTV();
+        return featTTV;
     }
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////    
@@ -2032,6 +2041,7 @@ public class SsnsService {
                 inputstream = con.getErrorStream();
 
                 StringBuffer response = new StringBuffer();
+                response.append(URLPath);                
                 BufferedReader in = new BufferedReader(new InputStreamReader(inputstream));
                 String line;
                 response.append("responseCode:400500");
@@ -2059,7 +2069,6 @@ public class SsnsService {
                 StringBuffer response = new StringBuffer();
 
                 while ((inputLine = in.readLine()) != null) {
-
                     response.append(inputLine);
                 }
                 in.close();
@@ -2147,12 +2156,14 @@ public class SsnsService {
                 inputstream = con.getErrorStream();
 
                 StringBuffer response = new StringBuffer();
+                response.append(URLPath);
                 BufferedReader in = new BufferedReader(new InputStreamReader(inputstream));
                 String line;
                 while ((line = in.readLine()) != null) {
                     response.append(line);
                 }
                 in.close();
+                
                 System.out.println(response.toString());
                 return response.toString();
 //                }
@@ -2208,35 +2219,21 @@ public class SsnsService {
         return inputStr.split("" + delimiter);
     }
 
-    public String format(String unformattedXml) {
-        try {
-            final Document document = parseXmlFile(unformattedXml);
+//https://self-learning-java-tutorial.blogspot.com/2018/03/pretty-print-xml-string-in-java.html
+    public static String getPrettyString(String xmlData, int indent) throws Exception {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setAttribute("indent-number", indent);
 
-            OutputFormat format = new OutputFormat(document);
-            format.setLineWidth(65);
-            format.setIndenting(true);
-            format.setIndent(2);
-            Writer out = new StringWriter();
-            XMLSerializer serializer = new XMLSerializer(out, format);
-            serializer.serialize(document);
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
-            return out.toString();
-        } catch (Exception e) {
-        }
-        return "";
-    }
+        StringWriter stringWriter = new StringWriter();
+        StreamResult xmlOutput = new StreamResult(stringWriter);
 
-    private Document parseXmlFile(String in) {
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            InputSource is = new InputSource(new StringReader(in));
+        Source xmlInput = new StreamSource(new StringReader(xmlData));
+        transformer.transform(xmlInput, xmlOutput);
 
-            return db.parse(is);
-
-        } catch (Exception e) {
-        }
-        return null;
+        return xmlOutput.getWriter().toString();
     }
 
     /**

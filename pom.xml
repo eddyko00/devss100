@@ -102,18 +102,7 @@
             <systemPath>${basedir}/libs/xchart-3.5.3-SNAPSHOT.jar</systemPath>
         </dependency>    
         -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <version>1.18</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>apache</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.11.0</version>
-            <type>jar</type>
-        </dependency>
+
     </dependencies>
 
     <build>
