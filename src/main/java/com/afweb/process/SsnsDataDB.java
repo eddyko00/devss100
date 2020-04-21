@@ -820,7 +820,12 @@ public class SsnsDataDB {
 
         String sql = "SELECT COUNT(name) as name FROM ssnsacc where name='" + name + "' GROUP BY name";
         ArrayList array = getAllNameSQL(sql);
-        String cnt = (String) array.get(0);
+        String cnt = "0";
+        if (array != null) {
+            if (array.size() > 0) {
+                cnt = (String) array.get(0);
+            }
+        }
         return cnt;
     }
 
