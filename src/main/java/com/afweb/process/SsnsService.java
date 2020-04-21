@@ -86,7 +86,7 @@ public class SsnsService {
         try {
             feat = getFeatureSsnsWifiProcess(dataObj);
         } catch (Exception ex) {
-            logger.info("> getFeatureSsnsWifi Exception" + ex.getMessage());
+            logger.info("> getFeatureSsnsWifi Exception " + ex.getMessage());
         }
         getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
         return feat;
@@ -225,7 +225,7 @@ public class SsnsService {
             }
             return NAccObj.getName();
         } catch (Exception ex) {
-            logger.info("> getFeatureSsnsWifiProcess Exception" + ex.getMessage());
+            logger.info("> getFeatureSsnsWifiProcess Exception " + ex.getMessage());
         }
         return "";
     }
@@ -315,7 +315,7 @@ public class SsnsService {
 
             return true;
         } catch (Exception ex) {
-            logger.info("> updateSsnsAppointment Exception" + ex.getMessage());
+            logger.info("> updateSsnsAppointment Exception " + ex.getMessage());
         }
         return false;
     }
@@ -604,7 +604,7 @@ public class SsnsService {
         try {
             feat = getFeatureSsnsAppointmentProcess(dataObj);
         } catch (Exception ex) {
-            logger.info("> getFeatureSsnsAppointment Exception" + ex.getMessage());
+            logger.info("> getFeatureSsnsAppointment Exception " + ex.getMessage());
         }
         getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
         return feat;
@@ -771,7 +771,7 @@ public class SsnsService {
             }
             return NAccObj.getName();
         } catch (Exception ex) {
-            logger.info("> getFeatureSsnsAppointmentProcess Exception" + ex.getMessage());
+            logger.info("> getFeatureSsnsAppointmentProcess Exception " + ex.getMessage());
         }
         return "";
     }
@@ -857,7 +857,7 @@ public class SsnsService {
 
             return true;
         } catch (Exception ex) {
-            logger.info("> updateSsnsAppointment Exception" + ex.getMessage());
+            logger.info("> updateSsnsAppointment Exception " + ex.getMessage());
         }
         return false;
     }
@@ -987,9 +987,9 @@ public class SsnsService {
 
             return "";
         } catch (Exception ex) {
-            logger.info("> SsnsAppointment exception " + ex.getMessage());
+//            logger.info("> getCustIdAppointmentDevop exception " + ex.getMessage());
         }
-        return null;
+        return "";
     }
 
     public String SendSsnsAppointmentGetTimeslot(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
@@ -1161,7 +1161,7 @@ public class SsnsService {
         try {
             feat = getFeatureSsnsProdiuctInventoryProcess(dataObj);
         } catch (Exception ex) {
-            logger.info("> getFeatureSsnsAppointment Exception" + ex.getMessage());
+            logger.info("> getFeatureSsnsAppointment Exception " + ex.getMessage());
         }
         getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
         return feat;
@@ -1315,7 +1315,7 @@ public class SsnsService {
             }
             return NAccObj.getName();
         } catch (Exception ex) {
-            logger.info("> getFeatureSsnsProdiuctInventoryProcess Exception" + ex.getMessage());
+            logger.info("> getFeatureSsnsProdiuctInventoryProcess Exception " + ex.getMessage());
         }
         return "";
     }
@@ -1718,7 +1718,7 @@ public class SsnsService {
 
             return true;
         } catch (Exception ex) {
-            logger.info("> updateSsnsProdiuctInventory Exception" + ex.getMessage());
+            logger.info("> updateSsnsProdiuctInventory Exception " + ex.getMessage());
         }
         return false;
     }
@@ -1788,7 +1788,7 @@ public class SsnsService {
 
             return true;
         } catch (Exception ex) {
-            logger.info("> updateSsnsProdiuctInventory Exception" + ex.getMessage());
+            logger.info("> updateSsnsProdiuctInventory Exception " + ex.getMessage());
         }
         return false;
     }

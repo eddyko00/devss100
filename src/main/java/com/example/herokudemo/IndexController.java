@@ -80,6 +80,33 @@ public class IndexController {
         return arrayString;
     }
 
+    @RequestMapping(value = "/cust/{username}/sys/mysql", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String getmysql(
+            @PathVariable("username") String username,
+            @RequestBody String input
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        RequestObj sqlObj = new RequestObj();
+        try {
+            sqlObj = new ObjectMapper().readValue(input, RequestObj.class);
+        } catch (IOException ex) {
+            return "";
+        }
+        CustomerObj cust = afWebService.getCustomerIgnoreMaintenance(username, null);
+        if (cust != null) {
+            if (cust.getType() == CustomerObj.INT_ADMIN_USER) {
+                if (sqlObj.getCmd().equals(ServiceAFweb.RemoteGetMySQL + "")) {
+                    return afWebService.SystemRemoteGetMySQL(sqlObj.getReq());
+                }
+                if (sqlObj.getCmd().equals(ServiceAFweb.RemoteUpdateMySQL + "")) {
+                    return afWebService.SystemRemoteUpdateMySQL(sqlObj.getReq());
+                }                
+            }
+        }
+        return "";
+    }
+
     @RequestMapping(value = "/server", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getServerObj() {
