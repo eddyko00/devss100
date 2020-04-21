@@ -252,6 +252,7 @@ public class SsnsService {
                     ProductApp prodTTV = parseWifiFeature(outputSt, oper, prodClass);
                     pData.setpSSNS(prodTTV);
                     featTTV = prodTTV.getFeat();
+
                 }
             } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
                 featTTV = APP_PRODUCT_TYPE_APP;
@@ -263,7 +264,9 @@ public class SsnsService {
             } else {
                 return false;
             }
-
+            if (banid.length() >= 10) {
+                featTTV += ":PassNotBan";
+            }
             logger.info("> updateSsnsWifi feat " + featTTV);
 /////////////TTV   
             if (NAccObj.getDown().equals("splunkflow")) {
@@ -280,6 +283,8 @@ public class SsnsService {
                     featTTV += ":splunkfailed";
                 }
             }
+
+
             pData.setPostParam(postParm);
             NAccObj.setName(featTTV);
             NAccObj.setBanid(banid);
@@ -483,7 +488,9 @@ public class SsnsService {
 //        https://soa-mp-rmsk-pr.tsl.telus.com:443/v1/cmo/selfmgmt/wifimanagement/account/208679328/device/
 
         String url = "";
-
+        if (banid.length() >= 10) {
+            logger.info("> SendSsnsWifi Bandid is Phonenumber " + banid);
+        }
         if (oper.equals(WI_Getdev)) {
             url = ProductURL + "/v1/cmo/selfmgmt/wifimanagement/account/" + banid
                     + "/device";
@@ -998,12 +1005,12 @@ public class SsnsService {
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
-            outputList.add(prodTTV.getFeatTTV());
+            ProductApp prodTTV = parseAppointmentFeature(outputSt, Oper); 
+            outputList.add(prodTTV.getFeat());
             outputList.addAll(inList);
             outputList.addAll(outList);
 
-            return prodTTV.getFeatTTV();
+            return prodTTV.getFeat();
         } else if (Oper == APP_GET_TIMES) {
             outputSt = SendSsnsAppointmentGetTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, inList);
             if (outputSt == null) {
@@ -2020,21 +2027,21 @@ public class SsnsService {
             if (responseCode != 200) {
 //                System.out.println("Response Code:: " + responseCode);
 
-                if ((responseCode == 400) || (responseCode == 500)) {
-                    InputStream inputstream = null;
-                    inputstream = con.getErrorStream();
+//                if ((responseCode == 400) || (responseCode == 500)) {
+                InputStream inputstream = null;
+                inputstream = con.getErrorStream();
 
-                    StringBuffer response = new StringBuffer();
-                    BufferedReader in = new BufferedReader(new InputStreamReader(inputstream));
-                    String line;
-                    response.append("responseCode:400500");
-                    while ((line = in.readLine()) != null) {
-                        response.append(line);
-                    }
-                    in.close();
-                    System.out.println(response.toString());
-                    return response.toString();
+                StringBuffer response = new StringBuffer();
+                BufferedReader in = new BufferedReader(new InputStreamReader(inputstream));
+                String line;
+                response.append("responseCode:400500");
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
                 }
+                in.close();
+                System.out.println(response.toString());
+                return response.toString();
+//                }
             }
             if (responseCode >= 200 && responseCode < 300) {
                 ;
@@ -2135,20 +2142,20 @@ public class SsnsService {
             int responseCode = con.getResponseCode();
             if (responseCode != 200) {
 //                System.out.println("Response Code:: " + responseCode);
-                if ((responseCode == 400) || (responseCode == 500)) {
-                    InputStream inputstream = null;
-                    inputstream = con.getErrorStream();
+//                if ((responseCode == 400) || (responseCode == 500)) {
+                InputStream inputstream = null;
+                inputstream = con.getErrorStream();
 
-                    StringBuffer response = new StringBuffer();
-                    BufferedReader in = new BufferedReader(new InputStreamReader(inputstream));
-                    String line;
-                    while ((line = in.readLine()) != null) {
-                        response.append(line);
-                    }
-                    in.close();
-                    System.out.println(response.toString());
-                    return response.toString();
+                StringBuffer response = new StringBuffer();
+                BufferedReader in = new BufferedReader(new InputStreamReader(inputstream));
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
                 }
+                in.close();
+                System.out.println(response.toString());
+                return response.toString();
+//                }
             }
             if (responseCode >= 200 && responseCode < 300) {
                 ;
