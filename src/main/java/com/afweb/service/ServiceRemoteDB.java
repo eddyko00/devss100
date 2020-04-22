@@ -1095,7 +1095,7 @@ public class ServiceRemoteDB {
                     }
                 }
                 sqlObj.setReq(sql);
-                String resp = remoteREST.getSQLRequest(sqlObj);
+                String resp = remoteREST.getSQLRequestRemote(sqlObj);
                 if (resp != null) {
                     resp = "~~ " + resp + " ~~";
                 }

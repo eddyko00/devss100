@@ -29,7 +29,7 @@ public class ServiceAFwebREST {
     private static final String METHOD_POST = "post";
     private static final String METHOD_GET = "get";
 
-    public String getSQLRequest(RequestObj sqlObj) {
+    public String getSQLRequestRemote(RequestObj sqlObj) {
         ServiceAFweb.getServerObj().setCntRESTrequest(ServiceAFweb.getServerObj().getCntRESTrequest() + 1);
         String subResourcePath = ServiceAFweb.SERVERDB_URL + "/cust/" + CKey.ADMIN_USERNAME + "/sys/mysql";
 
