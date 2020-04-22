@@ -12,6 +12,7 @@ import com.afweb.service.ServiceAFweb;
 import com.afweb.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.erichseifert.vectorgraphics2d.Document;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -29,10 +30,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.util.Map;
-import java.util.logging.Level;
 
 import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
+
 import org.apache.commons.codec.binary.Base64;
 import static org.apache.http.protocol.HTTP.USER_AGENT;
 
@@ -257,7 +258,7 @@ public class SsnsService {
                         return false;
                     }
                     ProductApp prodTTV = parseWifiFeature(outputSt, oper, prodClass);
-                    pData.setpSSNS(prodTTV);
+//                    pData.setpSSNS(prodTTV);
                     featTTV = prodTTV.getFeat();
 
                 }
@@ -277,14 +278,19 @@ public class SsnsService {
             logger.info("> updateSsnsWifi feat " + featTTV);
 /////////////TTV   
             if (NAccObj.getDown().equals("splunkflow")) {
-
+                ArrayList<String> callback = new ArrayList();
+                int faulureCall = getSsnsFlowTraceWifiCallback(dataObj, callback, postParm);
+                if (faulureCall == 0) {
+                    pData.setCallback(callback);
+                }
                 ArrayList<String> flow = new ArrayList();
-                int faulure = getSsnsFlowTraceWifi(dataObj, flow);
+                int faulure = getSsnsFlowTrace(dataObj, flow);
                 if (flow == null) {
                     logger.info("> updateSsnsAppointment skip no flow");
                     return false;
                 }
                 pData.setFlow(flow);
+                
 
                 if (faulure == 1) {
                     featTTV += ":splunkfailed";
@@ -418,11 +424,36 @@ public class SsnsService {
         return prodTTV;
     }
 
-    public int getSsnsFlowTraceWifi(SsnsData dataObj, ArrayList<String> flow) {
+    // 1 faulure, 0 = success
+    public int getSsnsFlowTraceWifiCallback(SsnsData dataObj, ArrayList<String> flow, String postParm) {
+        if (postParm == null) {
+            return 1;
+        }
+        if (postParm.length() == 1) {
+            return 1;
+        }
+        String newUid = "";
 
-        String uid = dataObj.getUid();
-        int failure = 0;
+        if (postParm.indexOf("asynchronousRequest") != -1) {
+            String[] operList = postParm.split(",");
+            for (int j = 0; j < operList.length; j++) {
+                String inLine = operList[j];
+                if (inLine.indexOf("operationId") != -1) {
+                    String valueSt = inLine;
+                    valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                    valueSt = ServiceAFweb.replaceAll("operationId:", "", valueSt);
+                    newUid = valueSt;
+                    break;
+                }
+            }
+        }
 
+        if (newUid.length() == 0) {
+            return 1;
+        }
+
+        String uid = newUid;
+  
         ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjListByUid(dataObj.getApp(), uid);
         if (ssnsList != null) {
 //            logger.info("> ssnsList " + ssnsList.size());
@@ -434,60 +465,70 @@ public class SsnsService {
                 }
                 flowSt += ":" + data.getExec();
                 String dataTxt = data.getData();
-                if (dataTxt.indexOf("stacktrace") != -1) {
-                    failure = 1;
-                } else {
-                    dataTxt = data.getRet();
-                    if (dataTxt.indexOf("httpCd=500") != -1) {
-                        failure = 1;
-                    }
-                }
-//                logger.info("> flow " + flowSt);
-                if (failure == 1) {
-                    flowSt += ":failed:" + data.getData();
-                }
-                flow.add(flowSt);
-            }
-        }
-
-        if (dataObj.getOper().equals(WI_config)) {
-            String dataSt = dataObj.getData();
-            dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
-            dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
-            dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
-            dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
-            dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
-            String[] dataList = dataSt.split(",");
-            String callUid = "";
-            for (int i = 0; i < dataList.length; i++) {
-                String inLine = dataList[i];
-                if (inLine.indexOf("operationId") != -1) {
-                    String valueSt = inLine;
-                    valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
-                    valueSt = ServiceAFweb.replaceAll("operationId:", "", valueSt);
-                    if (valueSt.length() >= 36) {
-                        callUid = valueSt.substring(0, 36);  // overrid uuid for call back
-                        break;
-                    }
-                }
-            }
-            if (callUid.length() > 0) {
-                ssnsList = getSsnsDataImp().getSsnsDataObjListByUid(dataObj.getApp(), callUid);
-                if (ssnsList != null) {
-                    for (int i = 0; i < ssnsList.size(); i++) {
-                        SsnsData data = ssnsList.get(i);
-                        String flowSt = data.getDown();
-                        if (flowSt.length() == 0) {
-                            flowSt = data.getOper();
+                if (dataTxt.indexOf("[tocpresp,") != -1) {
+                    try {
+                        String valueSt = ServiceAFweb.replaceAll("[tocpresp,{node:", "", dataTxt);
+                        valueSt = valueSt.substring(0, valueSt.length() - 2);
+                        String filteredStr = valueSt.replaceAll(" ", "");
+                        String[] filteredList = filteredStr.split("><");
+                        for (int k = 0; k < filteredList.length; k++) {
+                            String ln = filteredList[k];
+                            if (k == 0) {
+                                ln = ln + ">";
+                            } else if (k == filteredList.length - 1) {
+                                ln = "<" + ln;
+                            } else {
+                                ln = "<" + ln + ">";
+                            }
+                            flow.add(ln);
                         }
-                        flowSt += ":" + data.getExec();
-                        flowSt += ":" + data.getData();
-                        flow.add(flowSt);
+                        return 0;
+
+                    } catch (Exception ex) {
+                        logger.info(ex.getMessage());
                     }
                 }
+
             }
         }
-        return failure;
+        return 1;
+
+//        if (dataObj.getOper().equals(WI_config)) {
+//            String dataSt = dataObj.getData();
+//            dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+//            dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+//            dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+//            dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+//            dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+//            String[] dataList = dataSt.split(",");
+//            String callUid = "";
+//            for (int i = 0; i < dataList.length; i++) {
+//                String inLine = dataList[i];
+//                if (inLine.indexOf("operationId") != -1) {
+//                    String valueSt = inLine;
+//                    valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+//                    valueSt = ServiceAFweb.replaceAll("operationId:", "", valueSt);
+//                    if (valueSt.length() >= 36) {
+//                        callUid = valueSt.substring(0, 36);  // overrid uuid for call back
+//                        break;
+//                    }
+//                }
+//            }
+//            if (callUid.length() > 0) {
+//                ssnsList = getSsnsDataImp().getSsnsDataObjListByUid(dataObj.getApp(), callUid);
+//                if (ssnsList != null) {
+//                    for (int i = 0; i < ssnsList.size(); i++) {
+//                        SsnsData data = ssnsList.get(i);
+//                        String flowSt = data.getDown();
+//                        if (flowSt.length() == 0) {
+//                            flowSt = data.getOper();
+//                        }
+//                        flowSt += ":" + data.getExec();
+//                        flowSt += ":" + data.getData();
+//                        flow.add(flowSt);
+//                    }
+//                }
+//            }
     }
 
     public String SendSsnsWifi(String ProductURL, String oper, String banid, String uniquid, String prodClass, String serialid, String parm, ArrayList<String> inList) {
@@ -739,7 +780,7 @@ public class SsnsService {
                             cust = custid;
                             dataObj.setCusid(custid);
                             devOPflag = 1;
-                            logger.info("> getFeatureSsnsAppointmentProcess found DEVOP custid " + cust);
+                            logger.info("> getFeatureSsnsAppointmentProcess found Ticket to custid " + cust);
                         }
                     }
                 }
@@ -749,7 +790,7 @@ public class SsnsService {
             boolean stat = this.updateSsnsAppointment(oper, appTId, banid, cust, host, pData, dataObj, NAccObj);
             if (stat == true) {
                 if (devOPflag == 1) {
-                    String feat = NAccObj.getName() + ":DevOpGetCust";
+                    String feat = NAccObj.getName() + ":TicktoCust";
                     NAccObj.setName(feat);
                 }
                 ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
@@ -804,7 +845,7 @@ public class SsnsService {
                     }
                     ProductApp prodTTV = parseAppointmentFeature(outputSt, oper);
 
-                    pData.setpSSNS(prodTTV);
+//                    pData.setpSSNS(prodTTV);
                     featTTV = prodTTV.getFeat();
                 }
             } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
@@ -1667,18 +1708,20 @@ public class SsnsService {
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 return false;
             }
+
+            ProductTTV product = new ProductTTV();
             if (oper.equals(APP_PRODUCT_TYPE_HSIC)) {
-                ProductTTV prodHSIC = parseProductInternetFeature(outputSt, dataObj.getOper());
-                pData.setpHSIC(prodHSIC);
-                featTTV = prodHSIC.getFeatTTV();
+                product = parseProductInternetFeature(outputSt, dataObj.getOper());
+
+                featTTV = product.getFeatTTV();
             } else if (oper.equals(APP_PRODUCT_TYPE_TTV)) {
-                ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
-                pData.setpTTV(prodTTV);
-                featTTV = prodTTV.getFeatTTV();
+                product = parseProductTtvFeature(outputSt, dataObj.getOper());
+
+                featTTV = product.getFeatTTV();
             } else if (oper.equals(APP_PRODUCT_TYPE_SING)) {
-                ProductTTV prodSING = parseProductPhoneFeature(outputSt, dataObj.getOper());
-                pData.setpSING(prodSING);
-                featTTV = prodSING.getFeatTTV();
+                product = parseProductPhoneFeature(outputSt, dataObj.getOper());
+
+                featTTV = product.getFeatTTV();
             }
 
             logger.info("> updateSsnsProdiuctInventory feat " + featTTV);
@@ -1734,16 +1777,15 @@ public class SsnsService {
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 return false;
             }
-            ProductTTV prodTTV = null;
+            ProductTTV prodTTV = new ProductTTV();
             if (oper.equals(SsnsService.APP_PRODUCT_TYPE_HSIC)) {
                 prodTTV = parseProductInternetFeature(outputSt, dataObj.getOper());
-                pData.setpHSIC(prodTTV);
+
             } else if (oper.equals(SsnsService.APP_PRODUCT_TYPE_TTV)) {
                 prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
-                pData.setpTTV(prodTTV);
+
             } else if (oper.equals(SsnsService.APP_PRODUCT_TYPE_SING)) {
                 prodTTV = parseProductPhoneFeature(outputSt, dataObj.getOper());
-                pData.setpSING(prodTTV);
             }
 
             if (prodTTV == null) {
@@ -1967,7 +2009,7 @@ public class SsnsService {
         }
         return null;
     }
-
+    // 1 faulure, 0 = success
     public int getSsnsFlowTrace(SsnsData dataObj, ArrayList<String> flow) {
 
         String uid = dataObj.getUid();
@@ -2070,7 +2112,7 @@ public class SsnsService {
 //                con = (HttpsURLConnection) request.openConnection(proxy);
 //                //////Add Proxy 
 //            } else {
-                con = (HttpsURLConnection) request.openConnection();
+            con = (HttpsURLConnection) request.openConnection();
 //            }
 
 //            if (URLPath.indexOf(":8080") == -1) {
@@ -2167,7 +2209,6 @@ public class SsnsService {
             throws Exception {
         try {
 
-          
             String URLPath = subResourcePath;
 
             String webResourceString = "";
@@ -2194,7 +2235,7 @@ public class SsnsService {
 //                con = (HttpURLConnection) request.openConnection(proxy);
 //                //////Add Proxy 
 //            } else {
-                con = (HttpURLConnection) request.openConnection();
+            con = (HttpURLConnection) request.openConnection();
 //            }
 
 //            if (URLPath.indexOf(":8080") == -1) {
@@ -2285,7 +2326,7 @@ public class SsnsService {
             return null;
         }
         if (inputStr.charAt(inputStr.length() - 1) == delimiter) {
-            
+
             inputStr += "End";
             String[] tempString = inputStr.split("" + delimiter);
             int size = tempString.length - 1;
@@ -2299,7 +2340,7 @@ public class SsnsService {
     }
 
 //https://self-learning-java-tutorial.blogspot.com/2018/03/pretty-print-xml-string-in-java.html
-    public static String getPrettyString(String xmlData, int indent) throws Exception {
+    public static String getPrettyXMLString(String xmlData, int indent) throws Exception {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         transformerFactory.setAttribute("indent-number", indent);
 

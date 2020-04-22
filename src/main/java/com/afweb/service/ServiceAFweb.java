@@ -389,10 +389,10 @@ public class ServiceAFweb {
                         }
                     }
 
-                    boolean restoreSsnsAccFlag = true; // work for remote d
+                    boolean restoreSsnsAccFlag = false; // work for remote d
                     if (restoreSsnsAccFlag == true) {
-                         this.getSsnsDataImp().deleteAllSsnsAcc(0);
-                         boolean retSatus = getAccountImp().restoreSsnsAccDB(this);
+                        this.getSsnsDataImp().deleteAllSsnsAcc(0);
+                        boolean retSatus = getAccountImp().restoreSsnsAccDB(this);
                     }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
@@ -422,6 +422,9 @@ public class ServiceAFweb {
 /////////
                     boolean wififlag = false;
                     if (wififlag == true) {
+
+                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
+
                         SsnsService ss = new SsnsService();
                         String feature = "";
                         ArrayList appNameArrayTemp = getAllOpenWifiArray();
