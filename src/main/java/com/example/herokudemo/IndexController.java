@@ -115,7 +115,16 @@ public class IndexController {
 
         return afWebService.getServerList();
     }
-
+    @RequestMapping(value = "/server/localdb", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String getServerLocalDbURL() {
+        String url0 =RESTtimer.serverURL_0;
+        if (url0.length()==0) {
+            url0=ServiceAFweb.SERVERDB_URL;
+        }
+        return url0;
+    }
+    
     @RequestMapping(value = "/server/url0", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     String getServerURL() {

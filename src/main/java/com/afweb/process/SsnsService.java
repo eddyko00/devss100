@@ -12,7 +12,6 @@ import com.afweb.service.ServiceAFweb;
 import com.afweb.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.erichseifert.vectorgraphics2d.Document;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -23,8 +22,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -290,7 +288,6 @@ public class SsnsService {
                     return false;
                 }
                 pData.setFlow(flow);
-                
 
                 if (faulure == 1) {
                     featTTV += ":splunkfailed";
@@ -453,7 +450,7 @@ public class SsnsService {
         }
 
         String uid = newUid;
-  
+
         ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjListByUid(dataObj.getApp(), uid);
         if (ssnsList != null) {
 //            logger.info("> ssnsList " + ssnsList.size());
@@ -471,6 +468,8 @@ public class SsnsService {
                         valueSt = valueSt.substring(0, valueSt.length() - 2);
                         String filteredStr = valueSt.replaceAll(" ", "");
                         String[] filteredList = filteredStr.split("><");
+
+                        flow.add(postParm);
                         for (int k = 0; k < filteredList.length; k++) {
                             String ln = filteredList[k];
                             if (k == 0) {
@@ -2009,6 +2008,7 @@ public class SsnsService {
         }
         return null;
     }
+
     // 1 faulure, 0 = success
     public int getSsnsFlowTrace(SsnsData dataObj, ArrayList<String> flow) {
 
@@ -2340,22 +2340,21 @@ public class SsnsService {
     }
 
 //https://self-learning-java-tutorial.blogspot.com/2018/03/pretty-print-xml-string-in-java.html
-    public static String getPrettyXMLString(String xmlData, int indent) throws Exception {
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        transformerFactory.setAttribute("indent-number", indent);
-
-        Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-        StringWriter stringWriter = new StringWriter();
-        StreamResult xmlOutput = new StreamResult(stringWriter);
-
-        Source xmlInput = new StreamSource(new StringReader(xmlData));
-        transformer.transform(xmlInput, xmlOutput);
-
-        return xmlOutput.getWriter().toString();
-    }
-
+//    public static String getPrettyXMLString(String xmlData, int indent) throws Exception {
+//        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+//        transformerFactory.setAttribute("indent-number", indent);
+//
+//        Transformer transformer = transformerFactory.newTransformer();
+//        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+//
+//        StringWriter stringWriter = new StringWriter();
+//        StreamResult xmlOutput = new StreamResult(stringWriter);
+//
+//        Source xmlInput = new StreamSource(new StringReader(xmlData));
+//        transformer.transform(xmlInput, xmlOutput);
+//
+//        return xmlOutput.getWriter().toString();
+//    }
     /**
      * @return the ssnsDataImp
      */
