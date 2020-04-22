@@ -12,7 +12,6 @@ import com.afweb.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -37,8 +36,6 @@ import org.springframework.stereotype.Service;
  *
  * @author eddy
  */
-
-
 @Service
 public class ServiceAFweb {
 
@@ -63,6 +60,7 @@ public class ServiceAFweb {
     public static String PROXYURL = "";
 
     public static String URL_LOCALDB = "";
+
     /**
      * @return the serverObj
      */
@@ -367,7 +365,7 @@ public class ServiceAFweb {
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
                     }
 
-                    boolean ETLsplunkFlat = false;
+                    boolean ETLsplunkFlat = true;
                     if (ETLsplunkFlat == true) {
 
                         boolean clearsplunkflag = false;
@@ -387,6 +385,7 @@ public class ServiceAFweb {
                             processFeatureApp();
                             processFeatureProd();
                             processFeatureWifi();
+                            processFeatureTTVC();
                         }
                     }
 
@@ -424,8 +423,7 @@ public class ServiceAFweb {
                     boolean wififlag = false;
                     if (wififlag == true) {
 
-                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
-
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
                         SsnsService ss = new SsnsService();
                         String feature = "";
                         ArrayList appNameArrayTemp = getAllOpenWifiArray();
@@ -453,6 +451,22 @@ public class ServiceAFweb {
                                 int id = Integer.parseInt(idSt);
                                 SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
                                 feature = ss.getFeatureSsnsAppointment(data);
+                            }
+                        }
+                    }
+
+                    boolean ttvReqflag = false;
+                    if (ttvReqflag == true) {
+                        SsnsService ss = new SsnsService();
+                        String feature = "";
+                        ArrayList appNameArrayTemp = getAllOpenTTVCArray();
+                        if (appNameArrayTemp != null) {
+                            for (int i = 0; i < appNameArrayTemp.size(); i++) {
+                                String idSt = (String) appNameArrayTemp.get(i);
+
+                                int id = Integer.parseInt(idSt);
+                                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                                feature = ss.getFeatureSsnsTTVC(data);
                             }
                         }
                     }
@@ -685,6 +699,86 @@ public class ServiceAFweb {
                 int id = Integer.parseInt(idSt);
                 SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
                 String feature = ss.getFeatureSsnsWifi(data);
+//                logger.info("> feature " + i + " " + feature);
+
+                AFSleep();
+            }
+        } catch (Exception ex) {
+        }
+        removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
+        return result;
+
+    }
+/////////////////////////////////
+
+    ArrayList<String> getAllOpenTTVCArray() {
+        String app = SsnsService.APP_TTVREQ;
+        String ret = "parameter";
+        int status = ConstantKey.OPEN;
+        ArrayList<String> retList = new ArrayList();
+        ArrayList<String> reqList = getSsnsDataImp().getSsnsDataIDList(app, ret, status, 15);
+        app = SsnsService.APP_TTVSUB;
+        ArrayList<String> subList = getSsnsDataImp().getSsnsDataIDList(app, ret, status, 15);
+        retList.addAll(reqList);
+        retList.addAll(subList);
+        return retList;
+    }
+
+    ArrayList<String> ttvcNameArray = new ArrayList();
+
+    private ArrayList updateTTVCNameArray() {
+        if (ttvcNameArray != null && ttvcNameArray.size() > 0) {
+            return ttvcNameArray;
+        }
+        ArrayList ttvNameArrayTemp = getAllOpenTTVCArray();
+        if (ttvNameArrayTemp != null) {
+            ttvcNameArray = ttvNameArrayTemp;
+        }
+        return ttvcNameArray;
+    }
+
+    public int processFeatureTTVC() {
+
+        updateTTVCNameArray();
+        if ((ttvcNameArray == null) || (ttvcNameArray.size() == 0)) {
+            return 0;
+        }
+        int result = 0;
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        long lockDateValue = dateNow.getTimeInMillis();
+        String LockName = "ETL_" + SsnsService.APP_TTVREQ;
+
+        try {
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureApp");
+            if (CKey.NN_DEBUG == true) {
+                lockReturn = 1;
+            }
+            if (lockReturn == 0) {
+                return 0;
+            }
+
+            logger.info("processFeatureApp for 2 minutes size " + ttvcNameArray.size());
+
+            long currentTime = System.currentTimeMillis();
+            long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
+
+            for (int i = 0; i < 5; i++) {
+                currentTime = System.currentTimeMillis();
+//                if (CKey.NN_DEBUG != true) {
+                if (lockDate1Min < currentTime) {
+                    break;
+                }
+//                }
+                if (ttvcNameArray.size() == 0) {
+                    break;
+                }
+
+                String idSt = (String) ttvcNameArray.get(0);
+                ttvcNameArray.remove(0);
+                SsnsService ss = new SsnsService();
+                int id = Integer.parseInt(idSt);
+                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                String feature = ss.getFeatureSsnsTTVC(data);
 //                logger.info("> feature " + i + " " + feature);
 
                 AFSleep();
@@ -1054,7 +1148,7 @@ public class ServiceAFweb {
         int st = proceSssendRequestObj(writeSQLArray);
         logger.info("> processETLsplunkTTV done add:" + numAdd + " fail:" + numFail + " dup:" + numDup + " file:" + file);
         removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
-        return false;
+        return true;
     }
 
     private void processETLsplunkTTV1(SsnsData item, String spSt) {
@@ -1129,9 +1223,13 @@ public class ServiceAFweb {
                     int beg = parmSt.indexOf("parameter=");
 
                     String temSt = parmSt.substring(beg + 10, parmSt.length());
-                    int end = temSt.indexOf("]");
+                    int end = temSt.indexOf(oper);
                     if (end != -1) {
-                        status = temSt.substring(0, end + 1);
+                        status = temSt.substring(0, end);
+                        // search the last of ]
+                        int lastend = status.lastIndexOf("]");
+                        status = temSt.substring(0, lastend + 1);
+
                     }
                     status = replaceAll("\"\"", "\"", status);
                     ret = "parameter";
@@ -1289,32 +1387,7 @@ public class ServiceAFweb {
                                 String[] statusL = status.split(" ");
                                 String tranUid = "";
                                 if (statusL.length > 0) {
-                                    for (int k = 0; k < statusL.length; k++) {
-                                        String inL = statusL[k];
-                                        if (inL.indexOf("CallbackID") != -1) {
-                                            for (int m = 0; m < statusL.length; m++) {
-                                                String inLL = statusL[m];
-                                                if (inLL.indexOf("<Value>") != -1) {
-                                                    String cUid = ServiceAFweb.replaceAll("<Value>", "", inLL);
-                                                    if (cUid.length() >= 36) {
-                                                        tranUid = cUid.substring(0, 36);
-                                                    }
-                                                    if (tranUid.length() > 0) {
-                                                        break;
-                                                    }
-                                                }
-                                                if (tranUid.length() > 0) {
-                                                    break;
-                                                }
-                                            }
-                                            if (tranUid.length() > 0) {
-                                                break;
-                                            }
-                                        }
-                                        if (tranUid.length() > 0) {
-                                            break;
-                                        }
-                                    }
+                                    tranUid = getCallback(statusL);
                                 }
                                 if (tranUid.length() > 0) {
                                     tran = tranUid;
@@ -1432,6 +1505,29 @@ public class ServiceAFweb {
         logger.info("> ETLsplunkProcess done add:" + numAdd + " fail:" + numFail + " dup:" + numDup + " file:" + file);
         removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
         return true;
+    }
+
+    public String getCallback(String[] statusL) {
+        String tranUid = "";
+        for (int k = 0; k < statusL.length; k++) {
+            String inL = statusL[k];
+            if (inL.indexOf("CallbackID") != -1) {
+                for (int m = 0; m < statusL.length; m++) {
+                    String inLL = statusL[m];
+                    if (inLL.indexOf("<Value>") != -1) {
+                        String cUid = ServiceAFweb.replaceAll("<Value>", "", inLL);
+                        if (cUid.length() >= 36) {
+                            tranUid = cUid.substring(0, 36);
+                            return tranUid;
+                        }
+
+                    }
+
+                }
+
+            }
+        }
+        return "";
     }
 
     public static String replaceAll(String oldStr, String newStr, String inString) {
