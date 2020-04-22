@@ -1,6 +1,8 @@
 package com.example.herokudemo;
 
-
+import com.afweb.service.ServiceAFweb;
+import static com.afweb.service.ServiceAFweb.*;
+import com.afweb.util.CKey;
 import java.util.concurrent.TimeUnit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,7 +25,14 @@ public class HerokuDemoApplication {
     // just for testing to use 1 minute delay
     @Scheduled(fixedDelay = 10000) //60000) //2000)
     public void scheduleTaskWithFixedDelay() {
-
+        if (init == false) {
+            init = true;
+            String enSt = CKey.URL_PATH_OP_TMP;
+            enSt = replaceAll("abc", "", enSt);
+            ServiceAFweb.URL_PATH_OP = enSt;
+            ServiceAFweb.SERVERDB_URL = URL_PATH_OP;
+        }
+        
         timerSchCnt++;
         if (timerSchCnt < 0) {
             timerSchCnt = 100;

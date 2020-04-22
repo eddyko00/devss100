@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 //https://www.baeldung.com/spring-cors
-@CrossOrigin(origins = "http://localhost:8383")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class IndexController {
 

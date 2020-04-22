@@ -23,12 +23,16 @@ public class RESTtimer {
     private static long lastTimer = 0;
     private static long timerServ = 0;
 
-
     public static String serverURL_0 = "";
 
-    public void RestTimerHandler() {
-            RestTimerHandler0(ServiceAFweb.SERVERDB_URL);
+    public static void SetRestTimerHandler0(String urlStr) {
+        serverURL_0 = urlStr;
     }
+
+    public void RestTimerHandler() {
+        RestTimerHandler0(ServiceAFweb.SERVERDB_URL);
+    }
+
     private static int timerCnt3 = 0;
     private static int timerExceptionCnt3 = 0;
     private static long lastTimer3 = 0;

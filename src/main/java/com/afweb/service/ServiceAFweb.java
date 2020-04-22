@@ -9,6 +9,7 @@ import com.afweb.process.*;
 import com.afweb.model.*;
 
 import com.afweb.util.*;
+import com.example.herokudemo.RESTtimer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -131,6 +132,7 @@ public class ServiceAFweb {
 
         String URL_PATH = ServiceAFweb.URL_PATH_OP_DB_PHP1 + CKey.WEBPOST_OP_PHP;
         ServiceRemoteDB.setURL_PATH(URL_PATH);
+
     }
 
     //Repeat every 10 seconds
