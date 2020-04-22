@@ -62,6 +62,7 @@ public class ServiceAFweb {
     public static String SERVERDB_URL = "";
     public static String PROXYURL = "";
 
+    public static String URL_LOCALDB = "";
     /**
      * @return the serverObj
      */

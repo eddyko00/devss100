@@ -6,16 +6,15 @@ public class CKey {
     public static String FileLocalPath = "C:\\TEMP\\";
     public static final boolean LocalPCflag = true; // true;
 
-
     //////////////////////
     // remember to update the application properties      
-    public static final int LOCAL_MYSQL = 4; //jdbc:mysql://localhost:3306/db_sample     
+    public static final int LOCAL_MYSQL = 4; //jdbc:mysql://localhost:3306/db_sample       
     public static final int REMOTE_MYSQL = 2; // https://eddyko.000webhostapp.com/webgetreq.php php mysql
-    public static final int MYSQL = 0;   //direct mysql
+    public static final int MYSQL = 0;   //direct mysql   
 
     public static final int POSTGRESQLDB = 1; //using LOCAL_MYSQL require this set
     public static final int MYSQLDB = 0;
-    public static int DB = POSTGRESQLDB;   
+    public static int DB = POSTGRESQLDB;
 
     public static final int SQL_DATABASE = LOCAL_MYSQL;
     public static final boolean SQL_RemoveServerDB = false; // need true and REMOTE_MYSQL using remote server not PHP 
@@ -41,7 +40,6 @@ public class CKey {
 
 //    public static String URL_PATH_OP_DB_PHP1_TMP = "http://iiswebphp-web006.apps.us-east-1.starter.openshift-online.com"; //eddyko00     
 //    public static final String URL_PATH_OP_TMP = "http://iisweb-web006.apps.us-east-1.starter.openshift-online.com";
-
 //     public static String URL_PATH_OP_DB_PHP1_TMP = "http://iiswebphp-web006.apps.us-east-1.starter.openshift-online.com"; //eddyko00     
 //    public static final String URL_PATH_OP_TMP = "http://localhost:8080";
     //***********    

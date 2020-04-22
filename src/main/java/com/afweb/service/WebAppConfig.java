@@ -19,12 +19,12 @@ public class WebAppConfig {
                 String Local_mysql = "jdbc:mysql://localhost:3306/sampledb?useSSL=true";
                 dataSource.setUrl(Local_mysql);
 
-            dataSource.setDriverClassName("org.postgresql.Driver");
-            dataSource.setUrl("jdbc:postgresql://localhost:5432/sampledb");
-            dataSource.setUsername("postgres");
-            dataSource.setPassword("admin");                
-                
+                dataSource.setDriverClassName("org.postgresql.Driver");
+                dataSource.setUrl("jdbc:postgresql://localhost:5432/sampledb");
+                dataSource.setUsername("postgres");
+                dataSource.setPassword("admin");
             }
+            ServiceAFweb.URL_LOCALDB = dataSource.getUrl();
 
         }
         if (CKey.SQL_DATABASE == CKey.MYSQL) {
@@ -45,11 +45,17 @@ public class WebAppConfig {
 //MYSQL_PORT=tcp://100.65.175.81:3306
 //MYSQL_SERVICE_HOST=100.65.175.81
 //sh-4.2$
-
             dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-            dataSource.setUrl("jdbc:mysql://100.65.175.81:3306/sampledb?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false");
+            String dsUrl = "jdbc:mysql://100.65.175.81:3306/sampledb?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false";
+            dataSource.setUrl(dsUrl);
             dataSource.setUsername("sa");
             dataSource.setPassword("admin");
+
+            if (ServiceAFweb.URL_LOCALDB.length() == 0) {
+                ServiceAFweb.URL_LOCALDB = dataSource.getUrl();
+            } else {
+                 dataSource.setUrl(ServiceAFweb.URL_LOCALDB);
+            }
 
         }
 
