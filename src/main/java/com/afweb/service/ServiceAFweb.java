@@ -9,7 +9,6 @@ import com.afweb.process.*;
 import com.afweb.model.*;
 
 import com.afweb.util.*;
-import com.example.herokudemo.RESTtimer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -228,7 +227,7 @@ public class ServiceAFweb {
                     return getServerObj().getTimerCnt();
 
                 }
-                boolean restoreFlag = false;
+                boolean restoreFlag = false; // only work on PHP
                 if (restoreFlag == true) {
                     restoreSystem();
                     serverObj.setTimerQueueCnt(serverObj.getTimerQueueCnt() - 1);
@@ -388,6 +387,12 @@ public class ServiceAFweb {
                             processFeatureProd();
                             processFeatureWifi();
                         }
+                    }
+
+                    boolean restoreSsnsAccFlag = true; // work for remote d
+                    if (restoreSsnsAccFlag == true) {
+                         this.getSsnsDataImp().deleteAllSsnsAcc(0);
+                         boolean retSatus = getAccountImp().restoreSsnsAccDB(this);
                     }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    

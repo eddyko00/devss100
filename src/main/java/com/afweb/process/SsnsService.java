@@ -296,7 +296,7 @@ public class SsnsService {
             NAccObj.setBanid(banid);
             NAccObj.setCusid(dataObj.getCusid());
 
-            String deviceInfo = uniquid + "~" + prodClass + "~" + serialid + "~" + parm;
+            String deviceInfo = uniquid + "#" + prodClass + "#" + serialid + "#" + parm;
             NAccObj.setTiid(deviceInfo);
 
             NAccObj.setUid(dataObj.getUid());
@@ -542,7 +542,7 @@ public class SsnsService {
         if (appTId.length() == 0) {
             return "";
         }
-        String WifiparL[] = appTId.split("~");
+        String WifiparL[] = appTId.split("#");
 
         String uniquid = WifiparL[0];
         String prodClass = WifiparL[1];
@@ -2285,7 +2285,7 @@ public class SsnsService {
             return null;
         }
         if (inputStr.charAt(inputStr.length() - 1) == delimiter) {
-            // the 000webhostapp always add extra ~ at the end see the source
+            
             inputStr += "End";
             String[] tempString = inputStr.split("" + delimiter);
             int size = tempString.length - 1;

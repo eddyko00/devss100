@@ -777,6 +777,25 @@ public class SsnsDataDB {
         return null;
     }
 
+        public int deleteAllSsnsAcc(int month) {
+        try {
+            String deleteSQL = "delete from ssnsacc";
+            if (month == 0) {
+                ;
+            } else {
+                Calendar dateNow = TimeConvertion.getCurrentCalendar();
+                long dateNowLong = dateNow.getTimeInMillis();
+                long monthAge = TimeConvertion.addMonths(dateNowLong, -month);
+                deleteSQL = "delete from ssnsacc where updatedatel < " + monthAge;
+            }
+            processExecuteDB(deleteSQL);
+            return 1;
+        } catch (Exception e) {
+            logger.info("> deleteAllSsnsAcc exception " + e.getMessage());
+        }
+        return 0;
+    }
+        
     public int deleteAllSsnsData(int month) {
         try {
             String deleteSQL = "delete from ssnsdata";

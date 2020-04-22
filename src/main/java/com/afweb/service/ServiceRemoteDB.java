@@ -1080,6 +1080,8 @@ public class ServiceRemoteDB {
                     ;
                 } else if (cmd.equals("2")) {
                     ;
+                } else if (cmd.equals("3")) {
+                    ;
                 } else {
                     return "";
                 }

@@ -165,7 +165,7 @@ public class AccountImp {
         return result;
     }
 
-    public int updateCustAllStatus(String UserName,int substatus) {
+    public int updateCustAllStatus(String UserName, int substatus) {
 
         CustomerObj customer = getCustomerPassword(UserName, null);
         if (customer != null) {
@@ -507,6 +507,12 @@ public class AccountImp {
         return 0;
     }
 
+    public boolean restoreSsnsAccDB(ServiceAFweb serviceAFWeb) {
+        restoreDBSsnsDataProcess(serviceAFWeb, "ssnsacc");
+        return true;
+
+    }
+
     public boolean restoreDBData(ServiceAFweb serviceAFWeb) {
 
         if (FileUtil.FileTest(CKey.FileLocalPath + "cust.txt") == false) {
@@ -589,7 +595,7 @@ public class AccountImp {
                 if (i % 500 == 0) {
                     logger.info("> restoreDBSsnsDataProcess " + tableName + " " + i);
                 }
-                if (index > 5) {
+                if (index > 0) {// 5) {
                     index = 0;
                     int ret = serviceAFWeb.sendRequestObj(writeSQLArray);
                     if (ret == 0) {
