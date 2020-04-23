@@ -49,33 +49,35 @@ public class IndexController {
         arrayString.add("/cust/login?email={email}&pass={pass}");
         arrayString.add("/cust/{username}/login&pass={pass}");
 
-        arrayString.add("/cust/{username}/id/{id}/prod?length={0 for all}");
-        arrayString.add("/cust/{username}/id/{id}/prod/id/{pid}");
-        arrayString.add("/cust/{username}/id/{id}/prod/id/{pid}/rt");
-        arrayString.add("/cust/{username}/id/{id}/prod/featureall");
-        arrayString.add("/cust/{username}/id/{id}/prod/feature?name=");
+        arrayString.add("/cust/{username}/id/{id}/serv");
 
-        arrayString.add("/cust/{username}/id/{id}/app?length={0 for all}");
-        arrayString.add("/cust/{username}/id/{id}/app/id/{pid}");
-        arrayString.add("/cust/{username}/id/{id}/app/id/{pid}/rt/getapp");
-        arrayString.add("/cust/{username}/id/{id}/app/id/{pid}/rt/gettimeslot");
-        arrayString.add("/cust/{username}/id/{id}/app/featureall");
-        arrayString.add("/cust/{username}/id/{id}/app/feature?name=");
+        arrayString.add("/cust/{username}/id/{id}/serv/prod?length={0 for all}");
+        arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}");
+        arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}/rt");
+        arrayString.add("/cust/{username}/id/{id}/serv/prod/featureall");
+        arrayString.add("/cust/{username}/id/{id}/serv/prod/feature?name=");
 
-        arrayString.add("/cust/{username}/id/{id}/wifi?length={0 for all}");
-        arrayString.add("/cust/{username}/id/{id}/wifi/id/{pid}");
-        arrayString.add("/cust/{username}/id/{id}/wifi/id/{pid}/rt/getdevie");
-        arrayString.add("/cust/{username}/id/{id}/wifi/id/{pid}/rt/getdevicestatus");
-        arrayString.add("/cust/{username}/id/{id}/wifi/featureall");
-        arrayString.add("/cust/{username}/id/{id}/wifi/feature?name=");
+        arrayString.add("/cust/{username}/id/{id}/serv/app?length={0 for all}");
+        arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}");
+        arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/getapp");
+        arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/gettimeslot");
+        arrayString.add("/cust/{username}/id/{id}/serv/app/featureall");
+        arrayString.add("/cust/{username}/id/{id}/serv/app/feature?name=");
 
-        arrayString.add("/cust/{username}/id/{id}/ttv?length={0 for all}");
-        arrayString.add("/cust/{username}/id/{id}/ttv/id/{pid}");
-        arrayString.add("/cust/{username}/id/{id}/ttv/id/{pid}/rt/getsub");
-        arrayString.add("/cust/{username}/id/{id}/ttv/id/{pid}/rt/validate");
-        arrayString.add("/cust/{username}/id/{id}/ttv/id/{pid}/rt/quotation");
-        arrayString.add("/cust/{username}/id/{id}/ttv/featureall");
-        arrayString.add("/cust/{username}/id/{id}/ttv/feature?name=");
+        arrayString.add("/cust/{username}/id/{id}/serv/wifi?length={0 for all}");
+        arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}");
+        arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevice");
+        arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevicestatus");
+        arrayString.add("/cust/{username}/id/{id}/serv/wifi/featureall");
+        arrayString.add("/cust/{username}/id/{id}/serv/wifi/feature?name=");
+
+        arrayString.add("/cust/{username}/id/{id}/serv/ttv?length={0 for all}");
+        arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}");
+        arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/getsub");
+        arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/validate");
+        arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/quotation");
+        arrayString.add("/cust/{username}/id/{id}/serv/ttv/featureall");
+        arrayString.add("/cust/{username}/id/{id}/serv/ttv/feature?name=");
 
         arrayString.add("/cust/{username}/sys/stop");
         arrayString.add("/cust/{username}/sys/clearlock");
@@ -231,7 +233,30 @@ public class IndexController {
     }
 
 ////////////////////// 
-    @RequestMapping(value = "/cust/{username}/id/{id}/ttv", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<String> getAllprod(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "length", required = false) String lengthSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;
+        if (lengthSt != null) {
+            length = Integer.parseInt(lengthSt);
+        }
+        ArrayList<String> ret = afWebService.getSsnsprodAll(username, idSt, length);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+////////////////////// 
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getttvcprod(
             @PathVariable("username") String username,
@@ -253,7 +278,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/ttv/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     SsnsAcc getttvcpid(
             @PathVariable("username") String username,
@@ -271,7 +296,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/ttv/id/{pid}/rt/getsub", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/getsub", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getttvcrtsub(
             @PathVariable("username") String username,
@@ -290,7 +315,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/ttv/id/{pid}/rt/validate", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/validate", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getttvcvrtvalidate(
             @PathVariable("username") String username,
@@ -309,7 +334,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/ttv/id/{pid}/rt/quotation", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/quotation", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getttvcrtquotation(
             @PathVariable("username") String username,
@@ -328,7 +353,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/ttv/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<String> getttvcfeature(
             @PathVariable("username") String username,
@@ -346,7 +371,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/ttv/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getttvcfeature(
             @PathVariable("username") String username,
@@ -367,7 +392,7 @@ public class IndexController {
     }
 
 /////////////////////////////////////
-    @RequestMapping(value = "/cust/{username}/id/{id}/wifi", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getwifiprod(
             @PathVariable("username") String username,
@@ -389,7 +414,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/wifi/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     SsnsAcc getwifipid(
             @PathVariable("username") String username,
@@ -407,7 +432,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/wifi/id/{pid}/rt/getdevice", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevice", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getwifiidrt(
             @PathVariable("username") String username,
@@ -426,7 +451,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/wifi/id/{pid}/rt/getdevicestatus", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevicestatus", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getwifiidrtstatus(
             @PathVariable("username") String username,
@@ -445,7 +470,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/wifi/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<String> getwififeature(
             @PathVariable("username") String username,
@@ -463,7 +488,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/wifi/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getwififeature(
             @PathVariable("username") String username,
@@ -484,7 +509,7 @@ public class IndexController {
     }
 
 /////////////////////////////////////    
-    @RequestMapping(value = "/cust/{username}/id/{id}/app", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/app", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getappprod(
             @PathVariable("username") String username,
@@ -506,7 +531,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/app/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/app/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     SsnsAcc getappid(
             @PathVariable("username") String username,
@@ -524,7 +549,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/app/id/{pid}/rt/getapp", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/app/id/{pid}/rt/getapp", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getappidrt(
             @PathVariable("username") String username,
@@ -543,7 +568,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/app/id/{pid}/rt/gettimeslot", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/app/id/{pid}/rt/gettimeslot", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getappidrtTimeSlot(
             @PathVariable("username") String username,
@@ -562,7 +587,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/app/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/app/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<String> getappfeature(
             @PathVariable("username") String username,
@@ -580,7 +605,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/app/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/app/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getappfeature(
             @PathVariable("username") String username,
@@ -602,7 +627,7 @@ public class IndexController {
     }
 ////////////////////////////////////
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/prod", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getprodttv(
             @PathVariable("username") String username,
@@ -624,7 +649,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/prod/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     SsnsAcc getprodttvid(
             @PathVariable("username") String username,
@@ -642,7 +667,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/prod/id/{pid}/rt", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/id/{pid}/rt", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getprodttvidrt(
             @PathVariable("username") String username,
@@ -661,7 +686,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/prod/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<String> getprodttvfeature(
             @PathVariable("username") String username,
@@ -679,7 +704,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/prod/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getprodttvfeatureName(
             @PathVariable("username") String username,

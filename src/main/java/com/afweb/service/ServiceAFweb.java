@@ -1407,7 +1407,6 @@ public class ServiceAFweb {
                                 }
                                 status = replaceAll("\"\"", "\"", status);
 
-
                                 ret = "parameter";
                                 continue;
                             }
@@ -1809,6 +1808,30 @@ public class ServiceAFweb {
 
     }
 
+    public ArrayList<String> getSsnsprodAll(String EmailUserName, String IDSt, int length) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        ArrayList<String> ssnsList = new ArrayList();
+        ssnsList.add("prod");
+        ssnsList.add("SSNS Product Inventory");
+        ssnsList.add("app");
+        ssnsList.add("SSNS Appointment");
+        ssnsList.add("wifi");
+        ssnsList.add("SSNS Wifi Sevice");
+        ssnsList.add("ttv");
+        ssnsList.add("SSNS TTV Service");
+        
+        return ssnsList;
+
+    }
+
     public ArrayList<SsnsAcc> getSsnsprod(String EmailUserName, String IDSt, int length, String prod) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
@@ -1902,6 +1925,7 @@ public class ServiceAFweb {
         }
         return null;
     }
+
     public ArrayList<String> testSsnsprodTTVCByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
@@ -1952,7 +1976,7 @@ public class ServiceAFweb {
         }
         return null;
     }
-    
+
     public ArrayList<String> testSsnsprodWifiByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
