@@ -48,6 +48,7 @@ public class SsnsService {
     public static String APP_TTVREQ = "ttvreq";
 
     public static String APP_PRODUCT = "product";
+    public static String APP_TTVC = "TTVCL";
     //
 
     public static String APP_PRODUCT_TYPE_TTV = "TTV";
@@ -55,7 +56,6 @@ public class SsnsService {
     public static String APP_PRODUCT_TYPE_SING = "SING";
     public static String APP_PRODUCT_TYPE_APP = "APP";
     public static String APP_PRODUCT_TYPE_WIFI = "WIFI";
-    public static String APP_PRODUCT_TYPE_TTVC = "TTVCL";
 
     public static String APP_GET_APP = "getAppointment";
     public static String APP_CAN_APP = "cancelAppointment";
@@ -70,10 +70,10 @@ public class SsnsService {
     public static String WI_Getdev = "getDevices";
     public static String WI_config = "configureDeviceStatus";
 
-    public static String TT_0 = "getCustomerTvSubscription";
-    public static String TT_1 = "validateWithAuth";
-    public static String TT_2 = "quoteWithAuth";
-    public static String TT_3 = "saveOrder";
+    public static String TT_GetSub = "getCustomerTvSubscription";
+    public static String TT_Vadulate = "validateWithAuth";
+    public static String TT_Quote = "quoteWithAuth";
+    public static String TT_SaveOrder = "saveOrder";
 
     private SsnsDataImp ssnsDataImp = new SsnsDataImp();
 
@@ -103,7 +103,7 @@ public class SsnsService {
         String dataSt = "";
         try {
             String oper = dataObj.getOper();
-            if ((oper.equals(TT_1) || oper.equals(TT_2) || oper.equals(TT_3))) { //"updateAppointment")) {
+            if ((oper.equals(TT_Vadulate) || oper.equals(TT_Quote) || oper.equals(TT_SaveOrder))) { //"updateAppointment")) {
 
                 dataSt = dataObj.getData();
                 dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
@@ -126,7 +126,7 @@ public class SsnsService {
                         }
                     }
                 }
-            } else if (oper.equals(TT_0)) {
+            } else if (oper.equals(TT_GetSub)) {
                 dataSt = dataObj.getData();
                 dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
                 dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
@@ -194,12 +194,12 @@ public class SsnsService {
         try {
             String featTTV = "";
 
-            if (oper.equals(TT_0) || oper.equals(TT_1) || oper.equals(TT_2) || oper.equals(TT_3)) {
+            if (oper.equals(TT_GetSub) || oper.equals(TT_Vadulate) || oper.equals(TT_Quote) || oper.equals(TT_SaveOrder)) {
                 if ((banid.length() == 0) && (prodid.length() == 0)) {
                     return false;
                 } else {
                     String outputSt = null;
-                    outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, TT_0, banid, prodid, postParm, null);
+                    outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, TT_GetSub, banid, prodid, postParm, null);
                     if (outputSt == null) {
                         return false;
                     }
@@ -295,7 +295,19 @@ public class SsnsService {
                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll("offerCd:", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
-                prodTTV.setOffer(valueSt);
+
+                if (valueSt.indexOf("MediaroomTV-HS2.0") != -1) {
+                    prodTTV.setOffer("Mediaroom20");
+                    continue;
+                }
+                if (valueSt.indexOf("MediaroomTV-HS") != -1) {
+                    prodTTV.setOffer("Mediaroom");
+                    continue;
+                }
+                if (valueSt.indexOf("TVX") != -1) {
+                    prodTTV.setOffer("TVX");
+                }
+                continue;
             }
 
             if (inLine.indexOf("collectionCd") != -1) {
@@ -335,7 +347,7 @@ public class SsnsService {
             }
         }
 
-        String featTTV = APP_PRODUCT_TYPE_TTVC;
+        String featTTV = APP_TTVC;
         featTTV += ":" + oper;
 
         String gm = prodTTV.getGeomarket();
@@ -351,7 +363,7 @@ public class SsnsService {
         featTTV += ":" + coll;
         featTTV += ":Pack_" + packCd;
         featTTV += ":Channel_" + channelCd;
-        featTTV += ":Discount_" + discountCd;
+        featTTV += ":Disc_" + discountCd;
         featTTV += ":Add_" + add;
         featTTV += ":Remove_" + remove;
         prodTTV.setFeat(featTTV);
@@ -436,7 +448,7 @@ public class SsnsService {
         String url = "";
 
         try {
-            if (oper.equals(TT_0)) {
+            if (oper.equals(TT_GetSub)) {
                 url = ProductURL + "/v1/cmo/selfmgmt/tvsubscription/account/" + banid
                         + "/productinstance/" + prodid
                         + "/subscription";
@@ -464,7 +476,7 @@ public class SsnsService {
         return null;
     }
 
-    public String TestFeatureSsnsProdTTVC(SsnsAcc dataObj, ArrayList<String> outputList, String Oper) {
+    public String TestFeatureSsnsProdTTVC(SsnsAcc dataObj, ArrayList<String> outputList, String oper) {
         if (dataObj == null) {
             return "";
         }
@@ -475,55 +487,35 @@ public class SsnsService {
         if (appTId.length() == 0) {
             return "";
         }
-        String WifiparL[] = appTId.split("#");
-
-        String uniquid = WifiparL[0];
-        String prodClass = WifiparL[1];
-        String serialid = WifiparL[2];
 
         String outputSt = null;
         ArrayList<String> inList = new ArrayList();
-        if (Oper == WI_GetDeviceStatus) {
-            outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, Oper, banid, uniquid, prodClass, serialid, Oper, inList);
+        if (oper.equals(TT_GetSub) || oper.equals(TT_Vadulate) || oper.equals(TT_Quote) || oper.equals(TT_SaveOrder)) {
+            outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, oper, banid, appTId, null, inList);
             if (outputSt == null) {
-
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            ProductApp prodTTV = parseWifiFeature(outputSt, Oper, prodClass);
+            ProductApp prodTTV = parseTTVCFeature(outputSt, oper, null);
             outputList.add(prodTTV.getFeat());
             outputList.addAll(inList);
             outputList.addAll(outList);
 
             return prodTTV.getFeat();
-        } else if (Oper == WI_Getdev) {
+        } else if (oper == TT_SaveOrder) {
 
-            outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, Oper, banid, uniquid, prodClass, serialid, Oper, inList);
+            outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, oper, banid, appTId, null, inList);;
             if (outputSt == null) {
                 return "";
             }
 
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-
-            String feat = dataObj.getName();
-            for (int i = 0; i < outList.size(); i++) {
-                String inLine = outList.get(i);
-                inLine = ServiceAFweb.replaceAll("\"", "", inLine);
-                inLine = ServiceAFweb.replaceAll(",", "", inLine);
-
-                if (inLine.indexOf("deviceTypeCd") != -1) {
-                    String dCd = ServiceAFweb.replaceAll("deviceTypeCd:", "", inLine);
-                    feat += ":" + dCd;
-                }
-                if (inLine.indexOf("productClassId") != -1) {
-                    String dCd = ServiceAFweb.replaceAll("productClassId:", "", inLine);
-                    feat += ":" + dCd;
-                }
-            }
-            outputList.add(feat);
+            ProductApp prodTTV = parseTTVCFeature(outputSt, oper, null);
+            outputList.add(prodTTV.getFeat());
             outputList.addAll(inList);
             outputList.addAll(outList);
-            return feat;
+
+            return prodTTV.getFeat();
         }
 
         return "";
@@ -2257,7 +2249,7 @@ public class SsnsService {
             if (faulure == 1) {
                 feat += ":failed";
             }
-            logger.info("> updateSsnsProdiuctInventory feat " + featTTV);            
+            logger.info("> updateSsnsProdiuctInventory feat " + featTTV);
             NAccObj.setName(feat);
             NAccObj.setBanid(banid);
             NAccObj.setCusid(dataObj.getCusid());

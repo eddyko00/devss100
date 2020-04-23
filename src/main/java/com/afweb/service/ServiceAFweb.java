@@ -1901,7 +1901,57 @@ public class ServiceAFweb {
         }
         return null;
     }
+    public ArrayList<String> testSsnsprodTTVCByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(prod, PIDSt);
+        if (ssnsAccObjList != null) {
+            if (ssnsAccObjList.size() > 0) {
+                SsnsAcc ssnsAccObj = (SsnsAcc) ssnsAccObjList.get(0);
+                ArrayList<String> outputList = new ArrayList();
+                SsnsService ss = new SsnsService();
+                String feat = "";
 
+                if ((Oper == SsnsService.WI_Getdev) || (Oper == SsnsService.WI_GetDeviceStatus)) {
+                    feat = ss.TestFeatureSsnsProdWifi(ssnsAccObj, outputList, Oper);
+                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
+                    if ((feat == null) || (feat.length() == 0)) {
+                        // disabled this Acc Obj
+                        int type = ssnsAccObj.getType();
+                        String name = ssnsAccObj.getName();
+                        int status = ssnsAccObj.getStatus();
+                        type = type + 1; // increate error count
+                        if (type > 2) {
+                            if (name.indexOf("~testfailed") != -1) {
+                                name += "~testfailed";
+                            }
+                        }
+                        this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
+                    } else {
+                        String name = ssnsAccObj.getName();
+                        if (name.indexOf("~testfailed") != -1) {
+                            int type = ssnsAccObj.getType();
+                            int status = ssnsAccObj.getStatus();
+                            type = 0; // increate error count
+                            name = ServiceAFweb.replaceAll("~testfailed", "", name);
+                            this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
+
+                        }
+                    }
+                }
+                return outputList;
+            }
+        }
+        return null;
+    }
+    
     public ArrayList<String> testSsnsprodWifiByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
