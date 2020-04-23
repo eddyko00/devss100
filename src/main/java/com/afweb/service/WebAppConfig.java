@@ -56,7 +56,6 @@ public class WebAppConfig {
             } else {
                  dataSource.setUrl(ServiceAFweb.URL_LOCALDB);
             }
-
         }
 
         CKey.dataSourceURL = dataSource.getUrl();
