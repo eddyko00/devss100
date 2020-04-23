@@ -1817,7 +1817,7 @@ public class ServiceAFweb {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
             }
-        }
+        } 
         ArrayList<String> ssnsList = new ArrayList();
         ssnsList.add("prod");
         ssnsList.add("SSNS Product Inventory");

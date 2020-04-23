@@ -272,7 +272,7 @@ public class IndexController {
         int length = 20; //10;
         if (lengthSt != null) {
             length = Integer.parseInt(lengthSt);
-        }
+        } 
         ArrayList<SsnsAcc> ret = afWebService.getSsnsprod(username, idSt, length, SsnsService.APP_TTVC);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;

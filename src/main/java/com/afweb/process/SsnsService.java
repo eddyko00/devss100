@@ -1824,7 +1824,7 @@ public class SsnsService {
                         int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
                     }
                 }
- 
+  
                 NAccObj = new SsnsAcc();
                 NAccObj.setTiid(prodid);
                 NAccObj.setRet(APP_PRODUCT_TYPE_TTV);
