@@ -480,10 +480,11 @@ public class SsnsService {
                 long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
                 if (inList != null) {
-                    inList.add("elapsedTime " + elapsedTime);
+                    inList.add("elapsedTime:" + elapsedTime);
+                                        inList.add("output:");
                 }
                 return output;
-            } else if (oper.equals(TT_Quote)|| oper.equals(TT_SaveOrder)) {
+            } else if (oper.equals(TT_Quote) || oper.equals(TT_SaveOrder)) {
                 url = ProductURL + "/v1/cmo/selfmgmt/tv/requisition/account/" + banid
                         + "/productinstance/" + prodid
                         + "/quotation";
@@ -495,7 +496,9 @@ public class SsnsService {
                 long startTime = TimeConvertion.currentTimeMillis();
                 String st = ServiceAFweb.replaceAll("\":\",", "\":\"\",", postParm);
                 st = st.substring(0, st.length() - 2);
+
                 Map<String, String> map = new ObjectMapper().readValue(st, Map.class);
+                map.remove("customerEmail");
 
                 String output = this.sendRequest_Ssns(METHOD_POST, url, null, map);
 
@@ -503,10 +506,15 @@ public class SsnsService {
                 long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
                 if (inList != null) {
-                    inList.add("elapsedTime " + elapsedTime);
+                    inList.add("elapsedTime:" + elapsedTime);
+
+                    String bodyElement = new ObjectMapper().writeValueAsString(map);
+                    inList.add("bodyElement:" + bodyElement);
+                    inList.add("output:");
+
                 }
                 return output;
-                           
+
             } else if (oper.equals(TT_Vadulate)) {
                 url = ProductURL + "/v1/cmo/selfmgmt/tv/requisition/account/" + banid
                         + "/productinstance/" + prodid
@@ -519,7 +527,9 @@ public class SsnsService {
                 long startTime = TimeConvertion.currentTimeMillis();
                 String st = ServiceAFweb.replaceAll("\":\",", "\":\"\",", postParm);
                 st = st.substring(0, st.length() - 2);
+
                 Map<String, String> map = new ObjectMapper().readValue(st, Map.class);
+                map.remove("customerEmail");
 
                 String output = this.sendRequest_Ssns(METHOD_POST, url, null, map);
 
@@ -527,7 +537,11 @@ public class SsnsService {
                 long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
                 if (inList != null) {
-                    inList.add("elapsedTime " + elapsedTime);
+                    inList.add("elapsedTime:" + elapsedTime);
+
+                    String bodyElement = new ObjectMapper().writeValueAsString(map);
+                    inList.add("bodyElement:" + bodyElement);
+                    inList.add("output:");
                 }
                 return output;
             }
@@ -1089,7 +1103,8 @@ public class SsnsService {
             long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
-                inList.add("elapsedTime " + elapsedTime);
+                inList.add("elapsedTime:" + elapsedTime);
+                    inList.add("output:");                
             }
 
             return output;
@@ -1596,7 +1611,8 @@ public class SsnsService {
             long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
-                inList.add("elapsedTime " + elapsedTime);
+                inList.add("elapsedTime:" + elapsedTime);
+                                    inList.add("output:");
             }
 
             return output;
@@ -1696,7 +1712,8 @@ public class SsnsService {
             long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
-                inList.add("elapsedTime " + elapsedTime);
+                inList.add("elapsedTime:" + elapsedTime);
+                                    inList.add("output:");
             }
             return output;
         } catch (Exception ex) {
@@ -2523,7 +2540,8 @@ public class SsnsService {
             long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
-                inList.add("elapsedTime " + elapsedTime);
+                inList.add("elapsedTime:" + elapsedTime);
+                                    inList.add("output:");
             }
             return output;
         } catch (Exception ex) {
@@ -2564,7 +2582,8 @@ public class SsnsService {
             long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
-                inList.add("elapsedTime " + elapsedTime);
+                inList.add("elapsedTime:" + elapsedTime);
+                                    inList.add("output:");
             }
 
             return output;
