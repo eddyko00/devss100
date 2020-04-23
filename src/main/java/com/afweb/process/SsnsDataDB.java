@@ -777,7 +777,7 @@ public class SsnsDataDB {
         return null;
     }
 
-        public int deleteAllSsnsAcc(int month) {
+    public int deleteAllSsnsAcc(int month) {
         try {
             String deleteSQL = "delete from ssnsacc";
             if (month == 0) {
@@ -795,7 +795,7 @@ public class SsnsDataDB {
         }
         return 0;
     }
-        
+
     public int deleteAllSsnsData(int month) {
         try {
             String deleteSQL = "delete from ssnsdata";
@@ -866,6 +866,22 @@ public class SsnsDataDB {
         return entries;
     }
 
+    public ArrayList<SsnsAcc> getSsnsAccObjListByBan(String name, String banid) {
+        String sql = "select * from ssnsacc where name='" + name + "' and banid='" + banid + "'";
+        ArrayList entries = getAllSsnsAccSQL(sql, 0);
+        return entries;
+    }
+
+    public ArrayList<SsnsAcc> getSsnsAccObjListByCust(String name, String custid) {
+        String sql = "select * from ssnsacc where name='" + name + "' and cusid='" + custid + "'";
+        ArrayList entries = getAllSsnsAccSQL(sql, 0);
+        return entries;
+    }
+    public ArrayList<SsnsAcc> getSsnsAccObjListByTiid(String name, String tiid) {
+        String sql = "select * from ssnsacc where name='" + name + "' and tiid='" + tiid + "'";
+        ArrayList entries = getAllSsnsAccSQL(sql, 0);
+        return entries;
+    }
     public ArrayList<SsnsAcc> getSsnsAccObjList(String name, String uid) {
         String sql = "select * from ssnsacc where name='" + name + "' and uid='" + uid + "'";
         ArrayList entries = getAllSsnsAccSQL(sql, 0);

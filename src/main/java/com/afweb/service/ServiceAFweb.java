@@ -458,18 +458,22 @@ public class ServiceAFweb {
 
                     boolean ttvReqflag = false;
                     if (ttvReqflag == true) {
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVC);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);                        
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
 
-                        SsnsService ss = new SsnsService();
-                        String feature = "";
-                        ArrayList appNameArrayTemp = getAllOpenTTVCArray();
-                        if (appNameArrayTemp != null) {
-                            for (int i = 0; i < appNameArrayTemp.size(); i++) {
-                                String idSt = (String) appNameArrayTemp.get(i);
+                        for (int m = 0; m < 20; m++) {
+                            SsnsService ss = new SsnsService();
+                            String feature = "";
+                            ArrayList appNameArrayTemp = getAllOpenTTVCArray();
+                            if (appNameArrayTemp != null) {
+                                for (int i = 0; i < appNameArrayTemp.size(); i++) {
+                                    String idSt = (String) appNameArrayTemp.get(i);
 
-                                int id = Integer.parseInt(idSt);
-                                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
-                                feature = ss.getFeatureSsnsTTVC(data);
+                                    int id = Integer.parseInt(idSt);
+                                    SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                                    feature = ss.getFeatureSsnsTTVC(data);
+                                }
                             }
                         }
                     }
@@ -534,18 +538,18 @@ public class ServiceAFweb {
             }
             if ((getServerObj().getProcessTimerCnt() % 13) == 0) {
                 ;
-            } else if ((getServerObj().getProcessTimerCnt() % 9) == 0) {
+                processFeatureProd();
+            } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
                 ;
+                processFeatureApp();
             } else if ((getServerObj().getProcessTimerCnt() % 7) == 0) {
                 //////require to save memory
                 System.gc();
                 //////require to save memory
-
-                processFeatureProd();
-                processFeatureTTVC();
-            } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
-                processFeatureApp();
                 processFeatureWifi();
+            } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
+                ;
+                processFeatureTTVC();
             } else if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                 //10 Sec * 5 ~ 1 minutes
                 processETL();
@@ -1820,7 +1824,7 @@ public class ServiceAFweb {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
             }
-        } 
+        }
         ArrayList<String> ssnsList = new ArrayList();
         ssnsList.add("prod");
         ssnsList.add("SSNS Product Inventory");
@@ -1830,7 +1834,7 @@ public class ServiceAFweb {
         ssnsList.add("SSNS Wifi Sevice");
         ssnsList.add("ttv");
         ssnsList.add("SSNS TTV Service");
-        
+
         return ssnsList;
 
     }
@@ -1946,7 +1950,7 @@ public class ServiceAFweb {
                 ArrayList<String> outputList = new ArrayList();
                 SsnsService ss = new SsnsService();
                 String feat = "";
-                if ((Oper.equals(TT_GetSub) ||Oper.equals(TT_Vadulate) || Oper.equals(TT_Quote) || Oper.equals(TT_SaveOrder))) {
+                if ((Oper.equals(TT_GetSub) || Oper.equals(TT_Vadulate) || Oper.equals(TT_Quote) || Oper.equals(TT_SaveOrder))) {
                     feat = ss.TestFeatureSsnsProdTTVC(ssnsAccObj, outputList, Oper);
                     logger.info("> testSsnsprodTTVCByIdRT " + Oper + " feat " + feat);
                     if ((feat == null) || (feat.length() == 0)) {
@@ -2491,9 +2495,9 @@ public class ServiceAFweb {
     }
 
     public String SystemRemoteUpdateMySQLList(String SQL) {
-        if (getServerObj().isSysMaintenance() == true) {
-            return "";
-        }
+//        if (getServerObj().isSysMaintenance() == true) {
+//            return "";
+//        }
 
         String st = SQL;
         String[] sqlList = st.split("~");
@@ -2505,17 +2509,17 @@ public class ServiceAFweb {
     }
 
     public String SystemRemoteUpdateMySQL(String SQL) {
-        if (getServerObj().isSysMaintenance() == true) {
-            return "";
-        }
+//        if (getServerObj().isSysMaintenance() == true) {
+//            return "";
+//        }
 
         return getSsnsDataImp().updateRemoteMYSQL(SQL) + "";
     }
 
     public String SystemRemoteGetMySQL(String SQL) {
-        if (getServerObj().isSysMaintenance() == true) {
-            return "";
-        }
+//        if (getServerObj().isSysMaintenance() == true) {
+//            return "";
+//        }
 
         return getSsnsDataImp().getRemoteMYSQL(SQL);
     }

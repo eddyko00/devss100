@@ -152,6 +152,17 @@ public class SsnsDataImp {
         return ssnsdb.getSsnsAccObjListByApp(app, length);
     }
 
+    public ArrayList<SsnsAcc> getSsnsAccObjListByBan(String name, String banid) {
+        return ssnsdb.getSsnsAccObjListByBan(name, banid);
+    }
+
+    public ArrayList<SsnsAcc> getSsnsAccObjListByCust(String name, String custid) {
+        return ssnsdb.getSsnsAccObjListByCust(name, custid);
+    }
+
+    public ArrayList<SsnsAcc> getSsnsAccObjListByTiid(String name, String tiid) {
+        return ssnsdb.getSsnsAccObjListByTiid(name, tiid);
+    }        
     public ArrayList<SsnsAcc> getSsnsAccObjList(String name, String uid) {
         return ssnsdb.getSsnsAccObjList(name, uid);
     }

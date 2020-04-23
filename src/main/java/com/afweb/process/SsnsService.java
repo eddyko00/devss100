@@ -46,12 +46,11 @@ public class SsnsService {
 
     public static String APP_WIFI = "wifi";
     public static String APP_APP = "appointment";
-
-    public static String APP_TTVSUB = "ttvsub";
-    public static String APP_TTVREQ = "ttvreq";
-
     public static String APP_PRODUCT = "product";
+
     public static String APP_TTVC = "TTVCL";
+    public static String APP_TTVSUB = "ttvsub";  // ETL name
+    public static String APP_TTVREQ = "ttvreq";  // ETL name
     //
 
     public static String APP_PRODUCT_TYPE_TTV = "TTV";
@@ -149,16 +148,6 @@ public class SsnsService {
                 if (operList.length > 1) {
                     banid = operList[0];
                     prodid = operList[1];
-
-                    if (operList.length > 5) {
-                        dataSt = dataObj.getData();
-
-                        int beg = dataSt.indexOf("{");
-                        if (beg != -1) {
-                            postParm = dataSt.substring(beg);
-                            postParm += "}";
-                        }
-                    }
                 }
                 cmd.add("getsub");
                 cmd.add(TT_GetSub);
@@ -168,15 +157,11 @@ public class SsnsService {
                 logger.info("> getFeatureSsnsTTVCProcess Other oper " + oper);
                 return "";
             }
-            if (oper.equals(WI_Getdev)) {
-                // for testing ignore WI_Getdev becase always no info
+
+            if (prodid.equals("")) {
                 return "";
-                // for testing
-            } else {
-                if (prodid.equals("")) {
-                    return "";
-                }
             }
+
 //            logger.info(dataSt);
 /////////////
             //call devop to get customer id
@@ -195,6 +180,14 @@ public class SsnsService {
                     }
                 }
                 if (exist == false) {
+                    ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByBan(NAccObj.getName(), NAccObj.getBanid());
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() > 3) {
+                            exist = true;
+                        }
+                    }
+                }
+                if (exist == false) {
                     int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
                 }
             }
@@ -208,7 +201,8 @@ public class SsnsService {
     public boolean updateSsnsTTVC(String oper, String banid, String prodid, String postParm, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
             String featTTV = "";
-
+            int legacyDiscount = 0;
+            int XQException = 0;
             if (oper.equals(TT_GetSub) || oper.equals(TT_Vadulate) || oper.equals(TT_Quote) || oper.equals(TT_SaveOrder)) {
                 if ((banid.length() == 0) && (prodid.length() == 0)) {
                     return false;
@@ -225,7 +219,13 @@ public class SsnsService {
 //                        return false;
 //                    }
                     if (outputSt.indexOf("responseCode:400500") != -1) {
-                        return false;
+                        if (outputSt.indexOf("Legacy Discount") != -1) {
+                            legacyDiscount = 1;
+                        } else if (outputSt.indexOf("XQException") != -1) {
+                            XQException = 1;
+                        } else {
+                            return false;
+                        }
                     }
                     featTTV = parseTTVCFeature(outputSt, oper, postParm);
                 }
@@ -235,20 +235,35 @@ public class SsnsService {
 
 //            logger.info("> updateSsnsTTVC feat " + featTTV);
 /////////////TTV   
+            int failure = 0;
             if (NAccObj.getDown().equals("splunkflow")) {
 
                 ArrayList<String> flow = new ArrayList();
-                int faulure = getSsnsFlowTrace(dataObj, flow);
+                failure = getSsnsFlowTrace(dataObj, flow);
                 if (flow == null) {
                     logger.info("> updateSsnsTTVC skip no flow");
                     return false;
                 }
                 pData.setFlow(flow);
 
-                if (faulure == 1) {
+            }
+
+            if (legacyDiscount == 1) {
+                featTTV += ":legacyDisc";
+                if (failure == 0) {
                     featTTV += ":splunkfailed";
                 }
             }
+            if (XQException == 1) {
+                featTTV += ":XQException";
+                if (failure == 0) {
+                    featTTV += ":splunkfailed";
+                }
+            }
+            if (failure == 1) {
+                featTTV += ":splunkfailed";
+            }
+
             logger.info("> updateSsnsTTVC feat " + featTTV);
             pData.setPostParam(postParm);
             NAccObj.setName(featTTV);
@@ -346,16 +361,18 @@ public class SsnsService {
         }
 
         if (postParm != null) {
-            outputList = ServiceAFweb.prettyPrintJSON(postParm);
-            for (int j = 0; j < outputList.size(); j++) {
-                String inLine = outputList.get(j);
-                if (inLine.indexOf("ADD") != -1) {
-                    add++;
-                    continue;
-                }
-                if (inLine.indexOf("REMOVE") != -1) {
-                    remove++;
-                    continue;
+            if (postParm.length() > 0) {
+                outputList = ServiceAFweb.prettyPrintJSON(postParm);
+                for (int j = 0; j < outputList.size(); j++) {
+                    String inLine = outputList.get(j);
+                    if (inLine.indexOf("ADD") != -1) {
+                        add++;
+                        continue;
+                    }
+                    if (inLine.indexOf("REMOVE") != -1) {
+                        remove++;
+                        continue;
+                    }
                 }
             }
         }
@@ -381,79 +398,6 @@ public class SsnsService {
         featTTV += ":Remove_" + remove;
 
         return featTTV;
-    }
-
-    // 1 faulure, 0 = success
-    public int getSsnsFlowTraceTTVCCallback(SsnsData dataObj, ArrayList<String> flow, String postParm) {
-        if (postParm == null) {
-            return 1;
-        }
-        if (postParm.length() == 1) {
-            return 1;
-        }
-        String newUid = "";
-
-        if (postParm.indexOf("asynchronousRequest") != -1) {
-            String[] operList = postParm.split(",");
-            for (int j = 0; j < operList.length; j++) {
-                String inLine = operList[j];
-                if (inLine.indexOf("operationId") != -1) {
-                    String valueSt = inLine;
-                    valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
-                    valueSt = ServiceAFweb.replaceAll("operationId:", "", valueSt);
-                    newUid = valueSt;
-                    break;
-                }
-            }
-        }
-
-        if (newUid.length() == 0) {
-            return 1;
-        }
-
-        String uid = newUid;
-
-        ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjListByUid(dataObj.getApp(), uid);
-        if (ssnsList != null) {
-//            logger.info("> ssnsList " + ssnsList.size());
-            for (int i = 0; i < ssnsList.size(); i++) {
-                SsnsData data = ssnsList.get(i);
-                String flowSt = data.getDown();
-                if (flowSt.length() == 0) {
-                    flowSt = data.getOper();
-                }
-                flowSt += ":" + data.getExec();
-                String dataTxt = data.getData();
-                if (dataTxt.indexOf("[tocpresp,") != -1) {
-                    try {
-                        String valueSt = ServiceAFweb.replaceAll("[tocpresp,{node:", "", dataTxt);
-                        valueSt = valueSt.substring(0, valueSt.length() - 2);
-                        String filteredStr = valueSt.replaceAll(" ", "");
-                        String[] filteredList = filteredStr.split("><");
-
-                        flow.add(postParm);
-                        for (int k = 0; k < filteredList.length; k++) {
-                            String ln = filteredList[k];
-                            if (k == 0) {
-                                ln = ln + ">";
-                            } else if (k == filteredList.length - 1) {
-                                ln = "<" + ln;
-                            } else {
-                                ln = "<" + ln + ">";
-                            }
-                            flow.add(ln);
-                        }
-                        return 0;
-
-                    } catch (Exception ex) {
-                        logger.info(ex.getMessage());
-                    }
-                }
-
-            }
-        }
-        return 1;
-
     }
 
     public String SendSsnsTTVC(String ProductURL, String oper, String banid, String prodid, String postParm, ArrayList<String> inList) {
@@ -753,6 +697,15 @@ public class SsnsService {
                     if (ssnsAccObjList.size() != 0) {
                         SsnsAcc ssnsObj = ssnsAccObjList.get(0);
                         if (ssnsObj.getDown().equals("splunkflow")) {
+                            exist = true;
+                        }
+                    }
+                }
+                if (exist == false) {
+
+                    ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByTiid(NAccObj.getName(), NAccObj.getTiid());
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() > 3) {
                             exist = true;
                         }
                     }
@@ -1360,6 +1313,14 @@ public class SsnsService {
                     }
                 }
                 if (exist == false) {
+                    ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByTiid(NAccObj.getName(), NAccObj.getTiid());
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() > 3) {
+                            exist = true;
+                        }
+                    }
+                }
+                if (exist == false) {
                     int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
                 }
 
@@ -1843,6 +1804,14 @@ public class SsnsService {
                         }
                     }
                     if (exist == false) {
+                        ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByBan(NAccObj.getName(), NAccObj.getBanid());
+                        if (ssnsAccObjList != null) {
+                            if (ssnsAccObjList.size() > 3) {
+                                exist = true;
+                            }
+                        }
+                    }
+                    if (exist == false) {
                         int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
                     }
                 }
@@ -1866,6 +1835,14 @@ public class SsnsService {
                         if (ssnsAccObjList.size() != 0) {
                             SsnsAcc ssnsObj = ssnsAccObjList.get(0);
                             if (ssnsObj.getDown().equals("splunkflow")) {
+                                exist = true;
+                            }
+                        }
+                    }
+                    if (exist == false) {
+                        ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByBan(NAccObj.getName(), NAccObj.getBanid());
+                        if (ssnsAccObjList != null) {
+                            if (ssnsAccObjList.size() > 3) {
                                 exist = true;
                             }
                         }
@@ -1895,6 +1872,14 @@ public class SsnsService {
                         }
                     }
                     if (exist == false) {
+                        ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByBan(NAccObj.getName(), NAccObj.getBanid());
+                        if (ssnsAccObjList != null) {
+                            if (ssnsAccObjList.size() > 3) {
+                                exist = true;
+                            }
+                        }
+                    }
+                    if (exist == false) {
                         int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
                     }
                 }
@@ -1915,6 +1900,14 @@ public class SsnsService {
                         if (ssnsAccObjList.size() != 0) {
                             SsnsAcc ssnsObj = ssnsAccObjList.get(0);
                             if (ssnsObj.getDown().equals("splunkflow")) {
+                                exist = true;
+                            }
+                        }
+                    }
+                    if (exist == false) {
+                        ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByBan(NAccObj.getName(), NAccObj.getBanid());
+                        if (ssnsAccObjList != null) {
+                            if (ssnsAccObjList.size() > 3) {
                                 exist = true;
                             }
                         }
@@ -1958,7 +1951,7 @@ public class SsnsService {
                         continue;
                     }
                     fifaInit = 1;
-                    String valueSt = outputList.get(j - 1);
+                    String valueSt = outputList.get(outputList.size() - 1 - j + 1);
                     if (valueSt.indexOf("false") != -1) {
                         isFIFA = 0;
                     }
@@ -1973,7 +1966,7 @@ public class SsnsService {
                         continue;
                     }
                     vmInit = 1;
-                    String valueSt = outputList.get(j - 1);
+                    String valueSt = outputList.get(outputList.size() - 1 - j + 1);
                     if (valueSt.indexOf("false") != -1) {
                         voicemail = 0;
                     }

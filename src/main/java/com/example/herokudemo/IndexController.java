@@ -310,7 +310,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.TT_GetSub;
-        ArrayList<String> ret = afWebService.testSsnsprodTTVCByIdRT(username, idSt, pidSt, SsnsService.APP_WIFI, oper);
+        ArrayList<String> ret = afWebService.testSsnsprodTTVCByIdRT(username, idSt, pidSt, SsnsService.APP_TTVC, oper);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
