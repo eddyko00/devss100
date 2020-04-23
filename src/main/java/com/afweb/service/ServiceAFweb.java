@@ -539,6 +539,7 @@ public class ServiceAFweb {
                 //////require to save memory
 
                 processFeatureProd();
+                processFeatureTTVC();
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
                 processFeatureApp();
                 processFeatureWifi();
@@ -746,7 +747,7 @@ public class ServiceAFweb {
         int result = 0;
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
-        String LockName = "ETL_" + SsnsService.APP_TTVREQ;
+        String LockName = "ETL_TTVC";
 
         try {
             int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureApp");
@@ -1034,7 +1035,7 @@ public class ServiceAFweb {
 
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
-        String LockName = "ETL_" + app;;
+        String LockName = "ETL_TTVC";
         int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processETLsplunkTTV " + app);
         if (CKey.NN_DEBUG == true) {
             lockReturn = 1;
