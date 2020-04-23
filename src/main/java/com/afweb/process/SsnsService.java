@@ -14,6 +14,7 @@ import com.afweb.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.io.InputStreamReader;
@@ -26,12 +27,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.util.Map;
+import java.util.logging.Level;
 
 import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.codec.binary.Base64;
 import static org.apache.http.protocol.HTTP.USER_AGENT;
+import static org.springframework.http.converter.json.Jackson2ObjectMapperBuilder.json;
 
 /**
  *
@@ -258,7 +261,7 @@ public class SsnsService {
             NAccObj.setTiid(prodid);
 
             NAccObj.setUid(dataObj.getUid());
-            NAccObj.setApp(dataObj.getApp());
+            NAccObj.setApp(APP_TTVC);
             NAccObj.setOper(oper);
 
 //          NAccObj.setDown(""); // set by NAccObj
@@ -479,7 +482,53 @@ public class SsnsService {
                 if (inList != null) {
                     inList.add("elapsedTime " + elapsedTime);
                 }
+                return output;
+            } else if (oper.equals(TT_Quote)|| oper.equals(TT_SaveOrder)) {
+                url = ProductURL + "/v1/cmo/selfmgmt/tv/requisition/account/" + banid
+                        + "/productinstance/" + prodid
+                        + "/quotation";
 
+                if (inList != null) {
+                    inList.add(url);
+                }
+                // calculate elapsed time in milli seconds
+                long startTime = TimeConvertion.currentTimeMillis();
+                String st = ServiceAFweb.replaceAll("\":\",", "\":\"\",", postParm);
+                st = st.substring(0, st.length() - 2);
+                Map<String, String> map = new ObjectMapper().readValue(st, Map.class);
+
+                String output = this.sendRequest_Ssns(METHOD_POST, url, null, map);
+
+                long endTime = TimeConvertion.currentTimeMillis();
+                long elapsedTime = endTime - startTime;
+//            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
+                if (inList != null) {
+                    inList.add("elapsedTime " + elapsedTime);
+                }
+                return output;
+                           
+            } else if (oper.equals(TT_Vadulate)) {
+                url = ProductURL + "/v1/cmo/selfmgmt/tv/requisition/account/" + banid
+                        + "/productinstance/" + prodid
+                        + "/quotation";
+
+                if (inList != null) {
+                    inList.add(url);
+                }
+                // calculate elapsed time in milli seconds
+                long startTime = TimeConvertion.currentTimeMillis();
+                String st = ServiceAFweb.replaceAll("\":\",", "\":\"\",", postParm);
+                st = st.substring(0, st.length() - 2);
+                Map<String, String> map = new ObjectMapper().readValue(st, Map.class);
+
+                String output = this.sendRequest_Ssns(METHOD_POST, url, null, map);
+
+                long endTime = TimeConvertion.currentTimeMillis();
+                long elapsedTime = endTime - startTime;
+//            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
+                if (inList != null) {
+                    inList.add("elapsedTime " + elapsedTime);
+                }
                 return output;
             }
         } catch (Exception ex) {
@@ -502,19 +551,34 @@ public class SsnsService {
 
         String outputSt = null;
         ArrayList<String> inList = new ArrayList();
-        if (oper.equals(TT_GetSub) || oper.equals(TT_Vadulate) || oper.equals(TT_Quote) || oper.equals(TT_SaveOrder)) {
-            outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, oper, banid, appTId, null, inList);
+        if (oper.equals(TT_SaveOrder) || oper.equals(TT_Vadulate) || oper.equals(TT_Quote) || oper.equals(TT_SaveOrder)) {
+            outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, TT_GetSub, banid, appTId, null, inList);
             if (outputSt == null) {
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             ProductApp prodTTV = parseTTVCFeature(outputSt, oper, null);
             outputList.add(prodTTV.getFeat());
+
+            ProductData pData = null;
+            String output = dataObj.getData();
+            try {
+                pData = new ObjectMapper().readValue(output, ProductData.class);
+            } catch (IOException ex) {
+                logger.info("> TestFeatureSsnsProdTTVC Exception " + ex.getMessage());
+            }
+            if (pData == null) {
+                return "";
+            }
+            inList.clear();
+
+            String postParamSt = ProductDataHelper.getPostParamRestore(pData.getPostParam());
+            outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, oper, banid, appTId, postParamSt, inList);
             outputList.addAll(inList);
             outputList.addAll(outList);
 
             return prodTTV.getFeat();
-        } else if (oper == TT_SaveOrder) {
+        } else if (oper == TT_GetSub) {
 
             outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, oper, banid, appTId, null, inList);;
             if (outputSt == null) {
@@ -1824,7 +1888,7 @@ public class SsnsService {
                         int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
                     }
                 }
-  
+
                 NAccObj = new SsnsAcc();
                 NAccObj.setTiid(prodid);
                 NAccObj.setRet(APP_PRODUCT_TYPE_TTV);

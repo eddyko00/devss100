@@ -31,16 +31,9 @@ public class ProductData {
     /**
      * @return the detailResp
      */
+
+
     public ArrayList<String> getDetailResp() {
-        if (detailResp != null) {
-            ArrayList<String> detailRespNew = new ArrayList();
-            for (int i = 0; i < detailResp.size(); i++) {
-                String flowSt = detailResp.get(i);
-                flowSt = ServiceAFweb.replaceAll("^", "\"", flowSt);
-                detailRespNew.add(flowSt);
-            }
-            return detailRespNew;
-        }
         return detailResp;
     }
 
@@ -64,16 +57,8 @@ public class ProductData {
     /**
      * @return the callback
      */
+   
     public ArrayList<String> getCallback() {
-        if (callback != null) {
-            ArrayList<String> callbackNew = new ArrayList();
-            for (int i = 0; i < callback.size(); i++) {
-                String flowSt = callback.get(i);
-                flowSt = ServiceAFweb.replaceAll("^", "\"", flowSt);
-                callbackNew.add(flowSt);
-            }
-            return callbackNew;
-        }
         return callback;
     }
 
@@ -97,9 +82,9 @@ public class ProductData {
     /**
      * @return the postParam
      */
+
     public String getPostParam() {
-        String postParamSt = ServiceAFweb.replaceAll("^", "\"", postParam);
-        return postParamSt;
+        return postParam;
     }
 
     /**
@@ -113,16 +98,8 @@ public class ProductData {
     /**
      * @return the flow
      */
+
     public ArrayList<String> getFlow() {
-        if (flow != null) {
-            ArrayList<String> flowNew = new ArrayList();
-            for (int i = 0; i < flow.size(); i++) {
-                String flowSt = flow.get(i);
-                flowSt = ServiceAFweb.replaceAll("^", "\"", flowSt);
-                flowNew.add(flowSt);
-            }
-            return flowNew;
-        }
         return flow;
     }
 

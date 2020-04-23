@@ -7,6 +7,7 @@ package com.afweb.service;
 
 import com.afweb.process.*;
 import com.afweb.model.*;
+import static com.afweb.process.SsnsService.*;
 
 import com.afweb.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -455,8 +456,10 @@ public class ServiceAFweb {
                         }
                     }
 
-                    boolean ttvReqflag = true;
+                    boolean ttvReqflag = false;
                     if (ttvReqflag == true) {
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVC);
+
                         SsnsService ss = new SsnsService();
                         String feature = "";
                         ArrayList appNameArrayTemp = getAllOpenTTVCArray();
@@ -1943,10 +1946,9 @@ public class ServiceAFweb {
                 ArrayList<String> outputList = new ArrayList();
                 SsnsService ss = new SsnsService();
                 String feat = "";
-
-                if ((Oper == SsnsService.WI_Getdev) || (Oper == SsnsService.WI_GetDeviceStatus)) {
-                    feat = ss.TestFeatureSsnsProdWifi(ssnsAccObj, outputList, Oper);
-                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
+                if ((Oper.equals(TT_GetSub) ||Oper.equals(TT_Vadulate) || Oper.equals(TT_Quote) || Oper.equals(TT_SaveOrder))) {
+                    feat = ss.TestFeatureSsnsProdTTVC(ssnsAccObj, outputList, Oper);
+                    logger.info("> testSsnsprodTTVCByIdRT " + Oper + " feat " + feat);
                     if ((feat == null) || (feat.length() == 0)) {
                         // disabled this Acc Obj
                         int type = ssnsAccObj.getType();
@@ -2174,8 +2176,7 @@ public class ServiceAFweb {
                     return 0;
 
                 }
-                int result = new ObjectMapper().readValue(output, Integer.class
-                );
+                int result = new ObjectMapper().readValue(output, Integer.class);
                 return result;
             } catch (Exception ex) {
                 logger.info("> SystemUpdateSQLList exception " + ex.getMessage());
@@ -2205,8 +2206,7 @@ public class ServiceAFweb {
                 }
                 ArrayList<SsnsData> trArray = null;
 
-                SsnsData[] arrayItem = new ObjectMapper().readValue(output, SsnsData[].class
-                );
+                SsnsData[] arrayItem = new ObjectMapper().readValue(output, SsnsData[].class);
                 List<SsnsData> listItem = Arrays.<SsnsData>asList(arrayItem);
                 trArray = new ArrayList<SsnsData>(listItem);
                 return trArray;
@@ -2240,8 +2240,7 @@ public class ServiceAFweb {
                 }
                 ArrayList<SsnsData> trArray = null;
 
-                SsnsData[] arrayItem = new ObjectMapper().readValue(output, SsnsData[].class
-                );
+                SsnsData[] arrayItem = new ObjectMapper().readValue(output, SsnsData[].class);
                 List<SsnsData> listItem = Arrays.<SsnsData>asList(arrayItem);
                 trArray = new ArrayList<SsnsData>(listItem);
                 return trArray;
