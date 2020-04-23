@@ -227,10 +227,7 @@ public class SsnsService {
                     if (outputSt.indexOf("responseCode:400500") != -1) {
                         return false;
                     }
-                    ProductApp prodTTV = parseTTVCFeature(outputSt, oper, postParm);
-//                    pData.setpSSNS(prodTTV);
-                    featTTV = prodTTV.getFeat();
-
+                    featTTV = parseTTVCFeature(outputSt, oper, postParm);
                 }
             } else {
                 return false;
@@ -281,18 +278,21 @@ public class SsnsService {
         return false;
     }
 
-    public static ProductApp parseTTVCFeature(String outputSt, String oper, String postParm) {
+    public static String parseTTVCFeature(String outputSt, String oper, String postParm) {
 
         if (outputSt == null) {
             return null;
         }
-        ProductApp prodTTV = new ProductApp();
 
         int packCd = 0;
         int channelCd = 0;
         int discountCd = 0;
         int add = 0;
         int remove = 0;
+
+        String geomarket = "";
+        String offer = "noOfferCd";
+        String collectionCd = "";
 
         ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
         for (int j = 0; j < outputList.size(); j++) {
@@ -303,7 +303,7 @@ public class SsnsService {
                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll("geoTargetMarket:", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
-                prodTTV.setGeomarket(valueSt);
+                geomarket = valueSt;
             }
             if (inLine.indexOf("offerCd") != -1) {
                 String valueSt = inLine;
@@ -312,15 +312,13 @@ public class SsnsService {
                 valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
 
                 if (valueSt.indexOf("MediaroomTV-HS2.0") != -1) {
-                    prodTTV.setOffer("Mediaroom20");
+                    offer = "Mediaroom20";
                     continue;
-                }
-                if (valueSt.indexOf("MediaroomTV-HS") != -1) {
-                    prodTTV.setOffer("Mediaroom");
+                } else if (valueSt.indexOf("MediaroomTV-HS") != -1) {
+                    offer = "Mediaroom";
                     continue;
-                }
-                if (valueSt.indexOf("TVX") != -1) {
-                    prodTTV.setOffer("TVX");
+                } else if (valueSt.indexOf("TVX") != -1) {
+                    offer = "TVX";
                 }
                 continue;
             }
@@ -330,7 +328,7 @@ public class SsnsService {
                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll("collectionCd:", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
-                prodTTV.setCollectionCd(valueSt);
+                collectionCd = valueSt;
             }
 
             if (inLine.indexOf("discountCd") != -1) {
@@ -365,13 +363,13 @@ public class SsnsService {
         String featTTV = APP_TTVC;
         featTTV += ":" + oper;
 
-        String gm = prodTTV.getGeomarket();
+        String gm = geomarket;
         if (gm.length() == 0) {
             gm = "noGeoMarket";
         }
         featTTV += ":" + gm;
-        featTTV += ":" + prodTTV.getOffer();
-        String coll = prodTTV.getCollectionCd();
+        featTTV += ":" + offer;
+        String coll = collectionCd;
         if (coll.length() == 0) {
             coll = "Essential";
         }
@@ -381,9 +379,8 @@ public class SsnsService {
         featTTV += ":Disc_" + discountCd;
         featTTV += ":Add_" + add;
         featTTV += ":Remove_" + remove;
-        prodTTV.setFeat(featTTV);
 
-        return prodTTV;
+        return featTTV;
     }
 
     // 1 faulure, 0 = success
@@ -481,7 +478,7 @@ public class SsnsService {
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
                 if (inList != null) {
                     inList.add("elapsedTime:" + elapsedTime);
-                                        inList.add("output:");
+                    inList.add("output:");
                 }
                 return output;
             } else if (oper.equals(TT_Quote) || oper.equals(TT_SaveOrder)) {
@@ -571,8 +568,8 @@ public class SsnsService {
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            ProductApp prodTTV = parseTTVCFeature(outputSt, oper, null);
-            outputList.add(prodTTV.getFeat());
+            String feat = parseTTVCFeature(outputSt, oper, null);
+            outputList.add(feat);
 
             ProductData pData = null;
             String output = dataObj.getData();
@@ -591,7 +588,7 @@ public class SsnsService {
             outputList.addAll(inList);
             outputList.addAll(outList);
 
-            return prodTTV.getFeat();
+            return feat;
         } else if (oper == TT_GetSub) {
 
             outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, oper, banid, appTId, null, inList);;
@@ -600,12 +597,12 @@ public class SsnsService {
             }
 
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            ProductApp prodTTV = parseTTVCFeature(outputSt, oper, null);
-            outputList.add(prodTTV.getFeat());
+            String feat = parseTTVCFeature(outputSt, oper, null);
+            outputList.add(feat);
             outputList.addAll(inList);
             outputList.addAll(outList);
 
-            return prodTTV.getFeat();
+            return feat;
         }
 
         return "";
@@ -797,9 +794,7 @@ public class SsnsService {
                     if (outputSt.indexOf("responseCode:400500") != -1) {
                         return false;
                     }
-                    ProductApp prodTTV = parseWifiFeature(outputSt, oper, prodClass);
-//                    pData.setpSSNS(prodTTV);
-                    featTTV = prodTTV.getFeat();
+                    featTTV = parseWifiFeature(outputSt, oper, prodClass);
 
                 }
             } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
@@ -865,15 +860,20 @@ public class SsnsService {
         return false;
     }
 
-    public static ProductApp parseWifiFeature(String outputSt, String oper, String prodClass) {
+    public static String parseWifiFeature(String outputSt, String oper, String prodClass) {
 
         if (outputSt == null) {
             return null;
         }
-        ProductApp prodTTV = new ProductApp();
+
         int smartInit = 0;
         int catInit = 0;
         int cujoInit = 0;
+
+        String smartSteering = "";
+        int guestDevice = 0;
+        String frequency = "";
+        int cujoAgent = 0;
 
         ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
         for (int j = 0; j < outputList.size(); j++) {
@@ -889,7 +889,7 @@ public class SsnsService {
                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll("smartSteeringEnabledInd:", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
-                prodTTV.setSmartSteering(valueSt);
+                smartSteering = valueSt;
 
                 continue;
             }
@@ -897,9 +897,8 @@ public class SsnsService {
                 if (smartInit == 1) {
                     continue;
                 }
-
                 smartInit = 1;
-                prodTTV.setGuestDevice(1);
+                guestDevice = 1;
                 continue;
             }
             if (inLine.indexOf("wirelessRadioFrequencyTxt") != -1) {
@@ -908,13 +907,13 @@ public class SsnsService {
                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll("wirelessRadioFrequencyTxt:", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
-                String freq = prodTTV.getFrequency();
+                String freq = frequency;
                 if (freq.length() == 0) {
                     freq += valueSt;
                 } else {
                     freq += "_" + valueSt;
                 }
-                prodTTV.setFrequency(freq);
+                frequency = freq;
                 continue;
             }
             if (inLine.indexOf("cujoAgentEnabledInd") != -1) {
@@ -922,7 +921,7 @@ public class SsnsService {
                     continue;
                 }
                 cujoInit = 1;
-                prodTTV.setCujoAgent(1);;
+                cujoAgent = 1;;
                 continue;
             }
         }
@@ -931,7 +930,7 @@ public class SsnsService {
         featTTV += ":" + oper;
         featTTV += ":" + prodClass;
 
-        String sm = prodTTV.getSmartSteering();
+        String sm = smartSteering;
         if (sm.length() == 0) {
             sm = "noSmartSteering";
         } else {
@@ -939,7 +938,7 @@ public class SsnsService {
         }
         featTTV += ":" + sm;
 
-        String freq = prodTTV.getFrequency();
+        String freq = frequency;
         if (freq.length() == 0) {
             freq = "noFrequency";
         } else {
@@ -948,19 +947,17 @@ public class SsnsService {
         featTTV += ":" + freq;
 
         String guest = "noGuestDevice";
-        if (prodTTV.getGuestDevice() == 1) {
+        if (guestDevice == 1) {
             guest = "GuestDevice";
         }
         featTTV += ":" + guest;
         String cujo = "noCujoAgent";
-        if (prodTTV.getCujoAgent() == 1) {
+        if (cujoAgent == 1) {
             cujo = "CujoAgent";
         }
         featTTV += ":" + cujo;
 
-        prodTTV.setFeat(featTTV);
-
-        return prodTTV;
+        return featTTV;
     }
 
     // 1 faulure, 0 = success
@@ -1104,7 +1101,7 @@ public class SsnsService {
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
                 inList.add("elapsedTime:" + elapsedTime);
-                    inList.add("output:");                
+                inList.add("output:");
             }
 
             return output;
@@ -1140,12 +1137,12 @@ public class SsnsService {
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            ProductApp prodTTV = parseWifiFeature(outputSt, Oper, prodClass);
-            outputList.add(prodTTV.getFeat());
+            String feat = parseWifiFeature(outputSt, Oper, prodClass);
+            outputList.add(feat);
             outputList.addAll(inList);
             outputList.addAll(outList);
 
-            return prodTTV.getFeat();
+            return feat;
         } else if (Oper == WI_Getdev) {
 
             outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, Oper, banid, uniquid, prodClass, serialid, Oper, inList);
@@ -1402,10 +1399,7 @@ public class SsnsService {
                     if (outputSt.indexOf("responseCode:400500") != -1) {
                         return false;
                     }
-                    ProductApp prodTTV = parseAppointmentFeature(outputSt, oper);
-
-//                    pData.setpSSNS(prodTTV);
-                    featTTV = prodTTV.getFeat();
+                    featTTV = parseAppointmentFeature(outputSt, oper);
                 }
             } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
                 featTTV = APP_PRODUCT_TYPE_APP;
@@ -1460,16 +1454,20 @@ public class SsnsService {
         return false;
     }
 
-    public static ProductApp parseAppointmentFeature(String outputSt, String oper) {
+    public static String parseAppointmentFeature(String outputSt, String oper) {
 
         if (outputSt == null) {
             return null;
         }
-        ProductApp prodTTV = new ProductApp();
+
         int catCdInit = 0;
         int statInit = 0;
         int catInit = 0;
         int hostInit = 0;
+        String category = "";
+        String statusCd = "";
+        String categoryCd = "";
+        String host = "";
 
         ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
         for (int j = 0; j < outputList.size(); j++) {
@@ -1485,7 +1483,7 @@ public class SsnsService {
                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll("category:", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
-                prodTTV.setCategory(valueSt);
+                category = valueSt;
 
                 continue;
             }
@@ -1502,7 +1500,7 @@ public class SsnsService {
                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll("statusCd:", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
-                prodTTV.setStatusCd(valueSt);
+                statusCd = valueSt;
                 continue;
             }
             if (inLine.indexOf("productCategoryCd") != -1) {
@@ -1515,7 +1513,7 @@ public class SsnsService {
                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll("productCategoryCd:", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
-                prodTTV.setCategoryCd(valueSt);
+                categoryCd = valueSt;
                 continue;
             }
             if (inLine.indexOf("hostSystemCd") != -1) {
@@ -1528,24 +1526,19 @@ public class SsnsService {
                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll("hostSystemCd:", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
-                prodTTV.setHost(valueSt);
+                host = valueSt;
                 continue;
             }
         }
 
         String featTTV = APP_PRODUCT_TYPE_APP;
         featTTV += ":" + oper;
-        featTTV += ":" + prodTTV.getHost();
-        featTTV += ":" + prodTTV.getCategory();
-        featTTV += ":" + prodTTV.getStatusCd();
-        featTTV += ":" + prodTTV.getCategoryCd();
+        featTTV += ":" + host;
+        featTTV += ":" + category;
+        featTTV += ":" + statusCd;
+        featTTV += ":" + categoryCd;
 
-//        if (featTTV.indexOf("::") != -1) {
-//            logger.info("> parseAppointmentFeature " + featTTV);
-//        }
-        prodTTV.setFeat(featTTV);
-
-        return prodTTV;
+        return featTTV;
     }
 
     public String getCustIdAppointmentDevop(String ProductURL, String appTId, String banid, String cust, String host) {
@@ -1612,7 +1605,7 @@ public class SsnsService {
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
                 inList.add("elapsedTime:" + elapsedTime);
-                                    inList.add("output:");
+                inList.add("output:");
             }
 
             return output;
@@ -1641,12 +1634,12 @@ public class SsnsService {
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            ProductApp prodTTV = parseAppointmentFeature(outputSt, Oper);
-            outputList.add(prodTTV.getFeat());
+            String feat = parseAppointmentFeature(outputSt, Oper);
+            outputList.add(feat);
             outputList.addAll(inList);
             outputList.addAll(outList);
 
-            return prodTTV.getFeat();
+            return feat;
         } else if (Oper == APP_GET_TIMES) {
             outputSt = SendSsnsAppointmentGetTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, inList);
             if (outputSt == null) {
@@ -1713,7 +1706,7 @@ public class SsnsService {
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
                 inList.add("elapsedTime:" + elapsedTime);
-                                    inList.add("output:");
+                inList.add("output:");
             }
             return output;
         } catch (Exception ex) {
@@ -1737,14 +1730,14 @@ public class SsnsService {
         String featTTV = "";
         ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
         if (oper.equals(APP_PRODUCT_TYPE_HSIC)) {
-            ProductTTV prodHSIC = parseProductInternetFeature(outputSt, dataObj.getOper());
-            featTTV = prodHSIC.getFeatTTV();
+            featTTV = parseProductInternetFeature(outputSt, dataObj.getOper());
+
         } else if (oper.equals(APP_PRODUCT_TYPE_TTV)) {
-            ProductTTV prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
-            featTTV = prodTTV.getFeatTTV();
+            featTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
+
         } else if (oper.equals(APP_PRODUCT_TYPE_SING)) {
-            ProductTTV prodSING = parseProductPhoneFeature(outputSt, dataObj.getOper());
-            featTTV = prodSING.getFeatTTV();
+            featTTV = parseProductPhoneFeature(outputSt, dataObj.getOper());
+
         }
 
         outputList.add(featTTV);
@@ -1938,17 +1931,22 @@ public class SsnsService {
         return "";
     }
 
-    public static ProductTTV parseProductPhoneFeature(String outputSt, String oper) {
+    public static String parseProductPhoneFeature(String outputSt, String oper) {
         if (outputSt == null) {
             return null;
         }
         try {
-            ProductTTV prodTTV = new ProductTTV();
+
             int quotaAmtInit = 0;
             int fifaInit = 0;
             int planInit = 0;
             int vmInit = 0;
             int LocalLine = 0;
+
+            int isFIFA = 0;
+            String PrimaryPricePlan = "";
+            String CallControl = "";
+            int voicemail = 0;
             ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
 
             for (int j = 0; j < outputList.size(); j++) {
@@ -1962,10 +1960,10 @@ public class SsnsService {
                     fifaInit = 1;
                     String valueSt = outputList.get(j - 1);
                     if (valueSt.indexOf("false") != -1) {
-                        prodTTV.setIsFIFA(0);
+                        isFIFA = 0;
                     }
                     if (valueSt.indexOf("true") != -1) {
-                        prodTTV.setIsFIFA(1);
+                        isFIFA = 1;
                     }
                     continue;
                 }
@@ -1977,10 +1975,10 @@ public class SsnsService {
                     vmInit = 1;
                     String valueSt = outputList.get(j - 1);
                     if (valueSt.indexOf("false") != -1) {
-                        prodTTV.setVoicemail(0);
+                        voicemail = 0;
                     }
                     if (valueSt.indexOf("true") != -1) {
-                        prodTTV.setVoicemail(1);
+                        voicemail = 1;
                     }
                     continue;
                 }
@@ -1999,7 +1997,7 @@ public class SsnsService {
                             valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                             valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
                             valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
-                            prodTTV.setCallControl(valueSt);
+                            CallControl = valueSt;
                             exit = true;
                             break;
                         }
@@ -2027,7 +2025,7 @@ public class SsnsService {
                     planInit = 1;
                     String valueSt = checkPhonePlan(j, outputList);
                     if (valueSt.length() != 0) {
-                        prodTTV.setPrimaryPricePlan(valueSt);
+                        PrimaryPricePlan = valueSt;
                     }
                     continue;
                 }
@@ -2035,16 +2033,16 @@ public class SsnsService {
             String featTTV = APP_PRODUCT_TYPE_SING;
             featTTV += ":" + oper;
             String fifa = "fifa";
-            if (prodTTV.getIsFIFA() == 0) {
+            if (isFIFA == 0) {
                 fifa = "comp";
             }
             featTTV += ":" + fifa;
             String vm = "voicemail";
-            if (prodTTV.getIsFIFA() == 0) {
+            if (voicemail == 0) {
                 vm = "noVoliceMail";
             }
             featTTV += ":" + vm;
-            String plan = prodTTV.getPrimaryPricePlan();
+            String plan = PrimaryPricePlan;
             if (plan.length() == 0) {
                 plan = "noPlan";
                 if (LocalLine == 1) {
@@ -2052,14 +2050,13 @@ public class SsnsService {
                 }
             }
             featTTV += ":" + plan;
-            String callC = prodTTV.getCallControl();
+            String callC = CallControl;
             if (callC.length() == 0) {
                 callC = "noCallControl";
             }
             featTTV += ":" + callC;
-            prodTTV.setFeatTTV(featTTV);
 
-            return prodTTV;
+            return featTTV;
         } catch (Exception ex) {
 
         }
@@ -2085,17 +2082,23 @@ public class SsnsService {
         return "";
     }
 
-    public static ProductTTV parseProductInternetFeature(String outputSt, String oper) {
+    public static String parseProductInternetFeature(String outputSt, String oper) {
 
         if (outputSt == null) {
             return null;
         }
         try {
-            ProductTTV prodTTV = new ProductTTV();
+
             int quotaAmtInit = 0;
             int fifaInit = 0;
             int planInit = 0;
             int fifaFlag = 0;
+            int isFIFA = 0;
+
+            String SecurityBundle = "";
+            String EmailFeatures = "";
+            String UnlimitedUsage = "";
+            String PrimaryPricePlan = "";
 
             ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
 
@@ -2110,11 +2113,11 @@ public class SsnsService {
                     fifaInit = 1;
                     String valueSt = outputList.get(j + 1);
                     if (valueSt.indexOf("false") != -1) {
-                        prodTTV.setIsFIFA(0);
+                        isFIFA = 0;
                         fifaFlag = 0;
                     }
                     if (valueSt.indexOf("true") != -1) {
-                        prodTTV.setIsFIFA(1);
+                        isFIFA = 1;
                         fifaFlag = 1;
                     }
                     break;
@@ -2124,7 +2127,7 @@ public class SsnsService {
             for (int j = 0; j < outputList.size(); j++) {
                 String inLine = outputList.get(outputList.size() - 1 - j);
 //            logger.info("" + inLine);
-                //"name":"isFIFA",
+
                 if (inLine.indexOf("isFIFA") != -1) {
                     if (fifaInit == 1) {
                         continue;
@@ -2132,10 +2135,10 @@ public class SsnsService {
                     fifaInit = 1;
                     String valueSt = outputList.get(j - 1);
                     if (valueSt.indexOf("false") != -1) {
-                        prodTTV.setIsFIFA(0);
+                        isFIFA = 0;
                     }
                     if (valueSt.indexOf("true") != -1) {
-                        prodTTV.setIsFIFA(1);
+                        isFIFA = 1;
                     }
                     continue;
                 }
@@ -2156,7 +2159,7 @@ public class SsnsService {
                                     valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                                     valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
                                     valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
-                                    prodTTV.setSecurityBundle(valueSt);
+                                    SecurityBundle = valueSt;
                                     exit = true;
                                     break;
                                 }
@@ -2194,7 +2197,7 @@ public class SsnsService {
                                         valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                                         valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
                                         valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
-                                        prodTTV.setPrimaryPricePlan(valueSt);
+                                        PrimaryPricePlan = valueSt;
                                         exit = true;
                                         break;
                                     }
@@ -2219,7 +2222,7 @@ public class SsnsService {
                                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                                 valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
                                 valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
-                                prodTTV.setPrimaryPricePlan(valueSt);
+                                PrimaryPricePlan = valueSt;
                                 exit = true;
                                 break;
 
@@ -2232,42 +2235,41 @@ public class SsnsService {
                     continue;
                 }
                 if (inLine.indexOf("EmailFeatures") != -1) {
-                    prodTTV.setEmailFeatures("EmailFeatures");
+                    EmailFeatures = "EmailFeatures";
                     continue;
                 }
                 if (inLine.indexOf("UnlimitedUsage") != -1) {
-                    prodTTV.setUnlimitedUsage("UnlimitedUsage");
+                    EmailFeatures = "UnlimitedUsage";
                     continue;
                 }
             }
             String featTTV = APP_PRODUCT_TYPE_HSIC;
             featTTV += ":" + oper;
             String fifa = "fifa";
-            if (prodTTV.getIsFIFA() == 0) {
+            if (isFIFA == 0) {
                 fifa = "comp";
             }
             featTTV += ":" + fifa;
-            featTTV += ":" + prodTTV.getPrimaryPricePlan();
-            String security = prodTTV.getSecurityBundle();
+            featTTV += ":" + PrimaryPricePlan;
+            String security = SecurityBundle;
             if (security.length() == 0) {
                 security = "noSecurity";
             }
             featTTV += ":" + security;
 
-            String mail = prodTTV.getEmailFeatures();
+            String mail = EmailFeatures;
             if (mail.length() == 0) {
                 mail = "noEmail";
             }
             featTTV += ":" + mail;
 
-            String unlimit = prodTTV.getUnlimitedUsage();
+            String unlimit = UnlimitedUsage;
             if (unlimit.length() == 0) {
                 unlimit = "noUnlimitedUsage";
             }
             featTTV += ":" + unlimit;
-            prodTTV.setFeatTTV(featTTV);
 
-            return prodTTV;
+            return featTTV;
         } catch (Exception ex) {
 
         }
@@ -2288,19 +2290,15 @@ public class SsnsService {
                 return false;
             }
 
-            ProductTTV product = new ProductTTV();
             if (oper.equals(APP_PRODUCT_TYPE_HSIC)) {
-                product = parseProductInternetFeature(outputSt, dataObj.getOper());
+                featTTV = parseProductInternetFeature(outputSt, dataObj.getOper());
 
-                featTTV = product.getFeatTTV();
             } else if (oper.equals(APP_PRODUCT_TYPE_TTV)) {
-                product = parseProductTtvFeature(outputSt, dataObj.getOper());
+                featTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
 
-                featTTV = product.getFeatTTV();
             } else if (oper.equals(APP_PRODUCT_TYPE_SING)) {
-                product = parseProductPhoneFeature(outputSt, dataObj.getOper());
+                featTTV = parseProductPhoneFeature(outputSt, dataObj.getOper());
 
-                featTTV = product.getFeatTTV();
             }
 
 //            logger.info("> updateSsnsProdiuctInventory feat " + featTTV);
@@ -2347,7 +2345,6 @@ public class SsnsService {
     public boolean updateSsnsProdiuctInventory(String oper, String banid, String prodid, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
 
-            String featTTV = "";
             String outputSt = null;
 
             outputSt = SendSsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, prodid, oper, null);
@@ -2357,22 +2354,21 @@ public class SsnsService {
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 return false;
             }
-            ProductTTV prodTTV = new ProductTTV();
+            String feat = "";
             if (oper.equals(SsnsService.APP_PRODUCT_TYPE_HSIC)) {
-                prodTTV = parseProductInternetFeature(outputSt, dataObj.getOper());
+                feat = parseProductInternetFeature(outputSt, dataObj.getOper());
 
             } else if (oper.equals(SsnsService.APP_PRODUCT_TYPE_TTV)) {
-                prodTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
+                feat = parseProductTtvFeature(outputSt, dataObj.getOper());
 
             } else if (oper.equals(SsnsService.APP_PRODUCT_TYPE_SING)) {
-                prodTTV = parseProductPhoneFeature(outputSt, dataObj.getOper());
+                feat = parseProductPhoneFeature(outputSt, dataObj.getOper());
             }
 
-            if (prodTTV == null) {
+            if (feat == null) {
                 return false;
             }
 
-            featTTV = prodTTV.getFeatTTV();
 //            logger.info("> updateSsnsProdiuctInventory feat " + featTTV);
 /////////////TTV  
             ArrayList<String> flow = new ArrayList();
@@ -2383,11 +2379,11 @@ public class SsnsService {
             }
 
             pData.setFlow(flow);
-            String feat = prodTTV.getFeatTTV();
+
             if (faulure == 1) {
                 feat += ":failed";
             }
-            logger.info("> updateSsnsProdiuctInventory feat " + featTTV);
+            logger.info("> updateSsnsProdiuctInventory feat " + feat);
             NAccObj.setName(feat);
             NAccObj.setBanid(banid);
             NAccObj.setCusid(dataObj.getCusid());
@@ -2414,19 +2410,23 @@ public class SsnsService {
         return false;
     }
 
-    public static ProductTTV parseProductTtvFeature(String outputSt, String oper) {
+    public static String parseProductTtvFeature(String outputSt, String oper) {
 
         if (outputSt == null) {
             return null;
         }
-        ProductTTV prodTTV = new ProductTTV();
+
         int productCdInit = 0;
         int ChannelListInit = 0;
         int offerInit = 0;
         int fifaInit = 0;
         int regionInit = 0;
-        prodTTV.setProductCd("Essentials");
-        prodTTV.setRegion("NoRegion");
+
+        int isFIFA = 0;
+        String offer = "noOfferCd";
+        String productCd = "Essentials";
+        int ChannelList = 0;
+        String region = "";
 
         ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
         for (int j = 0; j < outputList.size(); j++) {
@@ -2440,10 +2440,10 @@ public class SsnsService {
                 fifaInit = 1;
                 String valueSt = outputList.get(j + 1);
                 if (valueSt.indexOf("false") != -1) {
-                    prodTTV.setIsFIFA(0);
+                    isFIFA = 0;
                 }
                 if (valueSt.indexOf("true") != -1) {
-                    prodTTV.setIsFIFA(1);
+                    isFIFA = 1;
                 }
                 continue;
             }
@@ -2454,15 +2454,15 @@ public class SsnsService {
                 offerInit = 1;
                 String valueSt = outputList.get(j + 1);
                 if (valueSt.indexOf("MediaroomTV-HS2.0") != -1) {
-                    prodTTV.setOffer("Mediaroom20");
+                    offer = "Mediaroom20";
                     continue;
                 }
                 if (valueSt.indexOf("MediaroomTV-HS") != -1) {
-                    prodTTV.setOffer("Mediaroom");
+                    offer = "Mediaroom";
                     continue;
                 }
                 if (valueSt.indexOf("TVX") != -1) {
-                    prodTTV.setOffer("TVX");
+                    offer = "TVX";
                 }
                 continue;
             }
@@ -2475,7 +2475,7 @@ public class SsnsService {
                 String valueSt = outputList.get(j + 1);
                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
-                prodTTV.setRegion(valueSt);
+                region = valueSt;
                 continue;
             }
             if (inLine.indexOf("productCd") != -1) {
@@ -2486,7 +2486,7 @@ public class SsnsService {
                 String valueSt = outputList.get(j + 1);
                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
-                prodTTV.setProductCd(valueSt);
+                productCd = valueSt;
                 continue;
             }
             if (inLine.indexOf("ChannelList") != -1) {
@@ -2496,9 +2496,9 @@ public class SsnsService {
                 ChannelListInit = 1;
                 String valueSt = outputList.get(j + 3);
                 if (valueSt.indexOf("channelId") != -1) {
-                    prodTTV.setChannelList(1);
+                    ChannelList = (1);
                 } else {
-                    prodTTV.setChannelList(1);
+                    ChannelList = (0);
                 }
                 continue;
             }
@@ -2507,22 +2507,24 @@ public class SsnsService {
         String featTTV = APP_PRODUCT_TYPE_TTV;
         featTTV += ":" + oper;
         String fifa = "fifa";
-        if (prodTTV.getIsFIFA() == 0) {
+        if (isFIFA == 0) {
             fifa = "comp";
         }
         featTTV += ":" + fifa;
-//        featTTV += ":" + prodTTV.getRegion();
-        featTTV += ":" + prodTTV.getOffer();
-        featTTV += ":" + prodTTV.getProductCd();
+//        featTTV += ":" + region;
+        featTTV += ":" + offer;
+        featTTV += ":" + productCd;
 
         String chann = "ChListfailed";
-        if (prodTTV.getChannelList() == 1) {
+        if (ChannelList == 1) {
             chann = "ChannelList";
         }
         featTTV += ":" + chann;
-        prodTTV.setFeatTTV(featTTV);
 
-        return prodTTV;
+        if (region.length() == 0) {
+            featTTV += ":noRegion";
+        }
+        return featTTV;
     }
 
     public String SendSsnsProdiuctInventoryByProdId(String ProductURL, String ban, String prodid, ArrayList<String> inList) {
@@ -2541,7 +2543,7 @@ public class SsnsService {
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
                 inList.add("elapsedTime:" + elapsedTime);
-                                    inList.add("output:");
+                inList.add("output:");
             }
             return output;
         } catch (Exception ex) {
@@ -2583,7 +2585,7 @@ public class SsnsService {
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
                 inList.add("elapsedTime:" + elapsedTime);
-                                    inList.add("output:");
+                inList.add("output:");
             }
 
             return output;
