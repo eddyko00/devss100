@@ -365,7 +365,7 @@ public class ServiceAFweb {
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
                     }
 
-                    boolean ETLsplunkFlat = true;
+                    boolean ETLsplunkFlat = false;
                     if (ETLsplunkFlat == true) {
 
                         boolean clearsplunkflag = false;
@@ -455,7 +455,7 @@ public class ServiceAFweb {
                         }
                     }
 
-                    boolean ttvReqflag = false;
+                    boolean ttvReqflag = true;
                     if (ttvReqflag == true) {
                         SsnsService ss = new SsnsService();
                         String feature = "";
@@ -1404,9 +1404,8 @@ public class ServiceAFweb {
                                 if (end != -1) {
                                     status = temSt.substring(0, end + 1);
                                 }
-                                status = replaceAll("\"", "", status);
-                                status = replaceAll("\\n", "", status);
-                                status = replaceAll("\\", "\"", status);
+                                status = replaceAll("\"\"", "\"", status);
+
 
                                 ret = "parameter";
                                 continue;

@@ -12,6 +12,48 @@ package com.afweb.model.ssns;
 public class ProductApp {
 
     /**
+     * @return the collectionCd
+     */
+    public String getCollectionCd() {
+        return collectionCd;
+    }
+
+    /**
+     * @param collectionCd the collectionCd to set
+     */
+    public void setCollectionCd(String collectionCd) {
+        this.collectionCd = collectionCd;
+    }
+
+    /**
+     * @return the offer
+     */
+    public String getOffer() {
+        return offer;
+    }
+
+    /**
+     * @param offer the offer to set
+     */
+    public void setOffer(String offer) {
+        this.offer = offer;
+    }
+
+    /**
+     * @return the geomarket
+     */
+    public String getGeomarket() {
+        return geomarket;
+    }
+
+    /**
+     * @param geomarket the geomarket to set
+     */
+    public void setGeomarket(String geomarket) {
+        this.geomarket = geomarket;
+    }
+
+    /**
      * @return the cujoAgent
      */
     public int getCujoAgent() {
@@ -161,4 +203,7 @@ public class ProductApp {
     private int guestDevice=0;
     private String frequency="";
     private int cujoAgent=0;    
+    private String geomarket="";
+    private String offer="";
+    private String collectionCd="";
 }

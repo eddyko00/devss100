@@ -55,6 +55,7 @@ public class SsnsService {
     public static String APP_PRODUCT_TYPE_SING = "SING";
     public static String APP_PRODUCT_TYPE_APP = "APP";
     public static String APP_PRODUCT_TYPE_WIFI = "WIFI";
+    public static String APP_PRODUCT_TYPE_TTVC = "TTVCL";
 
     public static String APP_GET_APP = "getAppointment";
     public static String APP_CAN_APP = "cancelAppointment";
@@ -93,14 +94,12 @@ public class SsnsService {
         if (dataObj == null) {
             return "";
         }
-        String cust = "";
+
         String banid = "";
         String prodid = "";
-        String prodClass = "";
-        String serialid = "";
-        String parm = "";
+
         String postParm = "";
-        int async = 0;
+
         String dataSt = "";
         try {
             String oper = dataObj.getOper();
@@ -113,7 +112,7 @@ public class SsnsService {
                 dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
                 dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
                 String[] operList = dataSt.split(",");
-                if (operList.length > 3) {
+                if (operList.length > 1) {
                     banid = operList[0];
                     prodid = operList[1];
 
@@ -135,7 +134,7 @@ public class SsnsService {
                 dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
                 dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
                 String[] operList = dataSt.split(",");
-                if (operList.length > 3) {
+                if (operList.length > 1) {
                     banid = operList[0];
                     prodid = operList[1];
 
@@ -170,11 +169,6 @@ public class SsnsService {
             NAccObj.setDown("splunkflow");
             boolean stat = this.updateSsnsTTVC(oper, banid, prodid, postParm, pData, dataObj, NAccObj);
             if (stat == true) {
-                if (async == 1) {
-                    String feat = NAccObj.getName() + ":AsyncReq";
-                    NAccObj.setName(feat);
-                }
-
                 ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                 boolean exist = false;
                 if (ssnsAccObjList != null) {
@@ -200,16 +194,12 @@ public class SsnsService {
         try {
             String featTTV = "";
 
-            if (oper.equals(TT_0) || oper.equals(TT_1) || oper.equals(TT_2)) {
+            if (oper.equals(TT_0) || oper.equals(TT_1) || oper.equals(TT_2) || oper.equals(TT_3)) {
                 if ((banid.length() == 0) && (prodid.length() == 0)) {
                     return false;
                 } else {
                     String outputSt = null;
-                    if (oper.equals(TT_3)) {
-                        outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, TT_0, banid, prodid, postParm, null);
-                    } else {
-                        outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, TT_0, banid, prodid,  postParm, null);
-                    }
+                    outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, TT_0, banid, prodid, postParm, null);
                     if (outputSt == null) {
                         return false;
                     }
@@ -222,36 +212,23 @@ public class SsnsService {
                     if (outputSt.indexOf("responseCode:400500") != -1) {
                         return false;
                     }
-                    ProductApp prodTTV = parseTTVCFeature(outputSt, oper, "");
+                    ProductApp prodTTV = parseTTVCFeature(outputSt, oper, postParm);
 //                    pData.setpSSNS(prodTTV);
                     featTTV = prodTTV.getFeat();
 
                 }
-            } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
-                featTTV = APP_PRODUCT_TYPE_APP;
-                featTTV += ":" + oper;
-//                featTTV += ":" + host;
-//                if ((banid.length() == 0) && (cust.length() == 0)) {
-//                    featTTV += ":ContactEng";
-//                }
             } else {
                 return false;
             }
-            if (banid.length() >= 10) {
-                featTTV += ":NotaBan";
-            }
-            logger.info("> updateSsnsWifi feat " + featTTV);
+
+//            logger.info("> updateSsnsTTVC feat " + featTTV);
 /////////////TTV   
             if (NAccObj.getDown().equals("splunkflow")) {
-                ArrayList<String> callback = new ArrayList();
-                int faulureCall = getSsnsFlowTraceWifiCallback(dataObj, callback, postParm);
-                if (faulureCall == 0) {
-                    pData.setCallback(callback);
-                }
+
                 ArrayList<String> flow = new ArrayList();
                 int faulure = getSsnsFlowTrace(dataObj, flow);
                 if (flow == null) {
-                    logger.info("> updateSsnsAppointment skip no flow");
+                    logger.info("> updateSsnsTTVC skip no flow");
                     return false;
                 }
                 pData.setFlow(flow);
@@ -260,7 +237,7 @@ public class SsnsService {
                     featTTV += ":splunkfailed";
                 }
             }
-
+            logger.info("> updateSsnsTTVC feat " + featTTV);
             pData.setPostParam(postParm);
             NAccObj.setName(featTTV);
             NAccObj.setBanid(banid);
@@ -289,99 +266,94 @@ public class SsnsService {
         return false;
     }
 
-    public static ProductApp parseTTVCFeature(String outputSt, String oper, String prodClass) {
+    public static ProductApp parseTTVCFeature(String outputSt, String oper, String postParm) {
 
         if (outputSt == null) {
             return null;
         }
         ProductApp prodTTV = new ProductApp();
-        int smartInit = 0;
-        int catInit = 0;
-        int cujoInit = 0;
+
+        int packCd = 0;
+        int channelCd = 0;
+        int discountCd = 0;
+        int add = 0;
+        int remove = 0;
 
         ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
         for (int j = 0; j < outputList.size(); j++) {
             String inLine = outputList.get(j);
 //            logger.info("" + inLine);
-
-            if (inLine.indexOf("smartSteeringEnabledInd") != -1) {
-                if (catInit == 1) {
-                    continue;
-                }
-                catInit = 1;
+            if (inLine.indexOf("geoTargetMarket") != -1) {
                 String valueSt = inLine;
                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
-                valueSt = ServiceAFweb.replaceAll("smartSteeringEnabledInd:", "", valueSt);
+                valueSt = ServiceAFweb.replaceAll("geoTargetMarket:", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
-                prodTTV.setSmartSteering(valueSt);
-
-                continue;
+                prodTTV.setGeomarket(valueSt);
             }
-            if (inLine.indexOf("guestDevice") != -1) {
-                if (smartInit == 1) {
-                    continue;
-                }
-
-                smartInit = 1;
-                prodTTV.setGuestDevice(1);
-                continue;
-            }
-            if (inLine.indexOf("wirelessRadioFrequencyTxt") != -1) {
-
+            if (inLine.indexOf("offerCd") != -1) {
                 String valueSt = inLine;
                 valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
-                valueSt = ServiceAFweb.replaceAll("wirelessRadioFrequencyTxt:", "", valueSt);
+                valueSt = ServiceAFweb.replaceAll("offerCd:", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
-                String freq = prodTTV.getFrequency();
-                if (freq.length() == 0) {
-                    freq += valueSt;
-                } else {
-                    freq += "_" + valueSt;
-                }
-                prodTTV.setFrequency(freq);
+                prodTTV.setOffer(valueSt);
+            }
+
+            if (inLine.indexOf("collectionCd") != -1) {
+                String valueSt = inLine;
+                valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                valueSt = ServiceAFweb.replaceAll("collectionCd:", "", valueSt);
+                valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
+                prodTTV.setCollectionCd(valueSt);
+            }
+
+            if (inLine.indexOf("discountCd") != -1) {
+                discountCd++;
                 continue;
             }
-            if (inLine.indexOf("cujoAgentEnabledInd") != -1) {
-                if (cujoInit == 1) {
-                    continue;
-                }
-                cujoInit = 1;
-                prodTTV.setCujoAgent(1);;
+            if (inLine.indexOf("packCd") != -1) {
+                packCd++;
+                continue;
+            }
+            if (inLine.indexOf("channelCd") != -1) {
+                channelCd++;
                 continue;
             }
         }
 
-        String featTTV = APP_PRODUCT_TYPE_WIFI;
+        if (postParm != null) {
+            outputList = ServiceAFweb.prettyPrintJSON(postParm);
+            for (int j = 0; j < outputList.size(); j++) {
+                String inLine = outputList.get(j);
+                if (inLine.indexOf("ADD") != -1) {
+                    add++;
+                    continue;
+                }
+                if (inLine.indexOf("REMOVE") != -1) {
+                    remove++;
+                    continue;
+                }
+            }
+        }
+
+        String featTTV = APP_PRODUCT_TYPE_TTVC;
         featTTV += ":" + oper;
-        featTTV += ":" + prodClass;
 
-        String sm = prodTTV.getSmartSteering();
-        if (sm.length() == 0) {
-            sm = "noSmartSteering";
-        } else {
-            sm = "SmartSteering_" + sm;
+        String gm = prodTTV.getGeomarket();
+        if (gm.length() == 0) {
+            gm = "noGeoMarket";
         }
-        featTTV += ":" + sm;
-
-        String freq = prodTTV.getFrequency();
-        if (freq.length() == 0) {
-            freq = "noFrequency";
-        } else {
-            freq = "Freq_" + freq;
+        featTTV += ":" + gm;
+        featTTV += ":" + prodTTV.getOffer();
+        String coll = prodTTV.getCollectionCd();
+        if (coll.length() == 0) {
+            coll = "Essential";
         }
-        featTTV += ":" + freq;
-
-        String guest = "noGuestDevice";
-        if (prodTTV.getGuestDevice() == 1) {
-            guest = "GuestDevice";
-        }
-        featTTV += ":" + guest;
-        String cujo = "noCujoAgent";
-        if (prodTTV.getCujoAgent() == 1) {
-            cujo = "CujoAgent";
-        }
-        featTTV += ":" + cujo;
-
+        featTTV += ":" + coll;
+        featTTV += ":Pack_" + packCd;
+        featTTV += ":Channel_" + channelCd;
+        featTTV += ":Discount_" + discountCd;
+        featTTV += ":Add_" + add;
+        featTTV += ":Remove_" + remove;
         prodTTV.setFeat(featTTV);
 
         return prodTTV;
@@ -751,7 +723,7 @@ public class SsnsService {
             if (banid.length() >= 10) {
                 featTTV += ":NotaBan";
             }
-            logger.info("> updateSsnsWifi feat " + featTTV);
+//            logger.info("> updateSsnsWifi feat " + featTTV);
 /////////////TTV   
             if (NAccObj.getDown().equals("splunkflow")) {
                 ArrayList<String> callback = new ArrayList();
@@ -771,7 +743,7 @@ public class SsnsService {
                     featTTV += ":splunkfailed";
                 }
             }
-
+            logger.info("> updateSsnsWifi feat " + featTTV);
             pData.setPostParam(postParm);
             NAccObj.setName(featTTV);
             NAccObj.setBanid(banid);
@@ -1336,7 +1308,7 @@ public class SsnsService {
                 return false;
             }
 
-            logger.info("> updateSsnsAppointment feat " + featTTV);
+//            logger.info("> updateSsnsAppointment feat " + featTTV);
 /////////////TTV   
             if (NAccObj.getDown().equals("splunkflow")) {
 
@@ -1352,7 +1324,7 @@ public class SsnsService {
                     featTTV += ":splunkfailed";
                 }
             }
-
+            logger.info("> updateSsnsAppointment feat " + featTTV);
             NAccObj.setName(featTTV);
             NAccObj.setBanid(banid);
             NAccObj.setCusid(cust);
@@ -1458,9 +1430,9 @@ public class SsnsService {
         featTTV += ":" + prodTTV.getStatusCd();
         featTTV += ":" + prodTTV.getCategoryCd();
 
-        if (featTTV.indexOf("::") != -1) {
-            logger.info("> parseAppointmentFeature " + featTTV);
-        }
+//        if (featTTV.indexOf("::") != -1) {
+//            logger.info("> parseAppointmentFeature " + featTTV);
+//        }
         prodTTV.setFeat(featTTV);
 
         return prodTTV;
@@ -2201,7 +2173,7 @@ public class SsnsService {
                 featTTV = product.getFeatTTV();
             }
 
-            logger.info("> updateSsnsProdiuctInventory feat " + featTTV);
+//            logger.info("> updateSsnsProdiuctInventory feat " + featTTV);
 /////////////TTV   
             ArrayList<String> flow = new ArrayList();
             int faulure = getSsnsFlowTrace(dataObj, flow);
@@ -2215,6 +2187,7 @@ public class SsnsService {
             if (faulure == 1) {
                 featTTV += ":failed";
             }
+            logger.info("> updateSsnsProdiuctInventory feat " + featTTV);
             NAccObj.setName(featTTV);
             NAccObj.setBanid(banid);
             NAccObj.setCusid(dataObj.getCusid());
@@ -2270,7 +2243,7 @@ public class SsnsService {
             }
 
             featTTV = prodTTV.getFeatTTV();
-            logger.info("> updateSsnsProdiuctInventory feat " + featTTV);
+//            logger.info("> updateSsnsProdiuctInventory feat " + featTTV);
 /////////////TTV  
             ArrayList<String> flow = new ArrayList();
             int faulure = getSsnsFlowTrace(dataObj, flow);
@@ -2284,6 +2257,7 @@ public class SsnsService {
             if (faulure == 1) {
                 feat += ":failed";
             }
+            logger.info("> updateSsnsProdiuctInventory feat " + featTTV);            
             NAccObj.setName(feat);
             NAccObj.setBanid(banid);
             NAccObj.setCusid(dataObj.getCusid());
