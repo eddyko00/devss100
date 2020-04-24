@@ -277,7 +277,7 @@ public class ServiceAFweb {
                 // final initialization
 //                getSsnsDataImp().updateSsnsDataAllOpenStatus();
             } else {
-                
+
                 processTimer();
             }
 
@@ -413,20 +413,52 @@ public class ServiceAFweb {
                     boolean monflag = false;
                     if (monflag == true) {
                         //creat monitor
-                        SsReport report = new SsReport();
-                        report.setName(CKey.ADMIN_USERNAME);
-                        report.setStatus(ConstantKey.INITIAL);
-                        report.setOper(SsnsService.REPORT_ALL);
+                        SsReport reportObj = new SsReport();
+                        reportObj.setName(CKey.ADMIN_USERNAME);
+                        reportObj.setStatus(ConstantKey.INITIAL);
+                        reportObj.setUid(SsnsService.REPORT_ALL);
+
+                        ArrayList<String> testIdList = new ArrayList();
+                        ArrayList<String> testFeatList = new ArrayList();
 
                         ReportData reportdata = new ReportData();
+
                         ArrayList<String> servList = getSsnsprodAll(CKey.ADMIN_USERNAME, null, 0);
                         for (int i = 0; i < servList.size(); i += 2) {
-                            String serv = servList.get(i);
-                            ArrayList<String> featallList = getSsnsprodByFeature(CKey.ADMIN_USERNAME, null, serv);
+                            String servProd = servList.get(i);
+                            ArrayList<String> featallList = getSsnsprodByFeature(CKey.ADMIN_USERNAME, null, servProd);
                             for (int j = 0; j < featallList.size(); j += 2) {
-                                String feat = featallList.get(i);
+                                String featN = featallList.get(i);
+                                testFeatList.add(featN);
+                                ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, 5);
+                                if (SsnsAcclist != null) {
+                                    for (int k = 0; k < SsnsAcclist.size(); k++) {
+                                        SsnsAcc accObj = SsnsAcclist.get(k);
+                                        testIdList.add(accObj.getId() + "");
+                                    }
+                                }
 
                             }
+                        }
+                        reportdata.setFeatList(testFeatList);
+                        reportdata.setIdList(testIdList);
+
+                        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjList(reportObj.getName(), reportObj.getUid());
+                        boolean exist = false;
+                        if (ssReportObjList != null) {
+                            if (ssReportObjList.size() != 0) {
+                                SsReport report = ssReportObjList.get(0);
+                                String data = "";
+                                int status = report.getStatus();
+                                int type = report.getType();
+                                int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(report.getId(), data, status, type);
+                                exist = true;
+                            }
+                        }
+                        if (exist == false) {
+                            int ret = getSsnsDataImp().insertSsReportObject(reportObj);
+                        } else {
+
                         }
 
                     }
@@ -2401,11 +2433,7 @@ public class ServiceAFweb {
     public ArrayList getAllLock() {
 
         ArrayList result = null;
-
-        {
-            result = getSsnsDataImp().getAllLock();
-        }
-
+        result = getSsnsDataImp().getAllLock();
         return result;
     }
 

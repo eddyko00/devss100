@@ -43,23 +43,25 @@ import static org.springframework.http.converter.json.Jackson2ObjectMapperBuilde
 public class SsnsService {
 
     protected static Logger logger = Logger.getLogger("SsnsService");
+
     public static String REPORT_ALL = "all";
-    
+    public static String REPORT_MOMITOR = "monitor";
+
     public static String APP_WIFI = "wifi";
     public static String APP_APP = "app";
     public static String APP_PRODUCT = "prod";
     public static String APP_TTVC = "ttv";
-    
-    
+
     public static String APP_TTVSUB = "ttvsub";  // ETL name
     public static String APP_TTVREQ = "ttvreq";  // ETL name
     //
 
-    public static String APP_PRODUCT_TYPE_TTV = "TTV";
-    public static String APP_PRODUCT_TYPE_HSIC = "HSIC";
-    public static String APP_PRODUCT_TYPE_SING = "SING";
-    public static String APP_PRODUCT_TYPE_APP = "APP";
-    public static String APP_PRODUCT_TYPE_WIFI = "WIFI";
+    public static String APP_FEAT_TYPE_TTV = "TTV";
+    public static String APP_FEAT_TYPE_HSIC = "HSIC";
+    public static String APP_FEATT_TYPE_SING = "SING";
+    public static String APP_FEAT_TYPE_APP = "APP";
+    public static String APP_FEAT_TYPE_WIFI = "WIFI";
+    public static String APP_FEAT_TYPE_TTVCL = "TTVCL";
 
     public static String APP_GET_APP = "getAppointment";
     public static String APP_CAN_APP = "cancelAppointment";
@@ -385,7 +387,7 @@ public class SsnsService {
             }
         }
 
-        String featTTV = APP_TTVC;
+        String featTTV = APP_FEAT_TYPE_TTVCL;
         featTTV += ":" + oper;
 
         String gm = geomarket;
@@ -759,7 +761,7 @@ public class SsnsService {
 
                 }
             } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
-                featTTV = APP_PRODUCT_TYPE_APP;
+                featTTV = APP_FEAT_TYPE_APP;
                 featTTV += ":" + oper;
 //                featTTV += ":" + host;
 //                if ((banid.length() == 0) && (cust.length() == 0)) {
@@ -887,7 +889,7 @@ public class SsnsService {
             }
         }
 
-        String featTTV = APP_PRODUCT_TYPE_WIFI;
+        String featTTV = APP_FEAT_TYPE_WIFI;
         featTTV += ":" + oper;
         featTTV += ":" + prodClass;
 
@@ -1346,7 +1348,7 @@ public class SsnsService {
 
             if (oper.equals(APP_UPDATE) || oper.equals(APP_GET_APP) || oper.equals(APP_GET_TIMES)) {
                 if ((banid.length() == 0) && (cust.length() == 0)) {
-                    featTTV = APP_PRODUCT_TYPE_APP;
+                    featTTV = APP_FEAT_TYPE_APP;
                     featTTV += ":" + oper;
                     featTTV += ":" + host;
                     featTTV += ":ContactEng";
@@ -1371,7 +1373,7 @@ public class SsnsService {
                     featTTV = parseAppointmentFeature(outputSt, oper);
                 }
             } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
-                featTTV = APP_PRODUCT_TYPE_APP;
+                featTTV = APP_FEAT_TYPE_APP;
                 featTTV += ":" + oper;
                 featTTV += ":" + host;
                 if ((banid.length() == 0) && (cust.length() == 0)) {
@@ -1500,7 +1502,7 @@ public class SsnsService {
             }
         }
 
-        String featTTV = APP_PRODUCT_TYPE_APP;
+        String featTTV = APP_FEAT_TYPE_APP;
         featTTV += ":" + oper;
         featTTV += ":" + host;
         featTTV += ":" + category;
@@ -1698,13 +1700,13 @@ public class SsnsService {
         }
         String featTTV = "";
         ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-        if (oper.equals(APP_PRODUCT_TYPE_HSIC)) {
+        if (oper.equals(APP_FEAT_TYPE_HSIC)) {
             featTTV = parseProductInternetFeature(outputSt, dataObj.getOper());
 
-        } else if (oper.equals(APP_PRODUCT_TYPE_TTV)) {
+        } else if (oper.equals(APP_FEAT_TYPE_TTV)) {
             featTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
 
-        } else if (oper.equals(APP_PRODUCT_TYPE_SING)) {
+        } else if (oper.equals(APP_FEATT_TYPE_SING)) {
             featTTV = parseProductPhoneFeature(outputSt, dataObj.getOper());
 
         }
@@ -1829,9 +1831,9 @@ public class SsnsService {
             if (oper.equals(PROD_GET_PROD)) {
 
                 NAccObj.setTiid(prodid);
-                NAccObj.setRet(APP_PRODUCT_TYPE_SING);
+                NAccObj.setRet(APP_FEATT_TYPE_SING);
                 NAccObj.setDown("splunkflow");
-                String PIoper = APP_PRODUCT_TYPE_SING;
+                String PIoper = APP_FEATT_TYPE_SING;
                 cmd.add("rt");
                 cmd.add(PIoper);
                 pData.setCmd(cmd);
@@ -1861,9 +1863,9 @@ public class SsnsService {
                 }
                 NAccObj = new SsnsAcc();
                 NAccObj.setTiid(prodid);
-                NAccObj.setRet(APP_PRODUCT_TYPE_HSIC);
+                NAccObj.setRet(APP_FEAT_TYPE_HSIC);
                 NAccObj.setDown("splunkflow");
-                PIoper = APP_PRODUCT_TYPE_HSIC;
+                PIoper = APP_FEAT_TYPE_HSIC;
                 cmd.add("rt");
                 cmd.add(PIoper);
                 pData.setCmd(cmd);
@@ -1894,9 +1896,9 @@ public class SsnsService {
 
                 NAccObj = new SsnsAcc();
                 NAccObj.setTiid(prodid);
-                NAccObj.setRet(APP_PRODUCT_TYPE_TTV);
+                NAccObj.setRet(APP_FEAT_TYPE_TTV);
                 NAccObj.setDown("splunkflow");
-                PIoper = APP_PRODUCT_TYPE_TTV;
+                PIoper = APP_FEAT_TYPE_TTV;
                 cmd.add("rt");
                 cmd.add(PIoper);
                 pData.setCmd(cmd);
@@ -2031,7 +2033,7 @@ public class SsnsService {
                     continue;
                 }
             }
-            String featTTV = APP_PRODUCT_TYPE_SING;
+            String featTTV = APP_FEATT_TYPE_SING;
             featTTV += ":" + oper;
             String fifa = "fifa";
             if (isFIFA == 0) {
@@ -2244,7 +2246,7 @@ public class SsnsService {
                     continue;
                 }
             }
-            String featTTV = APP_PRODUCT_TYPE_HSIC;
+            String featTTV = APP_FEAT_TYPE_HSIC;
             featTTV += ":" + oper;
             String fifa = "fifa";
             if (isFIFA == 0) {
@@ -2291,13 +2293,13 @@ public class SsnsService {
                 return false;
             }
 
-            if (oper.equals(APP_PRODUCT_TYPE_HSIC)) {
+            if (oper.equals(APP_FEAT_TYPE_HSIC)) {
                 featTTV = parseProductInternetFeature(outputSt, dataObj.getOper());
 
-            } else if (oper.equals(APP_PRODUCT_TYPE_TTV)) {
+            } else if (oper.equals(APP_FEAT_TYPE_TTV)) {
                 featTTV = parseProductTtvFeature(outputSt, dataObj.getOper());
 
-            } else if (oper.equals(APP_PRODUCT_TYPE_SING)) {
+            } else if (oper.equals(APP_FEATT_TYPE_SING)) {
                 featTTV = parseProductPhoneFeature(outputSt, dataObj.getOper());
 
             }
@@ -2356,13 +2358,13 @@ public class SsnsService {
                 return false;
             }
             String feat = "";
-            if (oper.equals(SsnsService.APP_PRODUCT_TYPE_HSIC)) {
+            if (oper.equals(SsnsService.APP_FEAT_TYPE_HSIC)) {
                 feat = parseProductInternetFeature(outputSt, dataObj.getOper());
 
-            } else if (oper.equals(SsnsService.APP_PRODUCT_TYPE_TTV)) {
+            } else if (oper.equals(SsnsService.APP_FEAT_TYPE_TTV)) {
                 feat = parseProductTtvFeature(outputSt, dataObj.getOper());
 
-            } else if (oper.equals(SsnsService.APP_PRODUCT_TYPE_SING)) {
+            } else if (oper.equals(SsnsService.APP_FEATT_TYPE_SING)) {
                 feat = parseProductPhoneFeature(outputSt, dataObj.getOper());
             }
 
@@ -2505,7 +2507,7 @@ public class SsnsService {
             }
         }
 
-        String featTTV = APP_PRODUCT_TYPE_TTV;
+        String featTTV = APP_FEAT_TYPE_TTV;
         featTTV += ":" + oper;
         String fifa = "fifa";
         if (isFIFA == 0) {
@@ -2558,16 +2560,16 @@ public class SsnsService {
         if (prodid.length() == 0) {
             url = ProductURL + "/v1/cmo/selfmgmt/productinventory/product?billingAccount.id=" + ban
                     + "&productType=" + productType;
-            if (productType.equals(APP_PRODUCT_TYPE_TTV)) {
+            if (productType.equals(APP_FEAT_TYPE_TTV)) {
                 url += "&fields=product.characteristic.channelInfoList";
-            } else if (productType.equals(APP_PRODUCT_TYPE_SING)) {
+            } else if (productType.equals(APP_FEATT_TYPE_SING)) {
                 url += "&fields=product.characteristic.voicemail";
             }
         } else {
             url = ProductURL + "/v1/cmo/selfmgmt/productinventory/product/" + prodid + "?billingAccount.id=" + ban;
-            if (productType.equals(APP_PRODUCT_TYPE_TTV)) {
+            if (productType.equals(APP_FEAT_TYPE_TTV)) {
                 url += "&fields=product.characteristic.channelInfoList";
-            } else if (productType.equals(APP_PRODUCT_TYPE_SING)) {
+            } else if (productType.equals(APP_FEATT_TYPE_SING)) {
                 url += "&fields=product.characteristic.voicemail";
             }
         }

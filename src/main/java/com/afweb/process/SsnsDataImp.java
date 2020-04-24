@@ -77,15 +77,20 @@ public class SsnsDataImp {
         return ssnsdb.deleteSsnsData(name);
     }
 
-//    public int insertSsnsDataObject(SsnsData Data) {
-//        return ssnsdb.insertSsnsDataObject(Data);
-//    }
+    public int updatSsReportDataStatusTypeById(int id, String data, int status, int type) {
+        return ssnsdb.updatSsReportDataStatusTypeById(id, data, status, type);
+    }
+
     public int updatSsnsAccNameStatusTypeById(int id, String name, int status, int type) {
         return ssnsdb.updatSsnsAccNameStatusTypeById(id, name, status, type);
     }
 
     public int insertSsnsAccObject(SsnsAcc nData) {
         return ssnsdb.insertSsnsAccObject(nData);
+    }
+
+    public int insertSsReportObject(SsReport nData) {
+        return ssnsdb.insertSsReportObject(nData);
     }
 
     public int updatSsnsDataStatusById(int id, int status) {
@@ -171,6 +176,10 @@ public class SsnsDataImp {
 
     public ArrayList<SsnsAcc> getSsnsAccObjList(String name, String uid) {
         return ssnsdb.getSsnsAccObjList(name, uid);
+    }
+
+    public ArrayList<SsReport> getSsReportObjList(String name, String uid) {
+        return ssnsdb.getSsReportObjList(name, uid);
     }
 
     public int deleteAllSsnsAcc(int month) {

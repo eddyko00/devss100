@@ -665,6 +665,16 @@ public class SsnsDataDB {
         return 0;
     }
 
+    public int insertSsReportObject(SsReport nData) {
+        try {
+            String sqlCMD = insertSsReportObjectSQL(nData);
+            return processUpdateDB(sqlCMD);
+
+        } catch (Exception e) {
+            logger.info("> insertSsnsAccObject exception " + nData.getName() + " - " + e.getMessage());
+        }
+        return 0;
+    }
 //    public int insertSsnsDataObject(String name, int type, String dataSt, long updatedatel) {
 //        try {
 //            dataSt = dataSt.replaceAll("|", "");
@@ -682,6 +692,22 @@ public class SsnsDataDB {
 //        }
 //        return 0;
 //    }
+
+    public int updatSsReportDataStatusTypeById(int id, String dataSt, int status, int type) {
+        try {
+            
+            dataSt = dataSt.replaceAll("|", "");
+            dataSt = dataSt.replaceAll("'", "");
+            dataSt = dataSt.replaceAll("\"", "#");
+            String sqlCMD = "update ssnsacc set data='" + dataSt + "', status=" + status + ", type=" + type
+                    + " where id=" + id;
+            return processUpdateDB(sqlCMD);
+        } catch (Exception e) {
+            logger.info("> updatSsnsAccNameStatusById exception " + e.getMessage());
+        }
+        return 0;
+    }
+
     public int updatSsnsAccNameStatusTypeById(int id, String name, int status, int type) {
         try {
             String sqlCMD = "update ssnsacc set name='" + name + "', status=" + status + ", type=" + type
@@ -959,6 +985,12 @@ public class SsnsDataDB {
 
     public ArrayList<SsnsAcc> getSsnsAccObjListByTiid(String name, String tiid) {
         String sql = "select * from ssnsacc where name='" + name + "' and tiid='" + tiid + "'";
+        ArrayList entries = getAllSsnsAccSQL(sql, 0);
+        return entries;
+    }
+
+    public ArrayList<SsReport> getSsReportObjList(String name, String uid) {
+        String sql = "select * from ssreport where name='" + name + "' and uid='" + uid + "'";
         ArrayList entries = getAllSsnsAccSQL(sql, 0);
         return entries;
     }

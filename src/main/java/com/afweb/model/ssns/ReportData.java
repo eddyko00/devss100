@@ -5,6 +5,8 @@
  */
 package com.afweb.model.ssns;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author koed
@@ -12,32 +14,34 @@ package com.afweb.model.ssns;
 public class ReportData {
 
     /**
-     * @return the name
+     * @return the idList
      */
-    public String getName() {
-        return name;
+    public ArrayList<String> getIdList() {
+        return idList;
     }
 
     /**
-     * @param name the name to set
+     * @param idList the idList to set
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setIdList(ArrayList<String> idList) {
+        this.idList = idList;
     }
 
     /**
-     * @return the idSt
+     * @return the featList
      */
-    public String getIdSt() {
-        return idSt;
+    public ArrayList<String> getFeatList() {
+        return featList;
     }
 
     /**
-     * @param idSt the idSt to set
+     * @param featList the featList to set
      */
-    public void setIdSt(String idSt) {
-        this.idSt = idSt;
+    public void setFeatList(ArrayList<String> featList) {
+        this.featList = featList;
     }
-    private String idSt = "";
-    private String name = "";
+
+
+    private ArrayList<String>  idList;
+    private ArrayList<String>  featList;
 }
