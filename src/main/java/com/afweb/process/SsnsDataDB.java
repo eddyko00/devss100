@@ -316,9 +316,11 @@ public class SsnsDataDB {
                         + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint, "
                         + "data text,  updatedatedisplay date, updatedatel bigint not null)");
                 createTableList.add("ALTER SEQUENCE ssnsaccIdSeq OWNED BY ssnsacc.id");
+                ExecuteSQLArrayList(createTableList);
+                createTableList.clear();
 
                 createTableList.add("CREATE SEQUENCE ssreportIdSeq");
-                createTableList.add("create table ssreport (id int not null primary key DEFAULT NEXTVAL('ssnsaccIdSeq'), name varchar(255) not null, status int not null, type int not null,"
+                createTableList.add("create table ssreport (id int not null primary key DEFAULT NEXTVAL('ssreportIdSeq'), name varchar(255) not null, status int not null, type int not null,"
                         + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint, "
                         + "data text,  updatedatedisplay date, updatedatel bigint not null)");
                 createTableList.add("ALTER SEQUENCE ssreportIdSeq OWNED BY ssreport.id");
