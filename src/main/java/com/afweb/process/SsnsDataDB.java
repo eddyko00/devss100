@@ -273,7 +273,7 @@ public class SsnsDataDB {
             dropTableList.add("drop table if exists ssnscomm");
             dropTableList.add("drop table if exists ssnsdata");
             dropTableList.add("drop table if exists ssnsacc");
-
+            dropTableList.add("drop table if exists ssreport");
             boolean resultDrop = ExecuteSQLArrayList(dropTableList);
 //            int resultDropList = updateSQLArrayList(dropTableList);
 
@@ -316,6 +316,12 @@ public class SsnsDataDB {
                         + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint, "
                         + "data text,  updatedatedisplay date, updatedatel bigint not null)");
                 createTableList.add("ALTER SEQUENCE ssnsaccIdSeq OWNED BY ssnsacc.id");
+
+                createTableList.add("CREATE SEQUENCE ssreportIdSeq");
+                createTableList.add("create table ssreport (id int not null primary key DEFAULT NEXTVAL('ssnsaccIdSeq'), name varchar(255) not null, status int not null, type int not null,"
+                        + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint, "
+                        + "data text,  updatedatedisplay date, updatedatel bigint not null)");
+                createTableList.add("ALTER SEQUENCE ssreportIdSeq OWNED BY ssreport.id");
                 ExecuteSQLArrayList(createTableList);
                 createTableList.clear();
 
@@ -328,6 +334,9 @@ public class SsnsDataDB {
                         + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint(20), "
                         + "data text,  updatedatedisplay date, updatedatel bigint(20) not null, primary key (id))");
                 createTableList.add("create table ssnsacc (id int(10) not null auto_increment, name varchar(255) not null, status int(10) not null, type int(10) not null,"
+                        + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint(20), "
+                        + "data text,  updatedatedisplay date, updatedatel bigint(20) not null, primary key (id))");
+                createTableList.add("create table ssreport (id int(10) not null auto_increment, name varchar(255) not null, status int(10) not null, type int(10) not null,"
                         + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint(20), "
                         + "data text,  updatedatedisplay date, updatedatel bigint(20) not null, primary key (id))");
 
@@ -564,7 +573,34 @@ public class SsnsDataDB {
         return 0;
     }
 
-    public static String insertSsnsData(String table, SsnsData newN) {
+//    public static String insertSsReport(String table, SsReport newN) {
+//        String dataSt = newN.getData();
+//
+//        dataSt = dataSt.replaceAll("|", "");
+//        dataSt = dataSt.replaceAll("'", "");
+//        dataSt = dataSt.replaceAll("\"", "#");
+//        newN.setUpdatedatedisplay(new java.sql.Date(newN.getUpdatedatel()));
+//        String sqlCMD = "insert into " + table + " (name, status, type, uid,cusid,banid,tiid,app,oper,down,ret,exec, data, updatedatedisplay, updatedatel, id) VALUES "
+//                + "('" + newN.getName() + "'," + newN.getStatus() + "," + newN.getType()
+//                + ",'" + newN.getUid() + "','" + newN.getCusid() + "','" + newN.getBanid() + "','" + newN.getTiid() + "','" + newN.getApp() + "','" + newN.getOper() + "','" + newN.getDown() + "','" + newN.getRet() + "'," + newN.getExec()
+//                + ",'" + dataSt + "'"
+//                + ",'" + newN.getUpdatedatedisplay() + "'," + newN.getUpdatedatel() + "," + newN.getId() + ")";
+//        return sqlCMD;
+//    }
+    public static String insertSsReportObjectSQL(SsReport nData) {
+        String dataSt = nData.getData();
+        dataSt = dataSt.replaceAll("|", "");
+        dataSt = dataSt.replaceAll("'", "");
+        dataSt = dataSt.replaceAll("\"", "#");
+        String sqlCMD = "insert into ssreport (name, status, type, uid,cusid,banid,tiid,app,oper,down,ret,exec, data, updatedatedisplay, updatedatel) VALUES "
+                + "('" + nData.getName() + "'," + nData.getStatus() + "," + nData.getType()
+                + ",'" + nData.getUid() + "','" + nData.getCusid() + "','" + nData.getBanid() + "','" + nData.getTiid() + "','" + nData.getApp() + "','" + nData.getOper() + "','" + nData.getDown() + "','" + nData.getRet() + "'," + nData.getExec()
+                + ",'" + dataSt + "'"
+                + ",'" + new java.sql.Date(nData.getUpdatedatel()) + "'," + nData.getUpdatedatel() + ")";
+        return sqlCMD;
+    }
+
+    public static String insertSsnsDataAcc(String table, SsnsData newN) {
         String dataSt = newN.getData();
 
         dataSt = dataSt.replaceAll("|", "");
@@ -592,16 +628,6 @@ public class SsnsDataDB {
         return sqlCMD;
     }
 
-//    public int insertSsnsDataObject(SsnsData nData) {
-//        try {
-//            String sqlCMD = insertSsnsDataObjectSQL(nData);
-//            return processUpdateDB(sqlCMD);
-//
-//        } catch (Exception e) {
-//            logger.info("> insertSsnsDataObject exception " + nData.getName() + " - " + e.getMessage());
-//        }
-//        return 0;
-//    }
     public static String insertSsnsAccObjectSQL(SsnsAcc nData) {
         String dataSt = nData.getData();
         dataSt = dataSt.replaceAll("|", "");
@@ -722,6 +748,57 @@ public class SsnsDataDB {
             return (ArrayList) entries;
         } catch (Exception e) {
             logger.info("> getAllSsnsDataSQL exception " + e.getMessage());
+        }
+        return null;
+    }
+
+    private ArrayList<SsReport> getAllSsReportSQL(String sql, int length) {
+        sql = ServiceAFweb.getSQLLengh(sql, length);
+        if (checkCallRemoveSQL_Mysql() == true) {
+            ArrayList nnList;
+            try {
+                nnList = remoteDB.getAllSsReportSqlRemoteDB_RemoteMysql(sql);
+                return nnList;
+            } catch (Exception ex) {
+            }
+            return null;
+        }
+
+        try {
+            List<SsReport> entries = new ArrayList<>();
+            entries.clear();
+            entries = this.jdbcTemplate.query(sql, new RowMapper() {
+                public SsReport mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    SsReport nn = new SsReport();
+                    nn.setId(rs.getInt("id"));
+                    nn.setName(rs.getString("name"));
+                    nn.setStatus(rs.getInt("status"));
+                    nn.setType(rs.getInt("type"));
+
+                    nn.setUid(rs.getString("uid"));
+                    nn.setCusid(rs.getString("cusid"));
+                    nn.setBanid(rs.getString("banid"));
+                    nn.setTiid(rs.getString("tiid"));
+
+                    nn.setApp(rs.getString("app"));
+                    nn.setOper(rs.getString("oper"));
+                    nn.setDown(rs.getString("down"));
+                    nn.setRet(rs.getString("ret"));
+                    nn.setExec(rs.getLong("exec"));
+
+                    String stData = rs.getString("data");
+                    stData = stData.replaceAll("#", "\"");
+                    nn.setData(stData);
+
+                    nn.setUpdatedatedisplay(new java.sql.Date(rs.getDate("updatedatedisplay").getTime()));
+                    nn.setUpdatedatel(rs.getLong("updatedatel"));
+
+                    return nn;
+                }
+            });
+            return (ArrayList) entries;
+        } catch (Exception e) {
+            logger.info("> getAllSsReportSQL exception " + e.getMessage());
         }
         return null;
     }
@@ -877,11 +954,13 @@ public class SsnsDataDB {
         ArrayList entries = getAllSsnsAccSQL(sql, 0);
         return entries;
     }
+
     public ArrayList<SsnsAcc> getSsnsAccObjListByTiid(String name, String tiid) {
         String sql = "select * from ssnsacc where name='" + name + "' and tiid='" + tiid + "'";
         ArrayList entries = getAllSsnsAccSQL(sql, 0);
         return entries;
     }
+
     public ArrayList<SsnsAcc> getSsnsAccObjList(String name, String uid) {
         String sql = "select * from ssnsacc where name='" + name + "' and uid='" + uid + "'";
         ArrayList entries = getAllSsnsAccSQL(sql, 0);
@@ -903,13 +982,14 @@ public class SsnsDataDB {
         ArrayList array = getAllNameSQL(sql);
         return array;
     }
+
     public ArrayList<SsnsData> getSsnsDataObjByUUIDList(String uid) {
-        String sql = "select * from ssnsdata where uid='" + uid +"'"
+        String sql = "select * from ssnsdata where uid='" + uid + "'"
                 + " order by updatedatel asc";
         ArrayList entries = getAllSsnsDataSQL(sql, 0);
         return entries;
     }
-    
+
     public ArrayList<SsnsData> getSsnsDataObjListByID(int id) {
         String sql = "select * from ssnsdata where id=" + id
                 + " order by updatedatel asc";
@@ -926,6 +1006,26 @@ public class SsnsDataDB {
 
     public ArrayList<SsnsData> getSsnsDataObj(String name, int length) {
         String sql = "select * from ssnsdata where name='" + name + "'" + " order by updatedatel asc";
+        ArrayList entries = getAllSsnsDataSQL(sql, length);
+        return entries;
+    }
+
+    public ArrayList<SsReport> getSsReportObjListByID(int id) {
+        String sql = "select * from ssreport where id=" + id
+                + " order by updatedatel asc";
+        ArrayList entries = getAllSsReportSQL(sql, 0);
+        return entries;
+    }
+
+    public ArrayList<SsReport> getSsReportObjList(String app, String ret, int status, int length) {
+        String sql = "select * from ssreport where app='" + app + "' and ret='" + ret + "' and status=" + status
+                + " order by updatedatel asc";
+        ArrayList entries = getAllSsnsDataSQL(sql, length);
+        return entries;
+    }
+
+    public ArrayList<SsReport> getSsReportObj(String name, int length) {
+        String sql = "select * from ssreport where name='" + name + "'" + " order by updatedatel asc";
         ArrayList entries = getAllSsnsDataSQL(sql, length);
         return entries;
     }

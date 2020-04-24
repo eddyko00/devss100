@@ -318,6 +318,7 @@ public class AccountImp {
         saveDBcustomer(serviceAFWeb);
         saveSsnsDataAcc(serviceAFWeb, "ssnsdata");
         saveSsnsDataAcc(serviceAFWeb, "ssnsacc");
+        saveSsnsDataAcc(serviceAFWeb, "ssreport");        
         saveDBcomm(serviceAFWeb);
         return true;
     }
@@ -351,13 +352,13 @@ public class AccountImp {
                 }
                 loopCnt++;
                 if (loopCnt > 5) {
-                    FileUtil.FileWriteTextArray(CKey.FileLocalPath + tableName + "_" + fileCont + ".txt", writeArray);
+                    FileUtil.FileWriteTextArray(ServiceAFweb.FileLocalPath + tableName + "_" + fileCont + ".txt", writeArray);
                     fileCont++;
                     loopCnt = 0;
                     writeArray.clear();
                 }
             }
-            FileUtil.FileWriteTextArray(CKey.FileLocalPath + tableName + "_" + fileCont + ".txt", writeArray);
+            FileUtil.FileWriteTextArray(ServiceAFweb.FileLocalPath + tableName + "_" + fileCont + ".txt", writeArray);
             return 1;
         }
         return 0;
@@ -431,15 +432,15 @@ public class AccountImp {
                 }
                 loopCnt++;
                 if (loopCnt > 200) {
-                    FileUtil.FileWriteTextArray(CKey.FileLocalPath + tableName + "_" + fileCont + ".txt", writeArray);
-                     logger.info("> saveSsnsData " + tableName + "_" + fileCont + " " + writeArray.size());
+                    FileUtil.FileWriteTextArray(ServiceAFweb.FileLocalPath + tableName + "_" + fileCont + ".txt", writeArray);
+                     logger.info("> saveSsnsDataAcc " + tableName + "_" + fileCont + " " + writeArray.size());
                     fileCont++;
                     loopCnt = 0;
                     writeArray.clear();
                 }
             }
 
-            FileUtil.FileWriteTextArray(CKey.FileLocalPath + tableName + "_" + fileCont + ".txt", writeArray);
+            FileUtil.FileWriteTextArray(ServiceAFweb.FileLocalPath + tableName + "_" + fileCont + ".txt", writeArray);
             return 1;
         }
 
@@ -514,7 +515,7 @@ public class AccountImp {
                     String st = new ObjectMapper().writeValueAsString(obj);
                     writeArray.add(st);
                 }
-                FileUtil.FileWriteTextArray(CKey.FileLocalPath + tableName + ".txt", writeArray);
+                FileUtil.FileWriteTextArray(ServiceAFweb.FileLocalPath + tableName + ".txt", writeArray);
                 return 1;
             }
         } catch (Exception ex) {
@@ -537,7 +538,7 @@ public class AccountImp {
 
     public boolean restoreDBData(ServiceAFweb serviceAFWeb) {
 
-        if (FileUtil.FileTest(CKey.FileLocalPath + "cust.txt") == false) {
+        if (FileUtil.FileTest(ServiceAFweb.FileLocalPath + "cust.txt") == false) {
             return false;
         }
 
@@ -548,6 +549,7 @@ public class AccountImp {
 
         restoreDBSsnsDataAcc(serviceAFWeb, "ssnsdata");
         restoreDBSsnsDataAcc(serviceAFWeb, "ssnsacc");
+        restoreDBSsnsDataAcc(serviceAFWeb, "ssreport");        
         restoreDBcomm(serviceAFWeb);
 
         return true;
@@ -559,7 +561,7 @@ public class AccountImp {
         String tableName = "ssnscomm";
         int ret = 0;
         while (true) {
-            String fileName = CKey.FileLocalPath + tableName + "_" + fileCont + ".txt";
+            String fileName = ServiceAFweb.FileLocalPath + tableName + "_" + fileCont + ".txt";
             if (FileUtil.FileTest(fileName) == false) {
                 break;
             }
@@ -573,7 +575,7 @@ public class AccountImp {
 
         try {
             ArrayList<String> writeArray = new ArrayList();
-            String fileName = CKey.FileLocalPath + tableName + "_" + fileCont + ".txt";
+            String fileName = ServiceAFweb.FileLocalPath + tableName + "_" + fileCont + ".txt";
             if (FileUtil.FileTest(fileName) == false) {
                 return 0;
             }
@@ -616,7 +618,7 @@ public class AccountImp {
 
         int ret = 0;
         while (true) {
-            String fileName = CKey.FileLocalPath + tableName + "_" + fileCont + ".txt";
+            String fileName = ServiceAFweb.FileLocalPath + tableName + "_" + fileCont + ".txt";
             if (FileUtil.FileTest(fileName) == false) {
                 break;
             }
@@ -631,7 +633,7 @@ public class AccountImp {
         try {
             ArrayList<String> writeArray = new ArrayList();
 
-            String fName = CKey.FileLocalPath + tableName + "_" + fileCont + ".txt";
+            String fName = ServiceAFweb.FileLocalPath + tableName + "_" + fileCont + ".txt";
             if (FileUtil.FileTest(fName) == false) {
                 return 0;
             }
@@ -642,7 +644,7 @@ public class AccountImp {
             for (int i = 0; i < writeArray.size(); i++) {
                 String output = writeArray.get(i);
                 SsnsData item = new ObjectMapper().readValue(output, SsnsData.class);
-                String sql = SsnsDataDB.insertSsnsData(tableName, item);
+                String sql = SsnsDataDB.insertSsnsDataAcc(tableName, item);
                 writeSQLArray.add(sql);
                 index++;
                 if (i % 500 == 0) {
@@ -672,7 +674,7 @@ public class AccountImp {
         try {
 
             ArrayList<String> writeArray = new ArrayList();
-            FileUtil.FileReadTextArray(CKey.FileLocalPath + tableName + ".txt", writeArray);
+            FileUtil.FileReadTextArray(ServiceAFweb.FileLocalPath + tableName + ".txt", writeArray);
             ArrayList<String> writeSQLArray = new ArrayList();
             logger.info("> restoreDBcustomer " + writeArray.size());
             for (int i = 0; i < writeArray.size(); i++) {

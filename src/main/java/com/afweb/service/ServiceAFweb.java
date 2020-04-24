@@ -61,6 +61,7 @@ public class ServiceAFweb {
     public static String PROXYURL = "";
 
     public static String URL_LOCALDB = "";
+    public static String FileLocalPath ="";
 
     /**
      * @return the serverObj
@@ -131,6 +132,10 @@ public class ServiceAFweb {
 
         String URL_PATH = ServiceAFweb.URL_PATH_OP_DB_PHP1 + CKey.WEBPOST_OP_PHP;
         ServiceRemoteDB.setURL_PATH(URL_PATH);
+        
+        if (FileLocalPath.length()==0) {
+            FileLocalPath = CKey.FileLocalPathTemp;
+        }
 
     }
 
@@ -227,7 +232,7 @@ public class ServiceAFweb {
                     return getServerObj().getTimerCnt();
 
                 }
-                boolean restoreFlag = false; // only work on PHP
+                boolean restoreFlag = fales; // only work on PHP
                 if (restoreFlag == true) {
                     restoreSystem();
                     serverObj.setTimerQueueCnt(serverObj.getTimerQueueCnt() - 1);
@@ -963,7 +968,7 @@ public class ServiceAFweb {
 
     void processETL() {
 
-        String file = CKey.FileLocalPath + "clear.txt";
+        String file = FileLocalPath + "clear.txt";
         if (FileUtil.FileTest(file) == true) {
             this.getSsnsDataImp().deleteAllSsnsData(0);
             FileUtil.FileDelete(file);
@@ -971,7 +976,7 @@ public class ServiceAFweb {
         }
 
         String app = SsnsService.APP_WIFI; //"wifi";
-        file = CKey.FileLocalPath + app + "data.csv";
+        file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             boolean ret = processETLsplunk(app, 10000);
             if (ret == true) {
@@ -981,7 +986,7 @@ public class ServiceAFweb {
         }
 
         app = SsnsService.APP_PRODUCT;  //"product"
-        file = CKey.FileLocalPath + app + "data.csv";
+        file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             boolean ret = processETLsplunk(app, 10000);
             if (ret == true) {
@@ -991,7 +996,7 @@ public class ServiceAFweb {
         }
 
         app = SsnsService.APP_APP;  //"appointment"
-        file = CKey.FileLocalPath + app + "data.csv";
+        file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             boolean ret = processETLsplunk(app, 0);
             if (ret == true) {
@@ -1001,7 +1006,7 @@ public class ServiceAFweb {
         }
 
         String appTTV = SsnsService.APP_TTVSUB;  //ttvsub"
-        file = CKey.FileLocalPath + appTTV + "data.csv";
+        file = FileLocalPath + appTTV + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             boolean ret = processETLsplunkTTV(appTTV, 0);
             if (ret == true) {
@@ -1011,7 +1016,7 @@ public class ServiceAFweb {
         }
 
         appTTV = SsnsService.APP_TTVREQ; //"ttvreq";
-        file = CKey.FileLocalPath + appTTV + "data.csv";
+        file = FileLocalPath + appTTV + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             boolean ret = processETLsplunkTTV(appTTV, 0);
             if (ret == true) {
@@ -1066,7 +1071,7 @@ public class ServiceAFweb {
             return false;
         }
 
-        String file = CKey.FileLocalPath + app + "data.csv";
+        String file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == false) {
             logger.info("> No File exist " + file);
             return false;
@@ -1294,7 +1299,7 @@ public class ServiceAFweb {
             return false;
         }
 
-        String file = CKey.FileLocalPath + app + "data.csv";
+        String file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == false) {
             logger.info("> No File exist " + file);
             return false;

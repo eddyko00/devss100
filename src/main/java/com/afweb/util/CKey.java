@@ -3,7 +3,8 @@ package com.afweb.util;
 public class CKey {
 
     //local pc
-    public static String FileLocalPath = "C:\\TEMP\\";
+    public static String FileLocalPathTemp = "C:\\TEMP\\";
+
     public static final boolean LocalPCflag = true; // true;
 
     //////////////////////
@@ -28,8 +29,8 @@ public class CKey {
 
     public static String URL_PRODUCT_TMP = "https://sabcoa-mp-rmsabck-prabc.tsabcl.teabclus.com";
 
-    public static boolean NN_DEBUG = false; //false; //true; 
-    public static boolean UI_ONLY = false;
+    public static boolean NN_DEBUG = true; //false; //true; 
+    public static boolean UI_ONLY = true;
     public static boolean DEVOP = false;
 
 //    //

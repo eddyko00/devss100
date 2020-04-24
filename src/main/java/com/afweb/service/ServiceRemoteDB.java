@@ -563,7 +563,7 @@ public class ServiceRemoteDB {
 
     }
 
-    public ArrayList getAllSsnsAccSqlRemoteDB_RemoteMysql(String sqlCMD) throws Exception {
+    public ArrayList<SsnsAcc> getAllSsnsAccSqlRemoteDB_RemoteMysql(String sqlCMD) throws Exception {
 
         ServiceAFweb.getServerObj().setCntRESTrequest(ServiceAFweb.getServerObj().getCntRESTrequest() + 1);
         try {
@@ -677,7 +677,121 @@ public class ServiceRemoteDB {
         }
     }
 
-    public ArrayList getAllSsnsDataSqlRemoteDB_RemoteMysql(String sqlCMD) throws Exception {
+    public ArrayList<SsReport> getAllSsReportSqlRemoteDB_RemoteMysql(String sqlCMD) throws Exception {
+
+        ServiceAFweb.getServerObj().setCntRESTrequest(ServiceAFweb.getServerObj().getCntRESTrequest() + 1);
+        try {
+            String subResourcePath = WEBPOST;
+            HashMap newmap = new HashMap();
+            newmap.put(CMD, "1");
+
+            HashMap newbodymap = new HashMap();
+            newbodymap.put(CMDPOST, sqlCMD);
+
+            String output = sendRequest_remotesql(METHOD_POST, subResourcePath, newmap, newbodymap);
+
+            int beg = output.indexOf("~~ ");
+            int end = output.indexOf(" ~~");
+            // create hash map
+            if (beg > end) {
+                return null;
+            }
+            output = output.substring(beg + 3, end);
+            if (output.length() == 0) {
+                return null;
+            }
+//            String[] dataArray = output.split("~");
+            String[] dataArray = splitIncludeEmpty(output, '~');
+            output = "[";
+
+            int recSize = 16;
+            for (int i = 0; i < dataArray.length; i += recSize) {
+                output += "{";
+                output += "\"id\":\"" + dataArray[i] + "\",";
+                output += "\"name\":\"" + dataArray[i + 1] + "\",";
+                output += "\"status\":\"" + dataArray[i + 2] + "\",";
+                output += "\"type\":\"" + dataArray[i + 3] + "\",";
+
+                output += "\"uid\":\"" + dataArray[i + 4] + "\",";
+                output += "\"cusid\":\"" + dataArray[i + 5] + "\",";
+                output += "\"banid\":\"" + dataArray[i + 6] + "\",";
+                output += "\"tiid\":\"" + dataArray[i + 7] + "\",";
+
+                output += "\"app\":\"" + dataArray[i + 8] + "\",";
+                output += "\"oper\":\"" + dataArray[i + 9] + "\",";
+                output += "\"down\":\"" + dataArray[i + 10] + "\",";
+                output += "\"ret\":\"" + dataArray[i + 11] + "\",";
+                output += "\"exec\":\"" + dataArray[i + 12] + "\",";
+
+                output += "\"data\":\"" + dataArray[i + 13] + "\",";
+                output += "\"updatedatedisplay\":\"" + dataArray[i + 14] + "\",";
+                output += "\"updatedatel\":\"" + dataArray[i + 15] + "\"";
+
+                if (i + recSize >= dataArray.length) {
+                    output += "}";
+                } else {
+                    output += "},";
+                }
+            }
+            output += "]";
+
+            return getAllSsReportSqlRemoteDB_Process(output);
+
+        } catch (Exception ex) {
+            log.info("getAllSsReportSqlRemoteDB_RemoteMysql exception " + ex);
+            ServiceAFweb.getServerObj().setCntRESTexception(ServiceAFweb.getServerObj().getCntRESTexception() + 1);
+            throw ex;
+        }
+    }
+
+    private ArrayList<SsReport> getAllSsReportSqlRemoteDB_Process(String output) {
+        if (output.equals("")) {
+            return null;
+        }
+        ArrayList<SsReportRDB> arrayDB = null;
+        ArrayList<SsReport> arrayReturn = new ArrayList();
+        try {
+            SsReportRDB[] arrayItem = new ObjectMapper().readValue(output, SsReportRDB[].class);
+            List<SsReportRDB> listItem = Arrays.<SsReportRDB>asList(arrayItem);
+            arrayDB = new ArrayList<SsReportRDB>(listItem);
+
+            for (int i = 0; i < arrayDB.size(); i++) {
+                SsReportRDB rs = arrayDB.get(i);
+
+                SsReport nn = new SsReport();
+                nn.setId(Integer.parseInt(rs.getId()));
+                nn.setName(rs.getName());
+                nn.setStatus(Integer.parseInt(rs.getStatus()));
+                nn.setType(Integer.parseInt(rs.getType()));
+
+                nn.setUid(rs.getUid());
+                nn.setCusid(rs.getCusid());
+                nn.setBanid(rs.getBanid());
+                nn.setTiid(rs.getTiid());
+
+                nn.setApp(rs.getApp());
+                nn.setOper(rs.getOper());
+                nn.setDown(rs.getDown());
+                nn.setRet(rs.getRet());
+                nn.setExec(Long.parseLong(rs.getExec()));
+
+                String stData = rs.getData();
+                stData = stData.replaceAll("#", "\"");
+                nn.setData(stData);
+
+                nn.setUpdatedatel(Long.parseLong(rs.getUpdatedatel()));
+                nn.setUpdatedatedisplay(new java.sql.Date(nn.getUpdatedatel()));
+
+                arrayReturn.add(nn);
+            }
+            return arrayReturn;
+        } catch (IOException ex) {
+            log.info("getAllSsReportSqlRemoteDB_Process exception " + output);
+            return null;
+        }
+    }
+
+    public ArrayList<SsnsData> getAllSsnsDataSqlRemoteDB_RemoteMysql(String sqlCMD) throws Exception {
 
         ServiceAFweb.getServerObj().setCntRESTrequest(ServiceAFweb.getServerObj().getCntRESTrequest() + 1);
         try {

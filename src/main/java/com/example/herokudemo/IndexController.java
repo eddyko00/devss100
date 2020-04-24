@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
- 
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +44,8 @@ public class IndexController {
         arrayString.add("/server");
         arrayString.add("/server/url0");
         arrayString.add("/server/url0/set?url=stop");
+        arrayString.add("/server/filepath");
+        arrayString.add("/server/filepath/set?path=");
         //
         arrayString.add("/cust/add?email={email}&pass={pass}&firstName={firstName}&lastName={lastName}");
         arrayString.add("/cust/login?email={email}&pass={pass}");
@@ -140,6 +142,23 @@ public class IndexController {
     ) {
 
         ServiceAFweb.URL_LOCALDB = urlSt.trim();
+        return "done...";
+    }
+
+    @RequestMapping(value = "/server/filepath", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String getServerFileP() {
+        return ServiceAFweb.FileLocalPath;
+    }
+
+    @RequestMapping(value = "/server/filepath/set", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String setServerfileP(
+            @RequestParam(value = "path", required = true) String pathSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+
+        ServiceAFweb.FileLocalPath = pathSt.trim();
         return "done...";
     }
 
@@ -272,7 +291,7 @@ public class IndexController {
         int length = 20; //10;
         if (lengthSt != null) {
             length = Integer.parseInt(lengthSt);
-        } 
+        }
         ArrayList<SsnsAcc> ret = afWebService.getSsnsprod(username, idSt, length, SsnsService.APP_TTVC);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
