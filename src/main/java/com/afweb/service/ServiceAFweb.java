@@ -14,6 +14,7 @@ import com.afweb.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -26,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.logging.Level;
 
 import java.util.logging.Logger;
 import javax.sql.DataSource;
@@ -412,54 +414,10 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////                    
                     boolean monflag = false;
                     if (monflag == true) {
-                        //creat monitor
-                        SsReport reportObj = new SsReport();
-                        reportObj.setName(CKey.ADMIN_USERNAME);
-                        reportObj.setStatus(ConstantKey.INITIAL);
-                        reportObj.setUid(SsnsService.REPORT_ALL);
+                        SsnsRegression regression = new SsnsRegression();
+                        regression.startMonitor(this);
 
-                        ArrayList<String> testIdList = new ArrayList();
-                        ArrayList<String> testFeatList = new ArrayList();
-
-                        ReportData reportdata = new ReportData();
-
-                        ArrayList<String> servList = getSsnsprodAll(CKey.ADMIN_USERNAME, null, 0);
-                        for (int i = 0; i < servList.size(); i += 2) {
-                            String servProd = servList.get(i);
-                            ArrayList<String> featallList = getSsnsprodByFeature(CKey.ADMIN_USERNAME, null, servProd);
-                            for (int j = 0; j < featallList.size(); j += 2) {
-                                String featN = featallList.get(i);
-                                testFeatList.add(featN);
-                                ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, 5);
-                                if (SsnsAcclist != null) {
-                                    for (int k = 0; k < SsnsAcclist.size(); k++) {
-                                        SsnsAcc accObj = SsnsAcclist.get(k);
-                                        testIdList.add(accObj.getId() + "");
-                                    }
-                                }
-
-                            }
-                        }
-                        reportdata.setFeatList(testFeatList);
-                        reportdata.setIdList(testIdList);
-
-                        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjList(reportObj.getName(), reportObj.getUid());
-                        boolean exist = false;
-                        if (ssReportObjList != null) {
-                            if (ssReportObjList.size() != 0) {
-                                SsReport report = ssReportObjList.get(0);
-                                String data = "";
-                                int status = report.getStatus();
-                                int type = report.getType();
-                                int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(report.getId(), data, status, type);
-                                exist = true;
-                            }
-                        }
-                        if (exist == false) {
-                            int ret = getSsnsDataImp().insertSsReportObject(reportObj);
-                        } else {
-
-                        }
+                        ArrayList NameArrayTemp = regression.getMoniterID();
 
                     }
 /////////
@@ -477,7 +435,7 @@ public class ServiceAFweb {
                                     String idSt = (String) ttvNameArrayTemp.get(i);
 
                                     int id = Integer.parseInt(idSt);
-                                    SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                                    SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
                                     feature = ss.getFeatureSsnsProdiuctInventory(data);
 
 //                                    ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList("cf0adc01-588e-4717-b87b-876441d79a1e");
@@ -500,7 +458,7 @@ public class ServiceAFweb {
                                 String idSt = (String) appNameArrayTemp.get(i);
 
                                 int id = Integer.parseInt(idSt);
-                                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                                SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
                                 feature = ss.getFeatureSsnsWifi(data);
 
 //                                    ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList("0f8825e8-d628-405e-83d6-3ff63dd82654");
@@ -520,7 +478,7 @@ public class ServiceAFweb {
                                 String idSt = (String) appNameArrayTemp.get(i);
 
                                 int id = Integer.parseInt(idSt);
-                                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                                SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
                                 feature = ss.getFeatureSsnsAppointment(data);
                             }
                         }
@@ -541,7 +499,7 @@ public class ServiceAFweb {
                                     String idSt = (String) appNameArrayTemp.get(i);
 
                                     int id = Integer.parseInt(idSt);
-                                    SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                                    SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
                                     feature = ss.getFeatureSsnsTTVC(data);
 
 //                                    ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList("28d552b9-df3d-4bd8-8a22-3ff63dd8b337");
@@ -778,7 +736,7 @@ public class ServiceAFweb {
                 wifiNameArray.remove(0);
                 SsnsService ss = new SsnsService();
                 int id = Integer.parseInt(idSt);
-                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
                 String feature = ss.getFeatureSsnsWifi(data);
 //                logger.info("> feature " + i + " " + feature);
 
@@ -858,7 +816,7 @@ public class ServiceAFweb {
                 ttvcNameArray.remove(0);
                 SsnsService ss = new SsnsService();
                 int id = Integer.parseInt(idSt);
-                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
                 String feature = ss.getFeatureSsnsTTVC(data);
 //                logger.info("> feature " + i + " " + feature);
 
@@ -932,7 +890,7 @@ public class ServiceAFweb {
                 appNameArray.remove(0);
                 SsnsService ss = new SsnsService();
                 int id = Integer.parseInt(idSt);
-                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
                 String feature = ss.getFeatureSsnsAppointment(data);
 //                logger.info("> feature " + i + " " + feature);
 
@@ -1006,7 +964,7 @@ public class ServiceAFweb {
                 prodNameArray.remove(0);
                 SsnsService ss = new SsnsService();
                 int id = Integer.parseInt(idSt);
-                SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
+                SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
                 String feature = ss.getFeatureSsnsProdiuctInventory(data);
 //                logger.info("> feature " + i + " " + feature);
 
@@ -2056,6 +2014,19 @@ public class ServiceAFweb {
         return null;
     }
 
+    public ArrayList<String> testSsnsprodPRocessByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
+        if (prod.equals(SsnsService.APP_APP)) {
+            return this.testSsnsprodAppByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper);
+        } else if (prod.equals(SsnsService.APP_TTVC)) {
+            return this.testSsnsprodTTVCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper);
+        } else if (prod.equals(SsnsService.APP_WIFI)) {
+            return this.testSsnsprodWifiByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper);
+        } else if (prod.equals(SsnsService.APP_PRODUCT)) {
+            return testSsnsprodByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper);
+        }
+        return null;
+    }
+
     public ArrayList<String> testSsnsprodWifiByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
@@ -2158,7 +2129,7 @@ public class ServiceAFweb {
         return null;
     }
 
-    public ArrayList<String> testSsnsprodByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod) {
+    public ArrayList<String> testSsnsprodByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String ProdOper) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -2781,6 +2752,7 @@ public class ServiceAFweb {
         int retSatus = 0;
         if (getServerObj().isLocalDBservice() == true) {
             retSatus = getSsnsDataImp().updateSsnsDataAllOpenStatus();
+            logger.info("> SystemReOpenData .. done");
         }
         return "" + retSatus;
     }

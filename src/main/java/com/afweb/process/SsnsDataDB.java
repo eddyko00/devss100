@@ -695,7 +695,7 @@ public class SsnsDataDB {
 
     public int updatSsReportDataStatusTypeById(int id, String dataSt, int status, int type) {
         try {
-            
+
             dataSt = dataSt.replaceAll("|", "");
             dataSt = dataSt.replaceAll("'", "");
             dataSt = dataSt.replaceAll("\"", "#");
@@ -1019,6 +1019,13 @@ public class SsnsDataDB {
 
     public ArrayList<SsnsData> getSsnsDataObjByUUIDList(String uid) {
         String sql = "select * from ssnsdata where uid='" + uid + "'"
+                + " order by updatedatel asc";
+        ArrayList entries = getAllSsnsDataSQL(sql, 0);
+        return entries;
+    }
+
+    public ArrayList<SsnsAcc> getSsnsAccObjListByID(int id) {
+        String sql = "select * from ssnsacc where id=" + id
                 + " order by updatedatel asc";
         ArrayList entries = getAllSsnsDataSQL(sql, 0);
         return entries;

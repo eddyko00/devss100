@@ -16,6 +16,7 @@ public class ConstantKey {
     public static final int SRV_LOCKTYPE = 30;
     public static final int FE_LOCKTYPE = 20;
     public static final int ETL_LOCKTYPE = 40;    
+    public static final int MON_LOCKTYPE = 50;      
     public static final int H2_LOCKTYPE = 100;
 
     public static final String PP_BASIC = "BASIC";
