@@ -989,9 +989,9 @@ public class SsnsDataDB {
         return entries;
     }
 
-    public ArrayList<SsReport> getSsReportObjList(String name, String uid) {
+    public ArrayList<SsReport> getSsReportObjListByUid(String name, String uid) {
         String sql = "select * from ssreport where name='" + name + "' and uid='" + uid + "'";
-        ArrayList entries = getAllSsnsAccSQL(sql, 0);
+        ArrayList entries = getAllSsReportSQL(sql, 0);
         return entries;
     }
 

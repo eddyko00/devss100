@@ -188,8 +188,8 @@ public class SsnsDataImp {
         return ssnsdb.getSsnsAccObjList(name, uid);
     }
 
-    public ArrayList<SsReport> getSsReportObjList(String name, String uid) {
-        return ssnsdb.getSsReportObjList(name, uid);
+    public ArrayList<SsReport> getSsReportObjListByUid(String name, String uid) {
+        return ssnsdb.getSsReportObjListByUid(name, uid);
     }
 
     public int deleteAllSsnsAcc(int month) {

@@ -412,12 +412,12 @@ public class ServiceAFweb {
                     }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
-                    boolean monflag = false;
+                    boolean monflag = true;
                     if (monflag == true) {
                         SsnsRegression regression = new SsnsRegression();
                         regression.startMonitor(this);
 
-                        ArrayList NameArrayTemp = regression.getMoniterID();
+                        ArrayList NameArrayTemp = regression.getMoniterIDList();
 
                     }
 /////////

@@ -13,18 +13,22 @@ import java.util.ArrayList;
  */
 public class ReportData {
 
+
+    private ArrayList<String>  testListObj;
+    private ArrayList<String>  featList;
+
     /**
-     * @return the idList
+     * @return the testListObj
      */
-    public ArrayList<String> getIdList() {
-        return idList;
+    public ArrayList<String> getTestListObj() {
+        return testListObj;
     }
 
     /**
-     * @param idList the idList to set
+     * @param testListObj the testListObj to set
      */
-    public void setIdList(ArrayList<String> idList) {
-        this.idList = idList;
+    public void setTestListObj(ArrayList<String> testListObj) {
+        this.testListObj = testListObj;
     }
 
     /**
@@ -40,8 +44,4 @@ public class ReportData {
     public void setFeatList(ArrayList<String> featList) {
         this.featList = featList;
     }
-
-
-    private ArrayList<String>  idList;
-    private ArrayList<String>  featList;
 }

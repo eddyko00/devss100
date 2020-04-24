@@ -56,22 +56,32 @@ public class SsnsRegression {
                 String servProd = servList.get(i);
                 ArrayList<String> featallList = serviceAFweb.getSsnsprodByFeature(CKey.ADMIN_USERNAME, null, servProd);
                 for (int j = 0; j < featallList.size(); j += 2) {
-                    String featN = featallList.get(i);
+                    String featN = featallList.get(j);
                     if (featN.indexOf("fail") != -1) {
                         continue;
                     }
                     testFeatList.add(featN);
                     ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, 5);
+                    int added = 0;
                     if (SsnsAcclist != null) {
                         for (int k = 0; k < SsnsAcclist.size(); k++) {
                             SsnsAcc accObj = SsnsAcclist.get(k);
-                            testIdList.add(accObj.getId() + "");
+                            testData tObj = new testData();
+                            tObj.setAccid(accObj.getId());
+                            tObj.setUsername(CKey.ADMIN_USERNAME);
+                            tObj.setTesturl("PR");
+                            String st = new ObjectMapper().writeValueAsString(tObj);
+                            st = ServiceAFweb.replaceAll("\"", "^", st);
+
+                            testIdList.add(st);
+                            added++;
                         }
+                        logger.info("> startMonitor  " + featN + "id added " + added);
                     }
                 }
             }
             reportdata.setFeatList(testFeatList);
-            reportdata.setIdList(testIdList);
+            reportdata.setTestListObj(testIdList);
             String dataSt = new ObjectMapper().writeValueAsString(reportdata);
 
             SsReport reportObj = new SsReport();
@@ -81,7 +91,7 @@ public class SsnsRegression {
 
             reportObj.setData(dataSt);
 
-            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjList(reportObj.getName(), reportObj.getUid());
+            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(reportObj.getName(), reportObj.getUid());
             boolean exist = false;
             if (ssReportObjList != null) {
                 if (ssReportObjList.size() != 0) {
@@ -100,20 +110,22 @@ public class SsnsRegression {
         }
     }
 
-    public ArrayList<String> getMoniterID() {
+    public ArrayList<String> getMoniterIDList() {
         try {
             //Start process
             String name = CKey.ADMIN_USERNAME;
             String uid = SsnsService.REPORT_ALL;
-            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjList(name, uid);
+            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, uid);
             if (ssReportObjList != null) {
                 if (ssReportObjList.size() > 0) {
                     SsReport reportObj = ssReportObjList.get(0);
                     if (reportObj.getStatus() == ConstantKey.INITIAL) {
                         String dataSt = reportObj.getData();
+
                         ReportData reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
-                        ArrayList<String> testIdList = reportdata.getIdList();
+                        ArrayList<String> testIdList = reportdata.getTestListObj();
                         return testIdList;
+
                     }
                 }
             }
@@ -130,7 +142,7 @@ public class SsnsRegression {
         if (moniterNameArray != null && moniterNameArray.size() > 0) {
             return moniterNameArray;
         }
-        ArrayList moniterNameArrayTemp = getMoniterID();
+        ArrayList moniterNameArrayTemp = getMoniterIDList();
         if (moniterNameArrayTemp != null) {
             moniterNameArray = moniterNameArrayTemp;
         }
@@ -172,11 +184,14 @@ public class SsnsRegression {
                 if (moniterNameArray.size() == 0) {
                     break;
                 }
+                testData tObj = new testData();
+                String tObjSt = moniterNameArray.get(0);
+                tObjSt = ServiceAFweb.replaceAll("^", "\"", tObjSt);
+                tObj = new ObjectMapper().readValue(tObjSt, testData.class);
 
-                String idSt = (String) moniterNameArray.get(0);
                 moniterNameArray.remove(0);
-                SsnsService ss = new SsnsService();
-                int id = Integer.parseInt(idSt);
+                int id = tObj.getAccid();
+
                 SsnsAcc accObj = getSsnsDataImp().getSsnsAccObjByID(id);
                 String dataSt = accObj.getData();
                 ProductData pData = new ObjectMapper().readValue(dataSt, ProductData.class);
