@@ -316,8 +316,8 @@ public class AccountImp {
 
     public boolean downloadDBData(ServiceAFweb serviceAFWeb) {
         saveDBcustomer(serviceAFWeb);
-        saveSsnsDataProcess(serviceAFWeb, "ssnsdata");
-        saveSsnsDataProcess(serviceAFWeb, "ssnsacc");
+        saveSsnsDataAcc(serviceAFWeb, "ssnsdata");
+        saveSsnsDataAcc(serviceAFWeb, "ssnsacc");
         saveDBcomm(serviceAFWeb);
         return true;
     }
@@ -403,7 +403,7 @@ public class AccountImp {
         return 0;
     }
 
-    private int saveSsnsDataProcess(ServiceAFweb serviceAFWeb, String tableName) {
+    private int saveSsnsDataAcc(ServiceAFweb serviceAFWeb, String tableName) {
 
         ArrayList<String> idList = getDBDataTableId(serviceAFWeb, tableName);
         int len = idList.size();
@@ -415,7 +415,7 @@ public class AccountImp {
                 String first = idList.get(id);
                 if ((id + 50) < len) {
                     String last = idList.get(id - 1 + 50);
-                    int ret = saveDBSsnsData(serviceAFWeb, tableName, first, last, writeArray);
+                    int ret = saveSsnsDataProcess(serviceAFWeb, tableName, first, last, writeArray);
                     if (ret == 0) {
                         return 0;
                     }
@@ -423,7 +423,7 @@ public class AccountImp {
                 }
                 if ((id + 50) >= len) {
                     String last = idList.get(len - 1);
-                    int ret = saveDBSsnsData(serviceAFWeb, tableName, first, last, writeArray);
+                    int ret = saveSsnsDataProcess(serviceAFWeb, tableName, first, last, writeArray);
                     if (ret == 0) {
                         return 0;
                     }
@@ -432,6 +432,7 @@ public class AccountImp {
                 loopCnt++;
                 if (loopCnt > 200) {
                     FileUtil.FileWriteTextArray(CKey.FileLocalPath + tableName + "_" + fileCont + ".txt", writeArray);
+                     logger.info("> saveSsnsData " + tableName + "_" + fileCont + " " + writeArray.size());
                     fileCont++;
                     loopCnt = 0;
                     writeArray.clear();
@@ -445,7 +446,7 @@ public class AccountImp {
         return 0;
     }
 
-    private int saveDBSsnsData(ServiceAFweb serviceAFWeb, String tableName, String first, String last, ArrayList<String> writeArray) {
+    private int saveSsnsDataProcess(ServiceAFweb serviceAFWeb, String tableName, String first, String last, ArrayList<String> writeArray) {
         try {
             logger.info("> saveDBSsnsData - " + tableName + " " + first + " " + last);
 
@@ -523,13 +524,13 @@ public class AccountImp {
     }
 
     public boolean restoreSsnsDataDB(ServiceAFweb serviceAFWeb) {
-        restoreDBSsnsData(serviceAFWeb, "ssnsdata");
+        restoreDBSsnsDataAcc(serviceAFWeb, "ssnsdata");
         return true;
 
     }
 
     public boolean restoreSsnsAccDB(ServiceAFweb serviceAFWeb) {
-        restoreDBSsnsData(serviceAFWeb, "ssnsacc");
+        restoreDBSsnsDataAcc(serviceAFWeb, "ssnsacc");
         return true;
 
     }
@@ -545,8 +546,8 @@ public class AccountImp {
             return false;
         }
 
-        restoreDBSsnsData(serviceAFWeb, "ssnsdata");
-        restoreDBSsnsData(serviceAFWeb, "ssnsacc");
+        restoreDBSsnsDataAcc(serviceAFWeb, "ssnsdata");
+        restoreDBSsnsDataAcc(serviceAFWeb, "ssnsacc");
         restoreDBcomm(serviceAFWeb);
 
         return true;
@@ -578,7 +579,7 @@ public class AccountImp {
             }
             FileUtil.FileReadTextArray(fileName, writeArray);
             ArrayList<String> writeSQLArray = new ArrayList();
-            logger.info("> restoreDBcomm " + writeArray.size());
+            logger.info("> restoreDBcommProcess " + tableName + "_" + fileCont + " " + writeArray.size());
             int index = 0;
             for (int i = 0; i < writeArray.size(); i++) {
                 String output = writeArray.get(i);
@@ -587,7 +588,7 @@ public class AccountImp {
                 writeSQLArray.add(sql);
                 index++;
                 if (i % 500 == 0) {
-                    logger.info("> restoreDBcomm " + tableName + " " + i);
+                    logger.info("> restoreDBcommProcess " + tableName + "_" + fileCont + " " + i);
                 }
                 if (index > 5) {
                     index = 0;
@@ -610,7 +611,7 @@ public class AccountImp {
         return 0;
     }
 
-    private int restoreDBSsnsData(ServiceAFweb serviceAFWeb, String tableName) {
+    private int restoreDBSsnsDataAcc(ServiceAFweb serviceAFWeb, String tableName) {
         int fileCont = 0;
 
         int ret = 0;
@@ -636,7 +637,7 @@ public class AccountImp {
             }
             FileUtil.FileReadTextArray(fName, writeArray);
             ArrayList<String> writeSQLArray = new ArrayList();
-            logger.info("> restoreDBSsnsDataProcess " + tableName + " " + writeArray.size());
+            logger.info("> restoreDBSsnsDataProcess " + tableName + "_" + fileCont + " " + writeArray.size());
             int index = 0;
             for (int i = 0; i < writeArray.size(); i++) {
                 String output = writeArray.get(i);
@@ -645,7 +646,7 @@ public class AccountImp {
                 writeSQLArray.add(sql);
                 index++;
                 if (i % 500 == 0) {
-                    logger.info("> restoreDBSsnsDataProcess " + tableName + " " + i);
+                    logger.info("> restoreDBSsnsDataProcess " + tableName + "_" + fileCont + " " + i);
                 }
                 if (index > 5) {// 5) {
                     index = 0;
