@@ -218,10 +218,16 @@ public class SsnsService {
 //                    if (outputSt.length() < 80) {  // or test 
 //                        return false;
 //                    }
-                    if (outputSt.indexOf("responseCode:400500") != -1) {
-                        if (outputSt.indexOf("Legacy Discount") != -1) {
+
+                    if (outputSt.indexOf("Legacy Discount") != -1) {
+                        String dataSt = ServiceAFweb.replaceAll("\"", "", outputSt);
+                        if (dataSt.indexOf("statusCd:400") != -1) {
                             legacyDiscount = 1;
-                        } else if (outputSt.indexOf("XQException") != -1) {
+                        }
+                    }
+
+                    if (outputSt.indexOf("responseCode:400500") != -1) {
+                        if (outputSt.indexOf("XQException") != -1) {
                             XQException = 1;
                         } else {
                             return false;

@@ -92,6 +92,11 @@ public class SsnsDataImp {
         return ssnsdb.updatSsnsDataStatusById(id, status);
     }
 
+    public ArrayList<SsnsData> getSsnsDataObjByUUIDList(String uid) {
+        ArrayList<SsnsData> ssnsObjList = ssnsdb.getSsnsDataObjByUUIDList(uid);
+        return ssnsObjList;
+    }
+
     public SsnsData getSsnsDataObjListByID(int id) {
         ArrayList<SsnsData> ssnsObjList = ssnsdb.getSsnsDataObjListByID(id);
         if (ssnsObjList != null) {
@@ -162,7 +167,8 @@ public class SsnsDataImp {
 
     public ArrayList<SsnsAcc> getSsnsAccObjListByTiid(String name, String tiid) {
         return ssnsdb.getSsnsAccObjListByTiid(name, tiid);
-    }        
+    }
+
     public ArrayList<SsnsAcc> getSsnsAccObjList(String name, String uid) {
         return ssnsdb.getSsnsAccObjList(name, uid);
     }

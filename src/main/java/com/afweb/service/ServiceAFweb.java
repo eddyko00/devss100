@@ -415,6 +415,9 @@ public class ServiceAFweb {
                                     int id = Integer.parseInt(idSt);
                                     SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
                                     feature = ss.getFeatureSsnsProdiuctInventory(data);
+
+//                                    ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList("cf0adc01-588e-4717-b87b-876441d79a1e");
+//                                    feature = ss.getFeatureSsnsProdiuctInventory(dataList.get(0));
                                 }
                             }
                         }
@@ -435,6 +438,9 @@ public class ServiceAFweb {
                                 int id = Integer.parseInt(idSt);
                                 SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
                                 feature = ss.getFeatureSsnsWifi(data);
+
+//                                    ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList("0f8825e8-d628-405e-83d6-3ff63dd82654");
+//                                    ss.getFeatureSsnsWifi(dataList.get(0));
                             }
                         }
                     }
@@ -473,6 +479,9 @@ public class ServiceAFweb {
                                     int id = Integer.parseInt(idSt);
                                     SsnsData data = getSsnsDataImp().getSsnsDataObjListByID(id);
                                     feature = ss.getFeatureSsnsTTVC(data);
+
+//                                    ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList("28d552b9-df3d-4bd8-8a22-3ff63dd8b337");
+//                                    feature = ss.getFeatureSsnsTTVC(dataList.get(1));
                                 }
                             }
                         }

@@ -903,7 +903,13 @@ public class SsnsDataDB {
         ArrayList array = getAllNameSQL(sql);
         return array;
     }
-
+    public ArrayList<SsnsData> getSsnsDataObjByUUIDList(String uid) {
+        String sql = "select * from ssnsdata where uid='" + uid +"'"
+                + " order by updatedatel asc";
+        ArrayList entries = getAllSsnsDataSQL(sql, 0);
+        return entries;
+    }
+    
     public ArrayList<SsnsData> getSsnsDataObjListByID(int id) {
         String sql = "select * from ssnsdata where id=" + id
                 + " order by updatedatel asc";
