@@ -647,7 +647,7 @@ public class AccountImp {
                 String sql = SsnsDataDB.insertSsnsDataAcc(tableName, item);
                 writeSQLArray.add(sql);
                 index++;
-                if (i % 500 == 0) {
+                if (i % 1000 == 0) {
                     logger.info("> restoreDBSsnsDataProcess " + tableName + "_" + fileCont + " " + i);
                 }
                 if (index > 5) {// 5) {
