@@ -62,7 +62,7 @@ public class ServiceAFweb {
     public static String PROXYURL = "";
 
     public static String URL_LOCALDB = "";
-    public static String FileLocalPath ="";
+    public static String FileLocalPath = "";
 
     /**
      * @return the serverObj
@@ -133,8 +133,8 @@ public class ServiceAFweb {
 
         String URL_PATH = ServiceAFweb.URL_PATH_OP_DB_PHP1 + CKey.WEBPOST_OP_PHP;
         ServiceRemoteDB.setURL_PATH(URL_PATH);
-        
-        if (FileLocalPath.length()==0) {
+
+        if (FileLocalPath.length() == 0) {
             FileLocalPath = CKey.FileLocalPathTemp;
         }
 
@@ -275,8 +275,9 @@ public class ServiceAFweb {
 //                    }
                 }
                 // final initialization
+//                getSsnsDataImp().updateSsnsDataAllOpenStatus();
             } else {
-
+                
                 processTimer();
             }
 
@@ -401,36 +402,33 @@ public class ServiceAFweb {
                         this.getSsnsDataImp().deleteAllSsnsAcc(0);
                         boolean retSatus = getAccountImp().restoreSsnsAccDB(this);
                     }
-                    
+
                     boolean restoreSsnsDataFlag = false; // work for remote d
                     if (restoreSsnsDataFlag == true) {
                         this.getSsnsDataImp().deleteAllSsnsData(0);
                         boolean retSatus = getAccountImp().restoreSsnsDataDB(this);
-                    }                    
+                    }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
                     boolean monflag = false;
                     if (monflag == true) {
                         //creat monitor
-                        SsReport report = new SsReport ();
+                        SsReport report = new SsReport();
                         report.setName(CKey.ADMIN_USERNAME);
                         report.setStatus(ConstantKey.INITIAL);
                         report.setOper(SsnsService.REPORT_ALL);
-                        
-                        ReportData reportdata = new ReportData();
-                        ArrayList<String> servList = getSsnsprodAll(CKey.ADMIN_USERNAME, null, 0); 
-                        for (int i=0; i<servList.size(); i+=2) {
-                            String serv=servList.get(i);
-                            ArrayList<String> featallList = getSsnsprodByFeature(CKey.ADMIN_USERNAME, null, serv);
-                            for (int j=0; j<featallList.size(); j +=2) {
-                                String feat =featallList.get(i);
 
-                                
+                        ReportData reportdata = new ReportData();
+                        ArrayList<String> servList = getSsnsprodAll(CKey.ADMIN_USERNAME, null, 0);
+                        for (int i = 0; i < servList.size(); i += 2) {
+                            String serv = servList.get(i);
+                            ArrayList<String> featallList = getSsnsprodByFeature(CKey.ADMIN_USERNAME, null, serv);
+                            for (int j = 0; j < featallList.size(); j += 2) {
+                                String feat = featallList.get(i);
+
                             }
                         }
-                        
-  
-                        
+
                     }
 /////////
 /////////

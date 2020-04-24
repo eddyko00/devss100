@@ -318,7 +318,7 @@ public class AccountImp {
         saveDBcustomer(serviceAFWeb);
         saveSsnsDataAcc(serviceAFWeb, "ssnsdata");
         saveSsnsDataAcc(serviceAFWeb, "ssnsacc");
-        saveSsnsDataAcc(serviceAFWeb, "ssreport");        
+        saveSsnsDataAcc(serviceAFWeb, "ssreport");
         saveDBcomm(serviceAFWeb);
         return true;
     }
@@ -433,7 +433,7 @@ public class AccountImp {
                 loopCnt++;
                 if (loopCnt > 200) {
                     FileUtil.FileWriteTextArray(ServiceAFweb.FileLocalPath + tableName + "_" + fileCont + ".txt", writeArray);
-                     logger.info("> saveSsnsDataAcc " + tableName + "_" + fileCont + " " + writeArray.size());
+                    logger.info("> saveSsnsDataAcc " + tableName + "_" + fileCont + " " + writeArray.size());
                     fileCont++;
                     loopCnt = 0;
                     writeArray.clear();
@@ -549,11 +549,33 @@ public class AccountImp {
 
         restoreDBSsnsDataAcc(serviceAFWeb, "ssnsdata");
         restoreDBSsnsDataAcc(serviceAFWeb, "ssnsacc");
-        restoreDBSsnsDataAcc(serviceAFWeb, "ssreport");        
+        restoreDBSsnsDataAcc(serviceAFWeb, "ssreport");
         restoreDBcomm(serviceAFWeb);
-
+        restoreDBdummy(serviceAFWeb);
         return true;
+    }
 
+    private int restoreDBdummy(ServiceAFweb serviceAFWeb) {
+
+        logger.info("> restoreDBdummy ");
+        ArrayList<String> writeSQLArray = new ArrayList();
+        String sql = SsnsDataDB.createDummytable();
+        writeSQLArray.add(sql);
+        try {
+            RequestObj sqlObj = new RequestObj();
+            sqlObj.setCmd(ServiceAFweb.UpdateSQLList + "");
+            String st = new ObjectMapper().writeValueAsString(writeSQLArray);
+            sqlObj.setReq(st);
+            RequestObj sqlObjresp = serviceAFWeb.SystemSQLRequest(sqlObj);
+            String output = sqlObjresp.getResp();
+            if (output == null) {
+                return 0;
+            }
+            return 1;
+        } catch (JsonProcessingException ex) {
+            logger.info("> sendRequestObj - exception " + ex);
+        }
+        return 0;
     }
 
     private int restoreDBcomm(ServiceAFweb serviceAFWeb) {
