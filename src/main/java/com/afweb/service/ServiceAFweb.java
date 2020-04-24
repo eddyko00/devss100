@@ -7,6 +7,7 @@ package com.afweb.service;
 
 import com.afweb.process.*;
 import com.afweb.model.*;
+import com.afweb.model.ssns.*;
 import static com.afweb.process.SsnsService.*;
 
 import com.afweb.util.*;
@@ -232,7 +233,7 @@ public class ServiceAFweb {
                     return getServerObj().getTimerCnt();
 
                 }
-                boolean restoreFlag = true; // only work on PHP
+                boolean restoreFlag = false; // only work on PHP
                 if (restoreFlag == true) {
                     restoreSystem();
                     serverObj.setTimerQueueCnt(serverObj.getTimerQueueCnt() - 1);
@@ -395,20 +396,42 @@ public class ServiceAFweb {
                         }
                     }
 
-                    boolean restoreSsnsAccFlag = true; // work for remote d
+                    boolean restoreSsnsAccFlag = false; // work for remote d
                     if (restoreSsnsAccFlag == true) {
                         this.getSsnsDataImp().deleteAllSsnsAcc(0);
                         boolean retSatus = getAccountImp().restoreSsnsAccDB(this);
                     }
                     
-                    boolean restoreSsnsDataFlag = true; // work for remote d
+                    boolean restoreSsnsDataFlag = false; // work for remote d
                     if (restoreSsnsDataFlag == true) {
                         this.getSsnsDataImp().deleteAllSsnsData(0);
                         boolean retSatus = getAccountImp().restoreSsnsDataDB(this);
                     }                    
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
+                    boolean monflag = false;
+                    if (monflag == true) {
+                        //creat monitor
+                        SsReport report = new SsReport ();
+                        report.setName(CKey.ADMIN_USERNAME);
+                        report.setStatus(ConstantKey.INITIAL);
+                        report.setOper(SsnsService.REPORT_ALL);
+                        
+                        ReportData reportdata = new ReportData();
+                        ArrayList<String> servList = getSsnsprodAll(CKey.ADMIN_USERNAME, null, 0); 
+                        for (int i=0; i<servList.size(); i+=2) {
+                            String serv=servList.get(i);
+                            ArrayList<String> featallList = getSsnsprodByFeature(CKey.ADMIN_USERNAME, null, serv);
+                            for (int j=0; j<featallList.size(); j +=2) {
+                                String feat =featallList.get(i);
 
+                                
+                            }
+                        }
+                        
+  
+                        
+                    }
 /////////
 /////////
                     boolean procflag = false;
@@ -1846,13 +1869,13 @@ public class ServiceAFweb {
             }
         }
         ArrayList<String> ssnsList = new ArrayList();
-        ssnsList.add("prod");
+        ssnsList.add(SsnsService.APP_PRODUCT);
         ssnsList.add("SSNS Product Inventory");
-        ssnsList.add("app");
+        ssnsList.add(SsnsService.APP_APP);
         ssnsList.add("SSNS Appointment");
-        ssnsList.add("wifi");
+        ssnsList.add(SsnsService.APP_WIFI);
         ssnsList.add("SSNS Wifi Sevice");
-        ssnsList.add("ttv");
+        ssnsList.add(SsnsService.APP_TTVC);
         ssnsList.add("SSNS TTV Service");
 
         return ssnsList;

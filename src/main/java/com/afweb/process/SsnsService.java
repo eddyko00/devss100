@@ -43,12 +43,14 @@ import static org.springframework.http.converter.json.Jackson2ObjectMapperBuilde
 public class SsnsService {
 
     protected static Logger logger = Logger.getLogger("SsnsService");
-
+    public static String REPORT_ALL = "all";
+    
     public static String APP_WIFI = "wifi";
-    public static String APP_APP = "appointment";
-    public static String APP_PRODUCT = "product";
-
-    public static String APP_TTVC = "TTVCL";
+    public static String APP_APP = "app";
+    public static String APP_PRODUCT = "prod";
+    public static String APP_TTVC = "ttv";
+    
+    
     public static String APP_TTVSUB = "ttvsub";  // ETL name
     public static String APP_TTVREQ = "ttvreq";  // ETL name
     //
