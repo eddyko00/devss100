@@ -232,7 +232,7 @@ public class ServiceAFweb {
                     return getServerObj().getTimerCnt();
 
                 }
-                boolean restoreFlag = fales; // only work on PHP
+                boolean restoreFlag = false; // only work on PHP
                 if (restoreFlag == true) {
                     restoreSystem();
                     serverObj.setTimerQueueCnt(serverObj.getTimerQueueCnt() - 1);
