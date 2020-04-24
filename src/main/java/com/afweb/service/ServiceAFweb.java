@@ -390,11 +390,17 @@ public class ServiceAFweb {
                         }
                     }
 
-                    boolean restoreSsnsAccFlag = false; // work for remote d
+                    boolean restoreSsnsAccFlag = true; // work for remote d
                     if (restoreSsnsAccFlag == true) {
                         this.getSsnsDataImp().deleteAllSsnsAcc(0);
                         boolean retSatus = getAccountImp().restoreSsnsAccDB(this);
                     }
+                    
+                    boolean restoreSsnsDataFlag = true; // work for remote d
+                    if (restoreSsnsDataFlag == true) {
+                        this.getSsnsDataImp().deleteAllSsnsData(0);
+                        boolean retSatus = getAccountImp().restoreSsnsDataDB(this);
+                    }                    
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
 
