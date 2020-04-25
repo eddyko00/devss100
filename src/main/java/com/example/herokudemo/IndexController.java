@@ -54,33 +54,33 @@ public class IndexController {
 
         arrayString.add("/cust/{username}/id/{id}/serv");
 
-        arrayString.add("/cust/{username}/id/{id}/serv/prod?length={0 for all}");       
-        arrayString.add("/cust/{username}/id/{id}/serv/prod/summary?length={0 for all}");        
+        arrayString.add("/cust/{username}/id/{id}/serv/prod?length={0 for all}");
+        arrayString.add("/cust/{username}/id/{id}/serv/prod/summary?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}/rt");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/feature?name=");
 
         arrayString.add("/cust/{username}/id/{id}/serv/app?length={0 for all}");
-        arrayString.add("/cust/{username}/id/{id}/serv/app/summary?length={0 for all}");        
+        arrayString.add("/cust/{username}/id/{id}/serv/app/summary?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/getapp");
         arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/gettimeslot");
         arrayString.add("/cust/{username}/id/{id}/serv/app/featureall");
-        arrayString.add("/cust/{username}/id/{id}/serv/app/feature?name=");        
+        arrayString.add("/cust/{username}/id/{id}/serv/app/feature?name=");
         arrayString.add("/cust/{username}/id/{id}/serv/app/feature/summary?name=");
 
         arrayString.add("/cust/{username}/id/{id}/serv/wifi?length={0 for all}");
-        arrayString.add("/cust/{username}/id/{id}/serv/wifi/summary?length={0 for all}");        
+        arrayString.add("/cust/{username}/id/{id}/serv/wifi/summary?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevice");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevicestatus");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/feature?name=");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/feature/summary?name=");
-        
+
         arrayString.add("/cust/{username}/id/{id}/serv/ttv?length={0 for all}");
-        arrayString.add("/cust/{username}/id/{id}/serv/ttv/summary?length={0 for all}");        
+        arrayString.add("/cust/{username}/id/{id}/serv/ttv/summary?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/getsub");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/validate");
@@ -88,7 +88,7 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/feature?name=");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/feature/summary?name=");
-        
+
         arrayString.add("/cust/{username}/sys/stop");
         arrayString.add("/cust/{username}/sys/clearlock");
         arrayString.add("/cust/{username}/sys/start");
@@ -150,6 +150,8 @@ public class IndexController {
     ) {
 
         ServiceAFweb.URL_LOCALDB = urlSt.trim();
+        //restart ServiceAFweb
+        afWebService.SystemStart();
         return "done...";
     }
 
@@ -283,6 +285,7 @@ public class IndexController {
     }
 ////////////////////// 
 ////////////////////// 
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<ProdSummary> getttvcprodSummary(
@@ -304,7 +307,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-    
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getttvcprod(
@@ -419,6 +422,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv/feature/name/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<ProdSummary> getttvcfeatureSummary(
@@ -439,7 +443,6 @@ public class IndexController {
         return ret;
     }
 
-    
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getttvcfeature(
@@ -482,7 +485,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-    
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getwifiprod(
@@ -578,6 +581,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi/feature/name/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<ProdSummary> getwififeatureSummary(
@@ -597,7 +601,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-    
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getwififeature(
@@ -640,7 +644,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-    
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/app", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getappprod(
@@ -736,6 +740,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/app/feature/name/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<ProdSummary> getappfeatureSummary(
@@ -756,7 +761,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-    
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/app/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getappfeature(
@@ -778,7 +783,7 @@ public class IndexController {
         return ret;
     }
 ////////////////////////////////////
-    
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv//prod/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<ProdSummary> getprodSummary(
@@ -800,7 +805,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-    
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getprodttv(
@@ -877,6 +882,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/feature/name/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<ProdSummary> getprodttvfeatureNameSummary(
@@ -895,7 +901,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-    
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getprodttvfeatureName(

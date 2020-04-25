@@ -64,7 +64,7 @@ public class WebAppConfig {
 //MYSQL_SERVICE_HOST=100.65.175.81
 //sh-4.2$
             dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-            String dsUrl = "jdbc:mysql:/172.30.136.72:3306/sampledb?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false";
+            String dsUrl = "jdbc:mysql://172.30.136.72:3306/sampledb?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false";
             dataSource.setUrl(dsUrl);
             dataSource.setUsername("sa");
             dataSource.setPassword("admin");
