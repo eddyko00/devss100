@@ -28,24 +28,7 @@ public class WebAppConfig {
 
         }
         if (CKey.SQL_DATABASE == CKey.MYSQL) {
-//Openshift
-//sh-4.2$ env | grep MYSQL
-//MYSQL_PREFIX=/opt/rh/rh-mysql57/root/usr
-//MYSQL_VERSION=5.7
-//MYSQL_DATABASE=sampledb
-//MYSQL_PASSWORD=admin
-//MYSQL_PORT_3306_TCP_PORT=3306
-//MYSQL_PORT_3306_TCP=tcp://172.30.136.72:3306
-//MYSQL_SERVICE_PORT_MYSQL=3306
-//MYSQL_PORT_3306_TCP_PROTO=tcp
-//MYSQL_PORT_3306_TCP_ADDR=172.30.136.72
-//MYSQL_SERVICE_PORT=3306
-//MYSQL_USER=sa
-//MYSQL_PORT=tcp://172.30.136.72:3306
-//MYSQL_SERVICE_HOST=172.30.136.72
-//sh-4.2$ 
-
-            
+          
             
 //sh-4.2$ env | grep MYSQL
 //MYSQL_PREFIX=/opt/rh/rh-mysql57/root/usr
@@ -64,7 +47,7 @@ public class WebAppConfig {
 //MYSQL_SERVICE_HOST=100.65.175.81
 //sh-4.2$
             dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-            String dsUrl = "jdbc:mysql://172.30.136.72:3306/sampledb?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false";
+            String dsUrl = "jdbc:mysql://100.65.175.81:3306/sampledb?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false";
             dataSource.setUrl(dsUrl);
             dataSource.setUsername("sa");
             dataSource.setPassword("admin");

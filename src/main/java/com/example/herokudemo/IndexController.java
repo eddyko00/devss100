@@ -7,6 +7,7 @@ import com.afweb.util.*;
 import com.afweb.service.ServiceAFweb;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -159,6 +160,13 @@ public class IndexController {
     public @ResponseBody
     String getServerFileP() {
         return ServiceAFweb.FileLocalPath;
+    }
+
+    @RequestMapping(value = "/server/sysfilepath", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String getServerFileDir() {
+        String userDirectory = Paths.get("").toAbsolutePath().toString();
+        return userDirectory;
     }
 
     @RequestMapping(value = "/server/filepath/set", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
