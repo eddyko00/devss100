@@ -412,15 +412,19 @@ public class ServiceAFweb {
                     }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
-                    boolean monflag = false;
+                    boolean monflag = true;
                     if (monflag == true) {
+                        
+//                         this.getSsnsDataImp().deleteAllSsReport(0);
+                         
                         SsnsRegression regression = new SsnsRegression();
-//                        regression.startMonitor(this);
-//
-//                        ArrayList NameArrayTemp = regression.getMoniterIDList();
-//                        for (int i = 0; i < 10; i++) {
-//                            regression.processMonitorTesting(this);
-//                        }
+                        String name = CKey.ADMIN_USERNAME;
+                        regression.startMonitor(this, name);
+
+                        ArrayList NameArrayTemp = regression.getMoniterNameList("");
+                        for (int i = 0; i < 10; i++) {
+                            regression.processMonitorTesting(this);
+                        }
                         regression.reportMoniter(this);
 
                     }
@@ -2851,7 +2855,7 @@ public class ServiceAFweb {
         }
         return null;
     }
-    
+
     ///// Restore DB need the following
     ////  SystemStop
     ////  SystemCleanDBData

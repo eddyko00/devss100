@@ -204,6 +204,10 @@ public class SsnsDataImp {
         return ssnsdb.getSsReportObjListByUid(name, uid);
     }
 
+    public int deleteAllSsReport(int month) {
+        return ssnsdb.deleteAllSsReport(month);
+    }
+        
     public int deleteAllSsnsAcc(int month) {
         return ssnsdb.deleteAllSsnsAcc(month);
     }

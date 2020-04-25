@@ -866,6 +866,25 @@ public class SsnsDataDB {
         return null;
     }
 
+    public int deleteAllSsReport(int month) {
+        try {
+            String deleteSQL = "delete from ssreport";
+            if (month == 0) {
+                ;
+            } else {
+                Calendar dateNow = TimeConvertion.getCurrentCalendar();
+                long dateNowLong = dateNow.getTimeInMillis();
+                long monthAge = TimeConvertion.addMonths(dateNowLong, -month);
+                deleteSQL = "delete from ssreport where updatedatel < " + monthAge;
+            }
+            processExecuteDB(deleteSQL);
+            return 1;
+        } catch (Exception e) {
+            logger.info("> deleteAllSsReport exception " + e.getMessage());
+        }
+        return 0;
+    }
+
     public int deleteAllSsnsAcc(int month) {
         try {
             String deleteSQL = "delete from ssnsacc";
@@ -1001,6 +1020,9 @@ public class SsnsDataDB {
 
     public ArrayList<SsReport> getSsReportObjListByUid(String name, String uid) {
         String sql = "select * from ssreport where name='" + name + "' and uid='" + uid + "'";
+        if ((name != null) || (name.length()==0)) {
+            sql = "select * from ssreport where uid='" + uid + "'";
+        }
         ArrayList entries = getAllSsReportSQL(sql, 0);
         return entries;
     }
