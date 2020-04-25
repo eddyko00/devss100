@@ -14,6 +14,7 @@ import java.util.ArrayList;
 public class ReportData {
 
 
+    private ArrayList<String>  reportList;
     private ArrayList<String>  testListObj;
     private ArrayList<String>  featList;
 
@@ -43,5 +44,19 @@ public class ReportData {
      */
     public void setFeatList(ArrayList<String> featList) {
         this.featList = featList;
+    }
+
+    /**
+     * @return the reportList
+     */
+    public ArrayList<String> getReportList() {
+        return reportList;
+    }
+
+    /**
+     * @param reportList the reportList to set
+     */
+    public void setReportList(ArrayList<String> reportList) {
+        this.reportList = reportList;
     }
 }

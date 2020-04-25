@@ -152,10 +152,22 @@ public class SsnsDataImp {
         return ssnsdb.getSsnsDataObj(name, type, updatedatel);
     }
 
+    public String getSsReportObjListByFeatureOperCnt(String name, String oper) {
+        return ssnsdb.getSsReportObjListByFeatureCnt(name, oper);
+    }        
     public String getSsnsAccObjListByFeatureCnt(String name) {
         return ssnsdb.getSsnsAccObjListByFeatureCnt(name);
     }
-
+    
+    
+    public ArrayList<SsReport> getSsReportByFeatureOperIdList(String name, String app, String oper, int length) {
+        return ssnsdb.getSsReportByFeatureOperIdList(name, app, oper, length);
+    }
+    
+    public ArrayList<String> getSsReportObjListByFeatureOper(String name, String app) {
+        return ssnsdb.getSsReportObjListByFeatureOper(name, app);
+    }
+    
     public ArrayList<String> getSsnsAccObjListByFeature(String app) {
         return ssnsdb.getSsnsAccObjListByFeature(app);
     }

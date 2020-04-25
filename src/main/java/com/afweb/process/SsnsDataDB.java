@@ -924,6 +924,19 @@ public class SsnsDataDB {
         return entries;
     }
 
+    public String getSsReportObjListByFeatureCnt(String name, String oper) {
+
+        String sql = "SELECT COUNT(oper) as name FROM ssreport where name='" + name + "' and oper='" + oper + "' GROUP BY oper";
+        ArrayList array = getAllNameSQL(sql);
+        String cnt = "0";
+        if (array != null) {
+            if (array.size() > 0) {
+                cnt = (String) array.get(0);
+            }
+        }
+        return cnt;
+    }
+
     public String getSsnsAccObjListByFeatureCnt(String name) {
 
         String sql = "SELECT COUNT(name) as name FROM ssnsacc where name='" + name + "' GROUP BY name";
@@ -935,6 +948,19 @@ public class SsnsDataDB {
             }
         }
         return cnt;
+    }
+
+    public ArrayList<SsReport> getSsReportByFeatureOperIdList(String name, String app, String oper, int length) {
+        String sql = "select * from ssreport where name='" + name + "' and app='" + app + "' and oper='" + oper + "'";
+        sql = ServiceAFweb.getSQLLengh(sql, length);
+        ArrayList entries = getAllSsReportSQL(sql, 0);
+        return entries;
+    }
+
+    public ArrayList<String> getSsReportObjListByFeatureOper(String name, String app) {
+        String sql = "select DISTINCT oper as name from ssreport where name='" + name + "' and app='" + app + "' order by oper asc";
+        ArrayList array = getAllNameSQL(sql);
+        return array;
     }
 
     public ArrayList<String> getSsnsAccObjListByFeature(String app) {

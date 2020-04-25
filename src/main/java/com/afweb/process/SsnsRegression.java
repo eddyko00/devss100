@@ -43,8 +43,97 @@ public class SsnsRegression {
     private SsnsDataImp ssnsDataImp = new SsnsDataImp();
     protected static Logger logger = Logger.getLogger("SsnsRegression");
 
-    public int startMonitor(ServiceAFweb serviceAFweb, String name) { //CKey.ADMIN_USERNAME) {
+    public static String R_PASS = "true";
+    public static String R_FAIL = "false";
+
+    public void reportMoniter(ServiceAFweb serviceAFweb) {
+        // report
         try {
+            String name = CKey.ADMIN_USERNAME;
+            String uid = SsnsService.REPORT_ALL;
+
+            ArrayList<SsReport> reportObjList = getSsnsDataImp().getSsReportObjListByUid(name, uid);
+            if (reportObjList != null) {
+                if (reportObjList.size() != 0) {
+
+                    SsReport repObj = reportObjList.get(0);
+//                    String dataStTmp = repObj.getData();
+//                    ReportData reportdata = new ObjectMapper().readValue(dataStTmp, ReportData.class);
+
+                    ArrayList<String> testReportList = new ArrayList();
+                    this.getReportStat(serviceAFweb, SsnsService.APP_WIFI, testReportList);
+                    this.getReportStat(serviceAFweb, SsnsService.APP_APP, testReportList);
+                    this.getReportStat(serviceAFweb, SsnsService.APP_PRODUCT, testReportList);
+                    this.getReportStat(serviceAFweb, SsnsService.APP_TTVC, testReportList);
+                    logger.info("> reportList  " + testReportList.size());
+
+                    ReportData reportdata = new ReportData();
+                    reportdata.setReportList(testReportList);
+
+                    SsReport reportNewObj = new SsReport();
+                    reportNewObj.setName(name);
+                    reportNewObj.setUid(uid);
+                    reportNewObj.setStatus(ConstantKey.OPEN);
+                    reportNewObj.setUid(SsnsService.REPORT_REPORT);
+
+                    String dataSt = new ObjectMapper().writeValueAsString(reportdata);
+                    reportNewObj.setData(dataSt);
+
+                    ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(reportNewObj.getName(), reportNewObj.getUid());
+                    boolean exist = false;
+                    if (ssReportObjList != null) {
+                        if (ssReportObjList.size() != 0) {
+                            SsReport report = ssReportObjList.get(0);
+                            int status = report.getStatus();
+                            int type = report.getType();
+                            int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(report.getId(), dataSt, status, type);
+                            exist = true;
+                        }
+                    }
+                    if (exist == false) {
+                        int ret = getSsnsDataImp().insertSsReportObject(reportNewObj);
+                    }
+
+                }
+            }
+        } catch (Exception ex) {
+
+        }
+    }
+
+    public void getReportStat(ServiceAFweb serviceAFweb, String app, ArrayList<String> reportList) {
+        int Pass = 0;
+        int Fail = 0;
+        ArrayList<String> operList = serviceAFweb.getSsReportByFeature(CKey.ADMIN_USERNAME, null, app);
+        if (operList != null) {
+            for (int j = 0; j < operList.size(); j += 2) {
+                String oper = operList.get(j);
+                String reportLine = oper + "," + operList.get(j + 1);
+                reportList.add(reportLine);
+
+                ArrayList<SsReport> reportOperList = serviceAFweb.getSsReportByFeatureOperIdList(CKey.ADMIN_USERNAME, null, app, oper);
+                if (reportOperList != null) {
+                    for (int k = 0; k < reportOperList.size(); k++) {
+                        SsReport rObj = reportOperList.get(k);
+                        reportLine = rObj.getId() + "," + rObj.getCusid() + "," + rObj.getBanid() + "," + rObj.getTiid() + "," + rObj.getRet() + "," + rObj.getExec();
+                        reportList.add(reportLine);
+
+                        if (rObj.getRet().equals(R_PASS)) {
+                            Pass++;
+                        } else {
+                            Fail++;
+                        }
+                    }
+                }
+            }
+            String reportLine = app + "," + "Pass " + Pass + ",Fail " + Fail;
+            reportList.add(reportLine);
+        }
+    }
+
+    public int startMonitor(ServiceAFweb serviceAFweb) { //CKey.ADMIN_USERNAME) {
+        try {
+            String name = CKey.ADMIN_USERNAME;
             //creat monitor
             ArrayList<String> testIdList = new ArrayList();
             ArrayList<String> testFeatList = new ArrayList();
@@ -119,13 +208,13 @@ public class SsnsRegression {
 
             reportdata.setFeatList(testFeatList);
             reportdata.setTestListObj(testIdList);
-            String dataSt = new ObjectMapper().writeValueAsString(reportdata);
 
             SsReport reportObj = new SsReport();
             reportObj.setName(name);
             reportObj.setStatus(ConstantKey.INITIAL);
             reportObj.setUid(SsnsService.REPORT_ALL);
 
+            String dataSt = new ObjectMapper().writeValueAsString(reportdata);
             reportObj.setData(dataSt);
 
             ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(reportObj.getName(), reportObj.getUid());
@@ -267,29 +356,29 @@ public class SsnsRegression {
                                 String execSt = response.get(2);
                                 execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
                                 long exec = Long.parseLong(execSt);
-                                String passSt = "false";
+                                String passSt = R_FAIL;
                                 if (feat.equals(accObj.getName())) {
-                                    passSt = "true";
+                                    passSt = R_PASS;
                                 } else {
-                                    passSt = "true";
+                                    passSt = R_PASS;
                                     String[] featL = feat.split(":");
                                     String[] nameL = accObj.getName().split(":");
                                     if ((featL.length > 4) && (nameL.length > 4)) {
                                         if (!featL[2].equals(nameL[2])) {
-                                            passSt = "false";
+                                            passSt = R_FAIL;
                                         }
                                         if (!featL[3].equals(nameL[3])) {
-                                            passSt = "false";
+                                            passSt = R_FAIL;
                                         }
                                         if (!featL[4].equals(nameL[4])) {
-                                            passSt = "false";
+                                            passSt = R_FAIL;
                                         }
                                     } else if ((featL.length > 3) && (nameL.length > 3)) {
                                         if (!featL[2].equals(nameL[2])) {
-                                            passSt = "false";
+                                            passSt = R_FAIL;
                                         }
                                         if (!featL[3].equals(nameL[3])) {
-                                            passSt = "false";
+                                            passSt = R_FAIL;
                                         }
                                     }
                                 }

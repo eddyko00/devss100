@@ -415,32 +415,14 @@ public class ServiceAFweb {
                     boolean monflag = true;
                     if (monflag == true) {
                         SsnsRegression regression = new SsnsRegression();
-                        regression.startMonitor(this, CKey.ADMIN_USERNAME);
+//                        regression.startMonitor(this);
+//
+//                        ArrayList NameArrayTemp = regression.getMoniterIDList();
+//                        for (int i = 0; i < 10; i++) {
+//                            regression.processMonitorTesting(this);
+//                        }
+                        regression.reportMoniter(this);
 
-                        ArrayList NameArrayTemp = regression.getMoniterIDList();
-                        for (int i = 0; i < 10; i++) {
-                            regression.processMonitorTesting(this);
-                        }
-
-                        // report
-                        try {
-                            String name = CKey.ADMIN_USERNAME;
-                            String uid = SsnsService.REPORT_ALL;
-
-                            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, uid);
-                            if (ssReportObjList != null) {
-                                if (ssReportObjList.size() != 0) {
-
-                                    SsReport reportObj = ssReportObjList.get(0);
-                                    String dataSt = reportObj.getData();
-
-                                    ReportData reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
-
-                                }
-                            }
-                        } catch (IOException ex) {
-
-                        }
                     }
 /////////
 /////////
@@ -1920,6 +1902,46 @@ public class ServiceAFweb {
         ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(prod, name, length);
         return SsnsAcclist;
 
+    }
+
+    public ArrayList<SsReport> getSsReportByFeatureOperIdList(String EmailUserName, String IDSt, String prod, String oper) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        ArrayList<SsReport> reportList = getSsnsDataImp().getSsReportByFeatureOperIdList(EmailUserName, prod, oper, 0);
+
+        return reportList;
+    }
+    
+    
+    public ArrayList<String> getSsReportByFeature(String EmailUserName, String IDSt, String prod) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        ArrayList<String> namelist = getSsnsDataImp().getSsReportObjListByFeatureOper(EmailUserName, prod);
+
+        ArrayList<String> retlist = new ArrayList();
+        if (namelist != null) {
+            for (int i = 0; i < namelist.size(); i++) {
+                String oper = namelist.get(i);
+                retlist.add(oper);
+                String cnt = getSsnsDataImp().getSsReportObjListByFeatureOperCnt(EmailUserName, oper);
+                retlist.add(cnt);
+            }
+        }
+        return retlist;
     }
 
     public ArrayList<String> getSsnsprodByFeature(String EmailUserName, String IDSt, String prod) {

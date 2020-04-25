@@ -45,7 +45,8 @@ public class SsnsService {
     public static String REPORT_ALL = "all";
     public static String REPORT_MOMITOR = "monitor";
     public static String REPORT_REPORT = "report";
-
+    public static String REPORT_TESE_CASE = "test";
+    
     public static String APP_WIFI = "wifi";
     public static String APP_APP = "app";
     public static String APP_PRODUCT = "prod";
