@@ -415,10 +415,32 @@ public class ServiceAFweb {
                     boolean monflag = true;
                     if (monflag == true) {
                         SsnsRegression regression = new SsnsRegression();
-                        regression.startMonitor(this);
+                        regression.startMonitor(this, CKey.ADMIN_USERNAME);
 
                         ArrayList NameArrayTemp = regression.getMoniterIDList();
+                        for (int i = 0; i < 10; i++) {
+                            regression.processMonitorTesting(this);
+                        }
 
+                        // report
+                        try {
+                            String name = CKey.ADMIN_USERNAME;
+                            String uid = SsnsService.REPORT_ALL;
+
+                            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, uid);
+                            if (ssReportObjList != null) {
+                                if (ssReportObjList.size() != 0) {
+
+                                    SsReport reportObj = ssReportObjList.get(0);
+                                    String dataSt = reportObj.getData();
+
+                                    ReportData reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
+
+                                }
+                            }
+                        } catch (IOException ex) {
+
+                        }
                     }
 /////////
 /////////
@@ -1983,28 +2005,22 @@ public class ServiceAFweb {
                 String feat = "";
                 if ((Oper.equals(TT_GetSub) || Oper.equals(TT_Vadulate) || Oper.equals(TT_Quote) || Oper.equals(TT_SaveOrder))) {
                     feat = ss.TestFeatureSsnsProdTTVC(ssnsAccObj, outputList, Oper);
-                    logger.info("> testSsnsprodTTVCByIdRT " + Oper + " feat " + feat);
-                    if ((feat == null) || (feat.length() == 0)) {
+//                    logger.info("> testSsnsprodTTVCByIdRT " + Oper + " feat " + feat);
+                    if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {
                         // disabled this Acc Obj
                         int type = ssnsAccObj.getType();
                         String name = ssnsAccObj.getName();
                         int status = ssnsAccObj.getStatus();
                         type = type + 1; // increate error count
-                        if (type > 2) {
-                            if (name.indexOf("~testfailed") != -1) {
-                                name += "~testfailed";
-                            }
-                        }
+
                         this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
                     } else {
                         String name = ssnsAccObj.getName();
-                        if (name.indexOf("~testfailed") != -1) {
-                            int type = ssnsAccObj.getType();
-                            int status = ssnsAccObj.getStatus();
+                        int type = ssnsAccObj.getType();
+                        int status = ssnsAccObj.getStatus();
+                        if (type > 0) {
                             type = 0; // increate error count
-                            name = ServiceAFweb.replaceAll("~testfailed", "", name);
                             this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
-
                         }
                     }
                 }
@@ -2045,30 +2061,24 @@ public class ServiceAFweb {
                 SsnsService ss = new SsnsService();
                 String feat = "";
 
-                if ((Oper == SsnsService.WI_Getdev) || (Oper == SsnsService.WI_GetDeviceStatus)) {
+                if (Oper.equals(SsnsService.WI_Getdev) || Oper.equals(SsnsService.WI_GetDeviceStatus)) {
                     feat = ss.TestFeatureSsnsProdWifi(ssnsAccObj, outputList, Oper);
-                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
-                    if ((feat == null) || (feat.length() == 0)) {
+//                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
+                    if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {
                         // disabled this Acc Obj
                         int type = ssnsAccObj.getType();
                         String name = ssnsAccObj.getName();
                         int status = ssnsAccObj.getStatus();
                         type = type + 1; // increate error count
-                        if (type > 2) {
-                            if (name.indexOf("~testfailed") != -1) {
-                                name += "~testfailed";
-                            }
-                        }
+
                         this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
                     } else {
                         String name = ssnsAccObj.getName();
-                        if (name.indexOf("~testfailed") != -1) {
-                            int type = ssnsAccObj.getType();
-                            int status = ssnsAccObj.getStatus();
-                            type = 0; // increate error count
-                            name = ServiceAFweb.replaceAll("~testfailed", "", name);
+                        int type = ssnsAccObj.getType();
+                        int status = ssnsAccObj.getStatus();
+                        if (type > 0) {
+                            type = 0; // clear error count
                             this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
-
                         }
                     }
                 }
@@ -2096,30 +2106,24 @@ public class ServiceAFweb {
                 SsnsService ss = new SsnsService();
                 String feat = "";
 
-                if ((Oper == SsnsService.APP_GET_APP) || (Oper == SsnsService.APP_GET_TIMES)) {
+                if (Oper.equals(SsnsService.APP_GET_APP) || Oper.equals(SsnsService.APP_GET_TIMES)) {
                     feat = ss.TestFeatureSsnsProdApp(ssnsAccObj, outputList, Oper);
-                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
-                    if ((feat == null) || (feat.length() == 0)) {
+//                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
+                    if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {
                         // disabled this Acc Obj
                         int type = ssnsAccObj.getType();
                         String name = ssnsAccObj.getName();
                         int status = ssnsAccObj.getStatus();
                         type = type + 1; // increate error count
-                        if (type > 2) {
-                            if (name.indexOf("~testfailed") != -1) {
-                                name += "~testfailed";
-                            }
-                        }
+
                         this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
                     } else {
                         String name = ssnsAccObj.getName();
-                        if (name.indexOf("~testfailed") != -1) {
-                            int type = ssnsAccObj.getType();
-                            int status = ssnsAccObj.getStatus();
-                            type = 0; // increate error count
-                            name = ServiceAFweb.replaceAll("~testfailed", "", name);
+                        int type = ssnsAccObj.getType();
+                        int status = ssnsAccObj.getStatus();
+                        if (type > 0) {
+                            type = 0; // clear error count
                             this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
-
                         }
                     }
                 }
@@ -2146,29 +2150,24 @@ public class ServiceAFweb {
                 ArrayList<String> outputList = new ArrayList();
                 SsnsService ss = new SsnsService();
                 String feat = "";
-                if (prod == SsnsService.APP_PRODUCT) {
+                if (prod.equals(SsnsService.APP_PRODUCT)) {
                     String oper = ssnsAccObj.getRet();
 
                     feat = ss.TestFeatureSsnsProductInventory(ssnsAccObj, outputList, oper);
-                    if ((feat == null) || (feat.length() == 0)) {
+                    if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {
                         // disabled this Acc Obj
                         int type = ssnsAccObj.getType();
                         String name = ssnsAccObj.getName();
                         int status = ssnsAccObj.getStatus();
                         type = type + 1; // increate error count
-                        if (type > 2) {
-                            if (name.indexOf("~testfailed") == -1) {
-                                name += "~testfailed";
-                            }
-                        }
+
                         this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
                     } else {
                         String name = ssnsAccObj.getName();
-                        if (name.indexOf("~testfailed") != -1) {
-                            int type = ssnsAccObj.getType();
-                            int status = ssnsAccObj.getStatus();
+                        int type = ssnsAccObj.getType();
+                        int status = ssnsAccObj.getStatus();
+                        if (type > 0) {
                             type = 0; // clear error count
-                            name = ServiceAFweb.replaceAll("~testfailed", "", name);
                             this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
                         }
                     }

@@ -27,14 +27,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.util.Map;
-import java.util.logging.Level;
 
 import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.codec.binary.Base64;
 import static org.apache.http.protocol.HTTP.USER_AGENT;
-import static org.springframework.http.converter.json.Jackson2ObjectMapperBuilder.json;
 
 /**
  *
@@ -46,6 +44,7 @@ public class SsnsService {
 
     public static String REPORT_ALL = "all";
     public static String REPORT_MOMITOR = "monitor";
+    public static String REPORT_REPORT = "report";
 
     public static String APP_WIFI = "wifi";
     public static String APP_APP = "app";
@@ -523,6 +522,9 @@ public class SsnsService {
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             String feat = parseTTVCFeature(outputSt, oper, null);
+            if (outputSt.indexOf("responseCode:400500") != -1) {
+                feat += ":testfailed";
+            }
             outputList.add(feat);
 
             ProductData pData = null;
@@ -543,7 +545,7 @@ public class SsnsService {
             outputList.addAll(outList);
 
             return feat;
-        } else if (oper == TT_GetSub) {
+        } else if (oper.equals(TT_GetSub)) {
 
             outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, oper, banid, appTId, null, inList);;
             if (outputSt == null) {
@@ -552,6 +554,9 @@ public class SsnsService {
 
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             String feat = parseTTVCFeature(outputSt, oper, null);
+            if (outputSt.indexOf("responseCode:400500") != -1) {
+                feat += ":testfailed";
+            }            
             outputList.add(feat);
             outputList.addAll(inList);
             outputList.addAll(outList);
@@ -1093,7 +1098,7 @@ public class SsnsService {
 
         String outputSt = null;
         ArrayList<String> inList = new ArrayList();
-        if (Oper == WI_GetDeviceStatus) {
+        if (Oper.equals(WI_GetDeviceStatus)) {
             outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, Oper, banid, uniquid, prodClass, serialid, Oper, inList);
             if (outputSt == null) {
 
@@ -1101,12 +1106,15 @@ public class SsnsService {
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             String feat = parseWifiFeature(outputSt, Oper, prodClass);
+            if (outputSt.indexOf("responseCode:400500") != -1) {
+                feat += ":testfailed";
+            }
             outputList.add(feat);
             outputList.addAll(inList);
             outputList.addAll(outList);
 
             return feat;
-        } else if (Oper == WI_Getdev) {
+        } else if (Oper.equals(WI_Getdev)) {
 
             outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, Oper, banid, uniquid, prodClass, serialid, Oper, inList);
             if (outputSt == null) {
@@ -1130,6 +1138,9 @@ public class SsnsService {
                     feat += ":" + dCd;
                 }
             }
+            if (outputSt.indexOf("responseCode:400500") != -1) {
+                feat += ":testfailed";
+            }            
             outputList.add(feat);
             outputList.addAll(inList);
             outputList.addAll(outList);
@@ -1559,7 +1570,9 @@ public class SsnsService {
         String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
 
         HashMap newbodymap = new HashMap();
-        newbodymap.put("customerId", cust);
+        if (cust.length() > 0) {
+            newbodymap.put("customerId", cust);
+        }
         newbodymap.put("id", appTId);
         newbodymap.put("hostSystemCd", host);
         try {
@@ -1598,20 +1611,24 @@ public class SsnsService {
         String host = dataObj.getRet();
         String outputSt = null;
         ArrayList<String> inList = new ArrayList();
-        if (Oper == APP_GET_APP) {
+        if (Oper.equals(APP_GET_APP)) {
 
             outputSt = SendSsnsAppointmentGetApp(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, inList);
             if (outputSt == null) {
                 return "";
             }
+
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             String feat = parseAppointmentFeature(outputSt, Oper);
+            if (outputSt.indexOf("responseCode:400500") != -1) {
+                feat += ":testfailed";
+            }
             outputList.add(feat);
             outputList.addAll(inList);
             outputList.addAll(outList);
 
             return feat;
-        } else if (Oper == APP_GET_TIMES) {
+        } else if (Oper.equals(APP_GET_TIMES)) {
             outputSt = SendSsnsAppointmentGetTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, inList);
             if (outputSt == null) {
                 return "";
@@ -1642,6 +1659,10 @@ public class SsnsService {
                 }
                 newFeat += ":" + line;
             }
+
+            if (outputSt.indexOf("responseCode:400500") != -1) {
+                newFeat += ":testfailed";
+            }            
             outputList.add(newFeat);
             outputList.addAll(inList);
             outputList.addAll(outList);
@@ -1710,7 +1731,9 @@ public class SsnsService {
             featTTV = parseProductPhoneFeature(outputSt, dataObj.getOper());
 
         }
-
+        if (outputSt.indexOf("responseCode:400500") != -1) {
+            featTTV += ":testfailed";
+        }
         outputList.add(featTTV);
         outputList.addAll(inList);
         outputList.addAll(outList);

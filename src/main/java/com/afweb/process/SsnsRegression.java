@@ -43,49 +43,86 @@ public class SsnsRegression {
     private SsnsDataImp ssnsDataImp = new SsnsDataImp();
     protected static Logger logger = Logger.getLogger("SsnsRegression");
 
-    public void startMonitor(ServiceAFweb serviceAFweb) {
+    public int startMonitor(ServiceAFweb serviceAFweb, String name) { //CKey.ADMIN_USERNAME) {
         try {
             //creat monitor
             ArrayList<String> testIdList = new ArrayList();
             ArrayList<String> testFeatList = new ArrayList();
 
+            //check if outstanding testing
+            ArrayList arrayTemp = getMoniterIDList();
+            if (arrayTemp != null) {
+                for (int i = 0; i < arrayTemp.size(); i++) {
+                    String tObjSt = moniterNameArray.get(i);
+                    testData tObj = new ObjectMapper().readValue(tObjSt, testData.class);
+                    if (tObj.getUsername().equals(name)) {
+                        return 2;
+                    }
+                }
+            }
             ReportData reportdata = new ReportData();
-
-            ArrayList<String> servList = serviceAFweb.getSsnsprodAll(CKey.ADMIN_USERNAME, null, 0);
+            ArrayList<String> servList = serviceAFweb.getSsnsprodAll(name, null, 0);
             for (int i = 0; i < servList.size(); i += 2) {
                 String servProd = servList.get(i);
-                ArrayList<String> featallList = serviceAFweb.getSsnsprodByFeature(CKey.ADMIN_USERNAME, null, servProd);
+                ArrayList<String> featallList = serviceAFweb.getSsnsprodByFeature(name, null, servProd);
+
                 for (int j = 0; j < featallList.size(); j += 2) {
                     String featN = featallList.get(j);
                     if (featN.indexOf("fail") != -1) {
                         continue;
                     }
                     testFeatList.add(featN);
-                    ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, 5);
+
+                    ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, 15);
                     int added = 0;
                     if (SsnsAcclist != null) {
                         for (int k = 0; k < SsnsAcclist.size(); k++) {
                             SsnsAcc accObj = SsnsAcclist.get(k);
+
+                            if (accObj.getType() > 10) {  // testfailed will increment this type
+                                continue;
+                            }
                             testData tObj = new testData();
                             tObj.setAccid(accObj.getId());
-                            tObj.setUsername(CKey.ADMIN_USERNAME);
+                            tObj.setUsername(name);
                             tObj.setTesturl("PR");
                             String st = new ObjectMapper().writeValueAsString(tObj);
-                            st = ServiceAFweb.replaceAll("\"", "^", st);
 
                             testIdList.add(st);
                             added++;
+
+                            if (added > 4) {
+                                break;  // test 5 on each feature
+                            }
                         }
                         logger.info("> startMonitor  " + featN + "id added " + added);
                     }
+//                    ///////just for testing
+//                    break;
                 }
             }
+
+            testData tObj = new testData();
+            tObj.setAccid(0);
+            tObj.setType(ConstantKey.INITIAL);
+            tObj.setUsername(name);
+            tObj.setTesturl("PR");
+            String st = new ObjectMapper().writeValueAsString(tObj);
+            testIdList.add(0, st);  // add front
+
+            tObj.setAccid(0);
+            tObj.setType(ConstantKey.COMPLETED);
+            tObj.setUsername(name);
+            tObj.setTesturl("PR");
+            st = new ObjectMapper().writeValueAsString(tObj);
+            testIdList.add(st);
+
             reportdata.setFeatList(testFeatList);
             reportdata.setTestListObj(testIdList);
             String dataSt = new ObjectMapper().writeValueAsString(reportdata);
 
             SsReport reportObj = new SsReport();
-            reportObj.setName(CKey.ADMIN_USERNAME);
+            reportObj.setName(name);
             reportObj.setStatus(ConstantKey.INITIAL);
             reportObj.setUid(SsnsService.REPORT_ALL);
 
@@ -105,9 +142,11 @@ public class SsnsRegression {
             if (exist == false) {
                 int ret = getSsnsDataImp().insertSsReportObject(reportObj);
             }
+            return 1;
         } catch (Exception ex) {
             logger.info("> startMonitor Exception " + ex.getMessage());
         }
+        return 0;
     }
 
     public ArrayList<String> getMoniterIDList() {
@@ -125,7 +164,6 @@ public class SsnsRegression {
                         ReportData reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
                         ArrayList<String> testIdList = reportdata.getTestListObj();
                         return testIdList;
-
                     }
                 }
             }
@@ -186,28 +224,10 @@ public class SsnsRegression {
                 }
                 testData tObj = new testData();
                 String tObjSt = moniterNameArray.get(0);
-                tObjSt = ServiceAFweb.replaceAll("^", "\"", tObjSt);
-                tObj = new ObjectMapper().readValue(tObjSt, testData.class);
-
                 moniterNameArray.remove(0);
-                int id = tObj.getAccid();
-
-                SsnsAcc accObj = getSsnsDataImp().getSsnsAccObjByID(id);
-                String dataSt = accObj.getData();
-                ProductData pData = new ObjectMapper().readValue(dataSt, ProductData.class);
-                if (pData != null) {
-                    ArrayList<String> cmdList = pData.getCmd();
-                    if (cmdList != null) {
-                        for (int j = 0; j < cmdList.size(); j += 2) {
-                            String oper = cmdList.get(j + 1);
-
-                            ArrayList<String> response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper);
-
-                            AFSleep();
-                        }
-                    }
-                }
-
+//
+                this.execMonitorTesting(serviceAFweb, tObjSt);
+//                
                 AFSleep();
             }
         } catch (Exception ex) {
@@ -216,6 +236,100 @@ public class SsnsRegression {
         serviceAFweb.removeNameLock(LockName, ConstantKey.MON_LOCKTYPE);
         return result;
 
+    }
+
+    public void execMonitorTesting(ServiceAFweb serviceAFweb, String tObjSt) {
+        try {
+            testData tObj = new ObjectMapper().readValue(tObjSt, testData.class);
+            if (tObj.getType() == ConstantKey.INITIAL) {
+                // send communication to start
+                return;
+            }
+            if (tObj.getType() == ConstantKey.COMPLETED) {
+                // send communication to completed
+                return;
+            }
+            int id = tObj.getAccid();
+
+            SsnsAcc accObj = getSsnsDataImp().getSsnsAccObjByID(id);
+            String dataSt = accObj.getData();
+            ProductData pData = new ObjectMapper().readValue(dataSt, ProductData.class);
+            if (pData != null) {
+                ArrayList<String> cmdList = pData.getCmd();
+                if (cmdList != null) {
+                    for (int j = 0; j < cmdList.size(); j += 2) {
+                        String oper = cmdList.get(j + 1);
+
+                        ArrayList<String> response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper);
+                        if (response != null) {
+                            if (response.size() > 3) {
+                                String feat = response.get(0);
+                                String execSt = response.get(2);
+                                execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
+                                long exec = Long.parseLong(execSt);
+                                String passSt = "false";
+                                if (feat.equals(accObj.getName())) {
+                                    passSt = "true";
+                                } else {
+                                    passSt = "true";
+                                    String[] featL = feat.split(":");
+                                    String[] nameL = accObj.getName().split(":");
+                                    if ((featL.length > 4) && (nameL.length > 4)) {
+                                        if (!featL[2].equals(nameL[2])) {
+                                            passSt = "false";
+                                        }
+                                        if (!featL[3].equals(nameL[3])) {
+                                            passSt = "false";
+                                        }
+                                        if (!featL[4].equals(nameL[4])) {
+                                            passSt = "false";
+                                        }
+                                    } else if ((featL.length > 3) && (nameL.length > 3)) {
+                                        if (!featL[2].equals(nameL[2])) {
+                                            passSt = "false";
+                                        }
+                                        if (!featL[3].equals(nameL[3])) {
+                                            passSt = "false";
+                                        }
+                                    }
+                                }
+//                                if (passSt.equals("false")) {
+//                                    logger.info("> execMonitorTesting false " + feat + " name:" + accObj.getName());
+//                                }
+                                SsReport reportObj = new SsReport();
+                                reportObj.setName(CKey.ADMIN_USERNAME);
+                                reportObj.setStatus(ConstantKey.OPEN);
+                                reportObj.setUid(SsnsService.REPORT_REPORT);
+                                reportObj.setRet(passSt);
+                                reportObj.setExec(exec);
+
+                                reportObj.setApp(accObj.getApp());
+                                reportObj.setCusid(accObj.getCusid());
+                                reportObj.setBanid(accObj.getBanid());
+                                reportObj.setOper(accObj.getOper());
+                                reportObj.setTiid(accObj.getTiid());
+
+                                ProductData pDataNew = new ProductData();
+                                pDataNew.setPostParam(pData.getPostParam());
+                                pDataNew.setFlow(response);
+
+                                String nameSt = new ObjectMapper().writeValueAsString(pDataNew);
+                                reportObj.setData(nameSt);
+
+                                Calendar dateNow = TimeConvertion.getCurrentCalendar();
+                                long ctime = dateNow.getTimeInMillis();
+                                reportObj.setUpdatedatel(ctime);
+                                reportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
+                                int ret = getSsnsDataImp().insertSsReportObject(reportObj);
+                            }
+                        }
+                        AFSleep();
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            logger.info("> execMonitorTesting Exception " + ex.getMessage());
+        }
     }
 
     /////

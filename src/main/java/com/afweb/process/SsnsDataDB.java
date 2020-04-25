@@ -589,6 +589,7 @@ public class SsnsDataDB {
 //                + ",'" + newN.getUpdatedatedisplay() + "'," + newN.getUpdatedatel() + "," + newN.getId() + ")";
 //        return sqlCMD;
 //    }
+//    
     public static String insertSsReportObjectSQL(SsReport nData) {
         String dataSt = nData.getData();
         dataSt = dataSt.replaceAll("|", "");
@@ -675,23 +676,6 @@ public class SsnsDataDB {
         }
         return 0;
     }
-//    public int insertSsnsDataObject(String name, int type, String dataSt, long updatedatel) {
-//        try {
-//            dataSt = dataSt.replaceAll("|", "");
-//            dataSt = dataSt.replaceAll("'", "");
-//            dataSt = dataSt.replaceAll("\"", "#");
-//            String sqlCMD = "insert into ssnsdata (name, status, type, uid,cusid,banid,tiid,app,oper,down,ret,exec, data, updatedatedisplay, updatedatel) VALUES "
-//                    + "('" + name + "'," + ConstantKey.OPEN + "," + type
-//                    + ",'','','','','','','','',0"
-//                    + ",'" + dataSt + "'"
-//                    + ",'" + new java.sql.Date(updatedatel) + "'," + updatedatel + ")";
-//            return processUpdateDB(sqlCMD);
-//
-//        } catch (Exception e) {
-//            logger.info("> insertSsnsDataObject exception " + name + " - " + e.getMessage());
-//        }
-//        return 0;
-//    }
 
     public int updatSsReportDataStatusTypeById(int id, String dataSt, int status, int type) {
         try {
@@ -699,11 +683,11 @@ public class SsnsDataDB {
             dataSt = dataSt.replaceAll("|", "");
             dataSt = dataSt.replaceAll("'", "");
             dataSt = dataSt.replaceAll("\"", "#");
-            String sqlCMD = "update ssnsacc set data='" + dataSt + "', status=" + status + ", type=" + type
+            String sqlCMD = "update ssreport set data='" + dataSt + "', status=" + status + ", type=" + type
                     + " where id=" + id;
             return processUpdateDB(sqlCMD);
         } catch (Exception e) {
-            logger.info("> updatSsnsAccNameStatusById exception " + e.getMessage());
+            logger.info("> updatSsReportDataStatusTypeById exception " + e.getMessage());
         }
         return 0;
     }
@@ -1027,7 +1011,7 @@ public class SsnsDataDB {
     public ArrayList<SsnsAcc> getSsnsAccObjListByID(int id) {
         String sql = "select * from ssnsacc where id=" + id
                 + " order by updatedatel asc";
-        ArrayList entries = getAllSsnsDataSQL(sql, 0);
+        ArrayList entries = getAllSsnsAccSQL(sql, 0);
         return entries;
     }
 
