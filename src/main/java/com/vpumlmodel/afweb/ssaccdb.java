@@ -66,19 +66,18 @@ public class ssaccdb {
     public void setTiid(String tiid) {
         this.tiid = tiid;
     }
-
     private int id;
-    private String name;
+    private String name="";
     private int status;
     private int type;
-    private String uid;
-    private String cusid;
-    private String banid;
-    private String tiid;    
-    private String app;
-    private String oper;
-    private String down;
-    private String ret;
+    private String uid="";
+    private String cusid="";
+    private String banid="";
+    private String tiid="";    
+    private String app="";
+    private String oper="";
+    private String down="";
+    private String ret="";
     private long exec;
 
     private String data;

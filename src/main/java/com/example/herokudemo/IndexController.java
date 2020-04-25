@@ -1,6 +1,7 @@
 package com.example.herokudemo;
 
 import com.afweb.model.*;
+import com.afweb.model.ssns.ProdSummary;
 import com.afweb.process.*;
 import com.afweb.util.*;
 import com.afweb.service.ServiceAFweb;
@@ -53,34 +54,41 @@ public class IndexController {
 
         arrayString.add("/cust/{username}/id/{id}/serv");
 
-        arrayString.add("/cust/{username}/id/{id}/serv/prod?length={0 for all}");
+        arrayString.add("/cust/{username}/id/{id}/serv/prod?length={0 for all}");       
+        arrayString.add("/cust/{username}/id/{id}/serv/prod/summary?length={0 for all}");        
         arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}/rt");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/feature?name=");
 
         arrayString.add("/cust/{username}/id/{id}/serv/app?length={0 for all}");
+        arrayString.add("/cust/{username}/id/{id}/serv/app/summary?length={0 for all}");        
         arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/getapp");
         arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/gettimeslot");
         arrayString.add("/cust/{username}/id/{id}/serv/app/featureall");
-        arrayString.add("/cust/{username}/id/{id}/serv/app/feature?name=");
+        arrayString.add("/cust/{username}/id/{id}/serv/app/feature?name=");        
+        arrayString.add("/cust/{username}/id/{id}/serv/app/feature/summary?name=");
 
         arrayString.add("/cust/{username}/id/{id}/serv/wifi?length={0 for all}");
+        arrayString.add("/cust/{username}/id/{id}/serv/wifi/summary?length={0 for all}");        
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevice");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevicestatus");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/feature?name=");
-
+        arrayString.add("/cust/{username}/id/{id}/serv/wifi/feature/summary?name=");
+        
         arrayString.add("/cust/{username}/id/{id}/serv/ttv?length={0 for all}");
+        arrayString.add("/cust/{username}/id/{id}/serv/ttv/summary?length={0 for all}");        
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/getsub");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/validate");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/quotation");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/feature?name=");
-
+        arrayString.add("/cust/{username}/id/{id}/serv/ttv/feature/summary?name=");
+        
         arrayString.add("/cust/{username}/sys/stop");
         arrayString.add("/cust/{username}/sys/clearlock");
         arrayString.add("/cust/{username}/sys/start");
@@ -274,7 +282,29 @@ public class IndexController {
         return ret;
     }
 ////////////////////// 
-
+////////////////////// 
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<ProdSummary> getttvcprodSummary(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "length", required = false) String lengthSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;
+        if (lengthSt != null) {
+            length = Integer.parseInt(lengthSt);
+        }
+        ArrayList<ProdSummary> ret = afWebService.getSsnsprodSummary(username, idSt, length, SsnsService.APP_TTVC);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+    
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getttvcprod(
@@ -389,7 +419,27 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv/feature/name/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<ProdSummary> getttvcfeatureSummary(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "name", required = true) String name,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;     
+        ArrayList<ProdSummary> ret = afWebService.getSsnsprodByFeatureNameSummary(username, idSt, name, SsnsService.APP_TTVC, length);
 
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/ttv/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getttvcfeature(
@@ -411,6 +461,28 @@ public class IndexController {
     }
 
 /////////////////////////////////////
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<ProdSummary> getwifiprodSummary(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "length", required = false) String lengthSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;
+        if (lengthSt != null) {
+            length = Integer.parseInt(lengthSt);
+        }
+        ArrayList<ProdSummary> ret = afWebService.getSsnsprodSummary(username, idSt, length, SsnsService.APP_WIFI);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+    
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getwifiprod(
@@ -506,7 +578,26 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi/feature/name/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<ProdSummary> getwififeatureSummary(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "name", required = true) String name,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;     
+        ArrayList<ProdSummary> ret = afWebService.getSsnsprodByFeatureNameSummary(username, idSt, name, SsnsService.APP_WIFI, length);
 
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+    
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getwififeature(
@@ -528,6 +619,28 @@ public class IndexController {
     }
 
 /////////////////////////////////////    
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/app/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<ProdSummary> getappprodsummary(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "length", required = false) String lengthSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;
+        if (lengthSt != null) {
+            length = Integer.parseInt(lengthSt);
+        }
+        ArrayList<ProdSummary> ret = afWebService.getSsnsprodSummary(username, idSt, length, SsnsService.APP_APP);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+    
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/app", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getappprod(
@@ -623,7 +736,27 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/app/feature/name/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<ProdSummary> getappfeatureSummary(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "name", required = true) String name,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;
 
+        ArrayList<ProdSummary> ret = afWebService.getSsnsprodByFeatureNameSummary(username, idSt, name, SsnsService.APP_APP, length);
+
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+    
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/app/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getappfeature(
@@ -645,7 +778,29 @@ public class IndexController {
         return ret;
     }
 ////////////////////////////////////
-
+    
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv//prod/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<ProdSummary> getprodSummary(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "length", required = false) String lengthSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;
+        if (lengthSt != null) {
+            length = Integer.parseInt(lengthSt);
+        }
+        ArrayList<ProdSummary> ret = afWebService.getSsnsprodSummary(username, idSt, length, SsnsService.APP_PRODUCT);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+    
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getprodttv(
@@ -722,7 +877,25 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/feature/name/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<ProdSummary> getprodttvfeatureNameSummary(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "name", required = true) String name,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;
+        ArrayList<ProdSummary> ret = afWebService.getSsnsprodByFeatureNameSummary(username, idSt, name, SsnsService.APP_PRODUCT, length);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+    
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsnsAcc> getprodttvfeatureName(

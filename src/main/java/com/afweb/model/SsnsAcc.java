@@ -12,17 +12,4 @@ import com.vpumlmodel.afweb.*;
  * @author eddyko
  */
 public class SsnsAcc extends ssaccdb {
-
-    public SsnsAcc() {
-        this.setUid("");
-        this.setApp("");
-        this.setBanid("");
-        this.setCusid("");
-        this.setData("");
-        this.setDown("");
-        this.setName("");
-        this.setOper("");
-        this.setRet("");
-        this.setTiid("");
-    }
 }

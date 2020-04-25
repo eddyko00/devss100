@@ -412,7 +412,7 @@ public class ServiceAFweb {
                     }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
-                    boolean monflag = true;
+                    boolean monflag = false;
                     if (monflag == true) {
                         SsnsRegression regression = new SsnsRegression();
 //                        regression.startMonitor(this);
@@ -1840,6 +1840,9 @@ public class ServiceAFweb {
             return null;
         }
         CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
         if (IDSt != null) {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
@@ -1855,6 +1858,9 @@ public class ServiceAFweb {
             return null;
         }
         CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
         if (IDSt != null) {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
@@ -1874,11 +1880,63 @@ public class ServiceAFweb {
 
     }
 
+    public static ArrayList<ProdSummary> getProdSummaryFromAccList(ArrayList<SsnsAcc> ssnsAccObjList) {
+        ArrayList<ProdSummary> psummaryList = new ArrayList();
+        if (ssnsAccObjList == null) {
+            return null;
+        }
+        for (int i = 0; i < ssnsAccObjList.size(); i++) {
+            SsnsAcc accObj = ssnsAccObjList.get(i);
+            ProdSummary sumObj = new ProdSummary();
+            if (accObj != null) {
+                sumObj.setBanid(accObj.getBanid());
+                sumObj.setCusid(accObj.getCusid());
+                sumObj.setId(accObj.getId());
+                sumObj.setOper(accObj.getOper());
+                sumObj.setTiid(accObj.getTiid());
+                ProductData pData = null;
+                String output = accObj.getData();
+                try {
+                    pData = new ObjectMapper().readValue(output, ProductData.class);
+                    String postParamSt = ProductDataHelper.getPostParamRestore(pData.getPostParam());
+                    sumObj.setPostParam(postParamSt);
+                    ArrayList<String> flowN = ProductDataHelper.getFlowRestore(pData.getFlow());
+                    String st = new ObjectMapper().writeValueAsString(flowN);
+                    sumObj.setStatus(st);
+                } catch (IOException ex) {
+                }
+            }
+            psummaryList.add(sumObj);
+        }
+
+        return psummaryList;
+    }
+
+    public ArrayList<ProdSummary> getSsnsprodSummary(String EmailUserName, String IDSt, int length, String prod) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByApp(prod, length);
+        return getProdSummaryFromAccList(ssnsAccObjList);
+    }
+
     public ArrayList<SsnsAcc> getSsnsprod(String EmailUserName, String IDSt, int length, String prod) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
         CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
         if (IDSt != null) {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
@@ -1889,11 +1947,31 @@ public class ServiceAFweb {
 
     }
 
+    public ArrayList<ProdSummary> getSsnsprodByFeatureNameSummary(String EmailUserName, String IDSt, String name, String prod, int length) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(prod, name, length);
+        return ServiceAFweb.getProdSummaryFromAccList(SsnsAcclist);
+    }
+
     public ArrayList<SsnsAcc> getSsnsprodByFeatureName(String EmailUserName, String IDSt, String name, String prod, int length) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
         CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
         if (IDSt != null) {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
@@ -1909,6 +1987,9 @@ public class ServiceAFweb {
             return null;
         }
         CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
         if (IDSt != null) {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
@@ -1918,13 +1999,15 @@ public class ServiceAFweb {
 
         return reportList;
     }
-    
-    
+
     public ArrayList<String> getSsReportByFeature(String EmailUserName, String IDSt, String prod) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
         CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
         if (IDSt != null) {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
@@ -1949,6 +2032,9 @@ public class ServiceAFweb {
             return null;
         }
         CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
         if (IDSt != null) {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
@@ -1973,6 +2059,9 @@ public class ServiceAFweb {
             return null;
         }
         CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
         if (IDSt != null) {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
@@ -1993,6 +2082,9 @@ public class ServiceAFweb {
             return null;
         }
         CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
         if (IDSt != null) {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
@@ -2013,6 +2105,9 @@ public class ServiceAFweb {
             return null;
         }
         CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
         if (IDSt != null) {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
@@ -2070,6 +2165,9 @@ public class ServiceAFweb {
             return null;
         }
         CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
         if (IDSt != null) {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
@@ -2115,6 +2213,9 @@ public class ServiceAFweb {
             return null;
         }
         CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
         if (IDSt != null) {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;
@@ -2160,6 +2261,9 @@ public class ServiceAFweb {
             return null;
         }
         CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
         if (IDSt != null) {
             if (IDSt.equals(custObj.getId() + "") != true) {
                 return null;

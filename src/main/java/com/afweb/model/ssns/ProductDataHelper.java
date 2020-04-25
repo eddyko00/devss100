@@ -19,7 +19,7 @@ public class ProductDataHelper {
             ArrayList<String> detailRespNew = new ArrayList();
             for (int i = 0; i < detailResp.size(); i++) {
                 String flowSt = detailResp.get(i);
-                flowSt = ServiceAFweb.replaceAll("^", "\"", flowSt);
+                flowSt = flowSt.replace('^', '"');
                 detailRespNew.add(flowSt);
             }
             return detailRespNew;
@@ -32,7 +32,7 @@ public class ProductDataHelper {
             ArrayList<String> callbackNew = new ArrayList();
             for (int i = 0; i < callback.size(); i++) {
                 String flowSt = callback.get(i);
-                flowSt = ServiceAFweb.replaceAll("^", "\"", flowSt);
+                flowSt = flowSt.replace('^', '"');
                 callbackNew.add(flowSt);
             }
             return callbackNew;
@@ -41,16 +41,16 @@ public class ProductDataHelper {
     }
 
     public static String getPostParamRestore( String postParam) {
-        String postParamSt = ServiceAFweb.replaceAll("^", "\"", postParam);
+        String postParamSt = postParam.replace('^', '"');
         return postParamSt;
     }
 
-    public ArrayList<String> getFlowRestore(ArrayList<String> flow) {
+    public static ArrayList<String> getFlowRestore(ArrayList<String> flow) {
         if (flow != null) {
             ArrayList<String> flowNew = new ArrayList();
             for (int i = 0; i < flow.size(); i++) {
                 String flowSt = flow.get(i);
-                flowSt = ServiceAFweb.replaceAll("^", "\"", flowSt);
+                flowSt = flowSt.replace('^', '"');
                 flowNew.add(flowSt);
             }
             return flowNew;

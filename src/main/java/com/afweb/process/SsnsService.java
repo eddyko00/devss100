@@ -533,7 +533,6 @@ public class SsnsService {
             try {
                 pData = new ObjectMapper().readValue(output, ProductData.class);
             } catch (IOException ex) {
-                logger.info("> TestFeatureSsnsProdTTVC Exception " + ex.getMessage());
             }
             if (pData == null) {
                 return "";
