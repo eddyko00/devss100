@@ -591,6 +591,11 @@ public class ServiceAFweb {
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
                 ;
                 processFeatureTTVC();
+                
+                //// process monitor
+                SsnsRegression regression = new SsnsRegression();
+                regression.processMonitorTesting(this);
+                
             } else if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                 //10 Sec * 5 ~ 1 minutes
                 processETL();
@@ -1882,6 +1887,50 @@ public class ServiceAFweb {
         SsReport reportObj = getSsnsDataImp().getSsReportByID(id);
         return reportObj;
 
+    }
+
+    public int getSsReportMonStop(String EmailUserName, String IDSt) {
+
+        if (getServerObj().isSysMaintenance() == true) {
+            return 0;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return 0;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return 0;
+            }
+        }
+        if (custObj.getType() != CustomerObj.INT_ADMIN_USER) {
+            return 10;
+        }
+        String name = CKey.ADMIN_USERNAME;
+        SsnsRegression regression = new SsnsRegression();
+        return regression.stopMonitor(this, name);
+    }
+
+    public int getSsReportMonStart(String EmailUserName, String IDSt) {
+
+        if (getServerObj().isSysMaintenance() == true) {
+            return 0;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return 0;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return 0;
+            }
+        }
+        if (custObj.getType() != CustomerObj.INT_ADMIN_USER) {
+            return 10;
+        }
+        String name = CKey.ADMIN_USERNAME;
+        SsnsRegression regression = new SsnsRegression();
+        return regression.startMonitor(this, name);
     }
 
     public ArrayList<SsReport> getSsReportMon(String EmailUserName, String IDSt) {
