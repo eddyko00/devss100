@@ -53,6 +53,7 @@ public class IndexController {
         arrayString.add("/cust/login?email={email}&pass={pass}");
         arrayString.add("/cust/{username}/login&pass={pass}");
 
+        arrayString.add("/cust/{username}/id/{id}/mon");
         arrayString.add("/cust/{username}/id/{id}/serv");
 
         arrayString.add("/cust/{username}/id/{id}/serv/prod?length={0 for all}");
@@ -100,176 +101,46 @@ public class IndexController {
 
         return arrayString;
     }
-
-    @RequestMapping(value = "/cust/{username}/sys/mysql", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    String getmysql(
-            @PathVariable("username") String username,
-            @RequestBody String input
-    ) {
-        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
-        RequestObj sqlObj = new RequestObj();
-        try {
-            sqlObj = new ObjectMapper().readValue(input, RequestObj.class);
-        } catch (IOException ex) {
-            return "";
-        }
-        CustomerObj cust = afWebService.getCustomerIgnoreMaintenance(username, null);
-        if (cust != null) {
-            if (cust.getType() == CustomerObj.INT_ADMIN_USER) {
-//                System.out.println(sqlObj.getReq());
-                if (sqlObj.getCmd().equals("1")) {
-                    return afWebService.SystemRemoteGetMySQL(sqlObj.getReq());
-                } else if (sqlObj.getCmd().equals("2")) {
-                    return afWebService.SystemRemoteUpdateMySQL(sqlObj.getReq());
-                } else if (sqlObj.getCmd().equals("3")) {
-                    return afWebService.SystemRemoteUpdateMySQLList(sqlObj.getReq());
-                }
-            }
-        }
-        return "";
-    }
-
-    @RequestMapping(value = "/server", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    ArrayList getServerObj() {
-
-        return afWebService.getServerList();
-    }
-
-    @RequestMapping(value = "/server/mysqldb", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    String getServerLocalDbURL() {
-        return ServiceAFweb.URL_LOCALDB;
-    }
-
-    @RequestMapping(value = "/server/mysqldb/set", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    String setServerLocalDbURL(
-            @RequestParam(value = "url", required = true) String urlSt,
-            HttpServletRequest request, HttpServletResponse response
-    ) {
-
-        ServiceAFweb.URL_LOCALDB = urlSt.trim();
-        //restart ServiceAFweb
-        afWebService.SystemStart();
-        return "done...";
-    }
-
-    @RequestMapping(value = "/server/filepath", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    String getServerFileP() {
-        return ServiceAFweb.FileLocalPath;
-    }
-
-    @RequestMapping(value = "/server/sysfilepath", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    String getServerFileDir() {
-        String userDirectory = Paths.get("").toAbsolutePath().toString();
-        return userDirectory;
-    }
-
-    @RequestMapping(value = "/server/filepath/set", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    String setServerfileP(
-            @RequestParam(value = "path", required = true) String pathSt,
-            HttpServletRequest request, HttpServletResponse response
-    ) {
-
-        ServiceAFweb.FileLocalPath = pathSt.trim();
-        return "done...";
-    }
-
-    @RequestMapping(value = "/server/url0", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    String getServerURL() {
-        String url0 = RESTtimer.serverURL_0;
-        if (url0.length() == 0) {
-            url0 = ServiceAFweb.SERVERDB_URL;
-        }
-        return url0;
-    }
-
-    @RequestMapping(value = "/server/url0/set", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    String setServerURL(
-            @RequestParam(value = "url", required = true) String urlSt,
-            HttpServletRequest request, HttpServletResponse response
-    ) {
-
-        RESTtimer.serverURL_0 = urlSt.trim();
-        return "done...";
-    }
-
-    @RequestMapping(value = "/timerhandler", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    WebStatus timerHandlerREST(
-            @RequestParam(value = "resttimerMsg", required = false) String resttimerMsg
-    ) {
-
-        WebStatus msg = new WebStatus();
-        msg.setResult(true);
-        msg.setResultID(ConstantKey.ENABLE);
-
-        //process timer handler
-        int timerCnt = afWebService.timerHandler(resttimerMsg);
-
-        msg.setResponse("timerCnt " + timerCnt);
-        return msg;
-    }
-
-    @RequestMapping(value = "/cust/login", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    LoginObj getCustObjLogin(
-            @RequestParam(value = "email", required = true) String emailSt,
-            @RequestParam(value = "pass", required = true) String passSt,
-            HttpServletRequest request, HttpServletResponse response
-    ) {
-        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
-        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
-            LoginObj loginObj = new LoginObj();
-            loginObj.setCustObj(null);
-            WebStatus webStatus = new WebStatus();
-            webStatus.setResultID(100);
-            loginObj.setWebMsg(webStatus);
-            return loginObj;
-        }
-        if (emailSt == null) {
-            return null;
-        }
-        if (passSt == null) {
-            return null;
-        }
-        LoginObj loginObj = afWebService.getCustomerEmailLogin(emailSt, passSt);
-        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
-        return loginObj;
-    }
-
-    @RequestMapping(value = "/cust/{username}/login", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    LoginObj getCustObjUserLogin(
-            @PathVariable("username") String username,
-            @RequestParam(value = "pass", required = true) String passSt,
-            HttpServletRequest request, HttpServletResponse response
-    ) {
-        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
-        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
-            LoginObj loginObj = new LoginObj();
-            loginObj.setCustObj(null);
-            WebStatus webStatus = new WebStatus();
-            webStatus.setResultID(100);
-            loginObj.setWebMsg(webStatus);
-            return loginObj;
-        }
-        if (passSt == null) {
-            return null;
-        }
-        LoginObj loginObj = afWebService.getCustomerLogin(username, passSt);
-        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
-        return loginObj;
-    }
-
 ////////////////////// 
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/mon", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<SsReport> getAllmon(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+
+        ArrayList<SsReport> ret = afWebService.getSsReportMon(username, idSt);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+    
+    @RequestMapping(value = "/cust/{username}/id/{id}/mon/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    SsReport getmonpid(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @PathVariable("pid") String pidSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        SsReport ret = afWebService.getSsReportById(username, idSt, pidSt);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }    
+    
+////////////////////// 
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<String> getAllprod(
@@ -287,6 +158,7 @@ public class IndexController {
         if (lengthSt != null) {
             length = Integer.parseInt(lengthSt);
         }
+
         ArrayList<String> ret = afWebService.getSsnsprodAll(username, idSt, length);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
@@ -941,7 +813,6 @@ public class IndexController {
     }
 
     //////////////
-
     @RequestMapping(value = "/cust/{username}/sys/resetdb", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     WebStatus SystemResetDB(@PathVariable("username") String username) {
@@ -966,7 +837,8 @@ public class IndexController {
             }
         }
         return null;
-    }    
+    }
+
     @RequestMapping(value = "/cust/{username}/sys/stop", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     WebStatus SystemStop(@PathVariable("username") String username) {
@@ -1164,6 +1036,175 @@ public class IndexController {
                 + AFwebService.getServerObj().getLastServUpdateESTdate() + "</br>"
                 + AFwebService.getServerObj().getTimerMsg() + "</br>" + AFwebService.getServerObj().getTimerThreadMsg());
         return model;
+    }
+///////////////////////
+
+    @RequestMapping(value = "/cust/{username}/sys/mysql", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String getmysql(
+            @PathVariable("username") String username,
+            @RequestBody String input
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        RequestObj sqlObj = new RequestObj();
+        try {
+            sqlObj = new ObjectMapper().readValue(input, RequestObj.class);
+        } catch (IOException ex) {
+            return "";
+        }
+        CustomerObj cust = afWebService.getCustomerIgnoreMaintenance(username, null);
+        if (cust != null) {
+            if (cust.getType() == CustomerObj.INT_ADMIN_USER) {
+//                System.out.println(sqlObj.getReq());
+                if (sqlObj.getCmd().equals("1")) {
+                    return afWebService.SystemRemoteGetMySQL(sqlObj.getReq());
+                } else if (sqlObj.getCmd().equals("2")) {
+                    return afWebService.SystemRemoteUpdateMySQL(sqlObj.getReq());
+                } else if (sqlObj.getCmd().equals("3")) {
+                    return afWebService.SystemRemoteUpdateMySQLList(sqlObj.getReq());
+                }
+            }
+        }
+        return "";
+    }
+
+    @RequestMapping(value = "/server", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList getServerObj() {
+
+        return afWebService.getServerList();
+    }
+
+    @RequestMapping(value = "/server/mysqldb", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String getServerLocalDbURL() {
+        return ServiceAFweb.URL_LOCALDB;
+    }
+
+    @RequestMapping(value = "/server/mysqldb/set", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String setServerLocalDbURL(
+            @RequestParam(value = "url", required = true) String urlSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+
+        ServiceAFweb.URL_LOCALDB = urlSt.trim();
+        //restart ServiceAFweb
+        afWebService.SystemStart();
+        return "done...";
+    }
+
+    @RequestMapping(value = "/server/filepath", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String getServerFileP() {
+        return ServiceAFweb.FileLocalPath;
+    }
+
+    @RequestMapping(value = "/server/sysfilepath", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String getServerFileDir() {
+        String userDirectory = Paths.get("").toAbsolutePath().toString();
+        return userDirectory;
+    }
+
+    @RequestMapping(value = "/server/filepath/set", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String setServerfileP(
+            @RequestParam(value = "path", required = true) String pathSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+
+        ServiceAFweb.FileLocalPath = pathSt.trim();
+        return "done...";
+    }
+
+    @RequestMapping(value = "/server/url0", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String getServerURL() {
+        String url0 = RESTtimer.serverURL_0;
+        if (url0.length() == 0) {
+            url0 = ServiceAFweb.SERVERDB_URL;
+        }
+        return url0;
+    }
+
+    @RequestMapping(value = "/server/url0/set", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String setServerURL(
+            @RequestParam(value = "url", required = true) String urlSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+
+        RESTtimer.serverURL_0 = urlSt.trim();
+        return "done...";
+    }
+
+    @RequestMapping(value = "/timerhandler", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    WebStatus timerHandlerREST(
+            @RequestParam(value = "resttimerMsg", required = false) String resttimerMsg
+    ) {
+
+        WebStatus msg = new WebStatus();
+        msg.setResult(true);
+        msg.setResultID(ConstantKey.ENABLE);
+
+        //process timer handler
+        int timerCnt = afWebService.timerHandler(resttimerMsg);
+
+        msg.setResponse("timerCnt " + timerCnt);
+        return msg;
+    }
+
+    @RequestMapping(value = "/cust/login", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    LoginObj getCustObjLogin(
+            @RequestParam(value = "email", required = true) String emailSt,
+            @RequestParam(value = "pass", required = true) String passSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            LoginObj loginObj = new LoginObj();
+            loginObj.setCustObj(null);
+            WebStatus webStatus = new WebStatus();
+            webStatus.setResultID(100);
+            loginObj.setWebMsg(webStatus);
+            return loginObj;
+        }
+        if (emailSt == null) {
+            return null;
+        }
+        if (passSt == null) {
+            return null;
+        }
+        LoginObj loginObj = afWebService.getCustomerEmailLogin(emailSt, passSt);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return loginObj;
+    }
+
+    @RequestMapping(value = "/cust/{username}/login", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    LoginObj getCustObjUserLogin(
+            @PathVariable("username") String username,
+            @RequestParam(value = "pass", required = true) String passSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            LoginObj loginObj = new LoginObj();
+            loginObj.setCustObj(null);
+            WebStatus webStatus = new WebStatus();
+            webStatus.setResultID(100);
+            loginObj.setWebMsg(webStatus);
+            return loginObj;
+        }
+        if (passSt == null) {
+            return null;
+        }
+        LoginObj loginObj = afWebService.getCustomerLogin(username, passSt);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return loginObj;
     }
 
 }

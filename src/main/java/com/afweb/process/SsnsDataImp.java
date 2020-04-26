@@ -202,7 +202,17 @@ public class SsnsDataImp {
     public ArrayList<SsnsAcc> getSsnsAccObjList(String name, String uid) {
         return ssnsdb.getSsnsAccObjList(name, uid);
     }
-
+    
+    public SsReport getSsReportByID(int id) {
+        ArrayList<SsReport> ssReportObjList = ssnsdb.getSsReportObjListByID(id);
+        if (ssReportObjList != null) {
+            if (ssReportObjList.size() > 0) {
+                return ssReportObjList.get(0);
+            }
+        }
+        return null;
+    }
+    
     public ArrayList<SsReport> getSsReportObjListByUid(String name, String uid) {
         return ssnsdb.getSsReportObjListByUid(name, uid);
     }

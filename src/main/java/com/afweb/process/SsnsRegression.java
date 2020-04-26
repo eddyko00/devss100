@@ -49,9 +49,35 @@ public class SsnsRegression {
     public static String REPORT_REPORT = "report";
     public static String REPORT_TESE_CASE = "test";
 
+    public int stopMonitor(ServiceAFweb serviceAFweb, String name) { //CKey.ADMIN_USERNAME) {
+        try {
+            //creat monitor
+
+            //check if outstanding testing
+            SsReport userReportObj = null;
+            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, REPORT_USER);
+            if (ssReportObjList != null) {
+                if (ssReportObjList.size() > 0) {
+                    userReportObj = ssReportObjList.get(0);
+                    userReportObj.setStatus(ConstantKey.COMPLETED);
+                    userReportObj.setType(ConstantKey.OPEN);
+                    Calendar dateNow = TimeConvertion.getCurrentCalendar();
+                    long ctime = dateNow.getTimeInMillis();
+                    userReportObj.setUpdatedatel(ctime);
+                    userReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
+                    int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(userReportObj.getId(), userReportObj.getData(),
+                            userReportObj.getStatus(), userReportObj.getType());
+                }
+            }
+            return 1;
+        } catch (Exception ex) {
+            logger.info("> stopMonitor Exception " + ex.getMessage());
+        }
+        return 0;
+    }
+
     public int startMonitor(ServiceAFweb serviceAFweb, String name) { //CKey.ADMIN_USERNAME) {
         try {
-
             //creat monitor
             ArrayList<String> testIdList = new ArrayList();
             ArrayList<String> testFeatList = new ArrayList();
@@ -99,7 +125,7 @@ public class SsnsRegression {
                             testIdList.add(st);
                             added++;
 ////////////////////////////////////////////////
-                            break;  // just for testing
+//                            break;  // just for testing
 ////////////////////////////////////////////////
                         }
                         logger.info("> startMonitor  " + featN + "id added " + added);
@@ -124,14 +150,13 @@ public class SsnsRegression {
             st = new ObjectMapper().writeValueAsString(tObj);
             testIdList.add(st);
 
-            reportdata.setFeatList(testFeatList);
-            reportdata.setTestListObj(testIdList);
-
             SsReport reportObj = new SsReport();
             reportObj.setName(name);
             reportObj.setStatus(ConstantKey.INITIAL);
             reportObj.setUid(REPORT_REPORT);  // 
 
+//            reportdata.setFeatList(testFeatList);
+            reportdata.setTestListObj(testIdList);
             String dataSt = new ObjectMapper().writeValueAsString(reportdata);
             reportObj.setData(dataSt);
 
@@ -144,12 +169,18 @@ public class SsnsRegression {
             int ret = getSsnsDataImp().insertSsReportObject(reportObj);
 
             //update userReportObj to start
+            reportdata = new ReportData();
             if (userReportObj == null) {
                 userReportObj = new SsReport();
                 userReportObj.setName(name);
                 userReportObj.setStatus(ConstantKey.INITIAL);
                 userReportObj.setType(ConstantKey.OPEN);
                 userReportObj.setUid(REPORT_USER);  // 
+
+                reportdata.setFeatList(testFeatList);
+//            reportdata.setTestListObj(testIdList);            
+                dataSt = new ObjectMapper().writeValueAsString(reportdata);
+                userReportObj.setData(dataSt);
 
                 userReportObj.setUpdatedatel(ctime);
                 userReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
@@ -161,11 +192,19 @@ public class SsnsRegression {
                 userReportObj.setStatus(ConstantKey.INITIAL);
                 userReportObj.setType(ConstantKey.OPEN);
                 userReportObj.setUpdatedatel(ctime);
+
+                reportdata.setFeatList(testFeatList);
+//            reportdata.setTestListObj(testIdList);       
+                dataSt = new ObjectMapper().writeValueAsString(reportdata);
+                userReportObj.setData(dataSt);
+
                 userReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
                 ret = getSsnsDataImp().updatSsReportDataStatusTypeById(userReportObj.getId(), userReportObj.getData(),
                         userReportObj.getStatus(), userReportObj.getType());
 
             }
+
+            ///// remove report except the last 3
             return 1;
         } catch (Exception ex) {
             logger.info("> startMonitor Exception " + ex.getMessage());
@@ -241,21 +280,22 @@ public class SsnsRegression {
             String name = moniterNameArray.get(0);
             moniterNameArray.remove(0);
 //
-            SsReport userReportObj = null;
+            SsReport reportReportObj = null;
             String uid = REPORT_REPORT;
             ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, uid);
             if (ssReportObjList != null) {
                 if (ssReportObjList.size() > 0) {
-                    userReportObj = ssReportObjList.get(0);
+                    reportReportObj = ssReportObjList.get(0);
                 }
             }
 
-            if (userReportObj == null) {
+            if (reportReportObj == null) {
                 return 0;
             }
-            idList = getMoniterIDList(userReportObj);
+            idList = getMoniterIDList(reportReportObj);
+            if (idList == null) {
 
-            if (idList != null) {
+            } else {
 
                 String LockName = "ETL_MONITOR_" + name;
                 Calendar dateNow = TimeConvertion.getCurrentCalendar();
@@ -274,6 +314,13 @@ public class SsnsRegression {
                 long currentTime = System.currentTimeMillis();
                 long lockDate1Min = TimeConvertion.addMinutes(currentTime, 1);
 
+                SsReport userReportObj = null;
+                ArrayList<SsReport> ssReportUserObjList = getSsnsDataImp().getSsReportObjListByUid(name, REPORT_USER);
+                if (ssReportUserObjList != null) {
+                    if (ssReportUserObjList.size() > 0) {
+                        userReportObj = ssReportUserObjList.get(0);
+                    }
+                }
                 while (idList.size() > 0) {
                     currentTime = System.currentTimeMillis();
                     if (lockDate1Min < currentTime) {
@@ -281,28 +328,29 @@ public class SsnsRegression {
                     }
                     String tObjSt = idList.get(0);
                     idList.remove(0);
-                    execMonitorTesting(serviceAFweb, tObjSt, userReportObj);
+
+                    execMonitorTesting(serviceAFweb, tObjSt, reportReportObj, userReportObj);
+                    AFSleep();
                 }
 
-                if (userReportObj != null) {
-                    String dataSt = userReportObj.getData();
+                if (reportReportObj != null) {
+                    String dataSt = reportReportObj.getData();
                     if (dataSt.length() > 0) {
                         ReportData reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
                         reportdata.setTestListObj(idList);
                         dataSt = new ObjectMapper().writeValueAsString(reportdata);
-                        userReportObj.setData(dataSt);
+                        reportReportObj.setData(dataSt);
                     }
                     dateNow = TimeConvertion.getCurrentCalendar();
                     long ctime = dateNow.getTimeInMillis();
-                    userReportObj.setUpdatedatel(ctime);
-                    userReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
-                    int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(userReportObj.getId(), userReportObj.getData(),
-                            userReportObj.getStatus(), userReportObj.getType());
+                    reportReportObj.setUpdatedatel(ctime);
+                    reportReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
+                    int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(reportReportObj.getId(), reportReportObj.getData(),
+                            reportReportObj.getStatus(), reportReportObj.getType());
                 }
                 serviceAFweb.removeNameLock(LockName, ConstantKey.MON_LOCKTYPE);
             }
-            AFSleep();
-
+            result = 1;
         } catch (Exception ex) {
             logger.info("> processMonitorTesting Exception " + ex.getMessage());
         }
@@ -311,7 +359,7 @@ public class SsnsRegression {
 
     }
 
-    public void execMonitorTesting(ServiceAFweb serviceAFweb, String tObjSt, SsReport userReportObj) {
+    public void execMonitorTesting(ServiceAFweb serviceAFweb, String tObjSt, SsReport reportReportObj, SsReport usreReportObj) {
         try {
             testData tObj = new ObjectMapper().readValue(tObjSt, testData.class);
             if (tObj.getType() == ConstantKey.INITIAL) {
@@ -321,23 +369,33 @@ public class SsnsRegression {
             if (tObj.getType() == ConstantKey.COMPLETED) {
                 // send communication to completed
 
-                if (userReportObj != null) {
+                if (reportReportObj != null) {
 
-                    userReportObj.setStatus(ConstantKey.COMPLETED);
-                    userReportObj.setType(ConstantKey.OPEN);
+                    reportReportObj.setStatus(ConstantKey.COMPLETED);
+                    reportReportObj.setType(ConstantKey.OPEN);
 
-                    userReportObj.setData("");
+                    ReportData reportdata = new ReportData();
+                    String dataSt = new ObjectMapper().writeValueAsString(reportdata);
+                    reportReportObj.setData(dataSt);
+
                     Calendar dateNow = TimeConvertion.getCurrentCalendar();
                     long ctime = dateNow.getTimeInMillis();
-                    userReportObj.setUpdatedatel(ctime);
-                    userReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
-                    userReportObj.setRet("complete:" + new java.sql.Date(ctime));
-                    int ret = getSsnsDataImp().updatSsReportDataStatusTypeRetById(userReportObj.getId(), userReportObj.getData(),
-                            userReportObj.getStatus(), userReportObj.getType(), userReportObj.getRet());
+                    reportReportObj.setUpdatedatel(ctime);
+                    reportReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
+                    reportReportObj.setRet("complete:" + new java.sql.Date(ctime));
+                    int ret = getSsnsDataImp().updatSsReportDataStatusTypeRetById(reportReportObj.getId(), reportReportObj.getData(),
+                            reportReportObj.getStatus(), reportReportObj.getType(), reportReportObj.getRet());
 
                 }
                 return;
             }
+
+            if (usreReportObj != null) {
+                if (usreReportObj.getStatus() != ConstantKey.INITIAL) {
+                    return;
+                }
+            }
+
             int id = tObj.getAccid();
 
             SsnsAcc accObj = getSsnsDataImp().getSsnsAccObjByID(id);
@@ -382,11 +440,12 @@ public class SsnsRegression {
                                         }
                                     }
                                 }
+                                passSt = accObj.getName() + ":" + passSt;
 //                                if (passSt.equals("false")) {
 //                                    logger.info("> execMonitorTesting false " + feat + " name:" + accObj.getName());
 //                                }
                                 SsReport reportObj = new SsReport();
-                                String nameRepId = userReportObj.getName() + "_" + userReportObj.getId();
+                                String nameRepId = reportReportObj.getName() + "_" + reportReportObj.getId();
                                 reportObj.setName(nameRepId);
                                 reportObj.setStatus(ConstantKey.OPEN);
                                 reportObj.setRet(passSt);
@@ -398,7 +457,7 @@ public class SsnsRegression {
                                 reportObj.setOper(accObj.getOper());
                                 reportObj.setTiid(accObj.getTiid());
 
-                                reportObj.setType(userReportObj.getId()); // reference to report test case
+                                reportObj.setType(reportReportObj.getId()); // reference to report test case
                                 reportObj.setUid(REPORT_TESE_CASE);
 
                                 ProductData pDataNew = new ProductData();
@@ -437,10 +496,10 @@ public class SsnsRegression {
                 return;
             }
 
-            SsReport repObj = reportObjList.get(0);
+            SsReport reportReportObj = reportObjList.get(0);
 
             ArrayList<String> testReportList = new ArrayList();
-            String nameRepId = name + "_" + repObj.getId();
+            String nameRepId = name + "_" + reportReportObj.getId();
 
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_PRODUCT, testReportList);
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WIFI, testReportList);
@@ -448,24 +507,23 @@ public class SsnsRegression {
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_TTVC, testReportList);
             logger.info("> reportList  " + testReportList.size());
 
-            if (repObj.getStatus() == ConstantKey.COMPLETED) {
+            if (reportReportObj.getStatus() == ConstantKey.COMPLETED) {
                 ReportData reportdata = new ReportData();
 
-                String dataSt = repObj.getData();
+                String dataSt = reportReportObj.getData();
                 if (dataSt.length() > 0) {
                     reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
                 }
                 reportdata.setReportList(testReportList);
-
                 dataSt = new ObjectMapper().writeValueAsString(reportdata);
-                repObj.setData(dataSt);
+                reportReportObj.setData(dataSt);
 
                 Calendar dateNow = TimeConvertion.getCurrentCalendar();
                 long ctime = dateNow.getTimeInMillis();
-                repObj.setUpdatedatel(ctime);
-                repObj.setUpdatedatedisplay(new java.sql.Date(ctime));
-                int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(repObj.getId(), repObj.getData(),
-                        repObj.getStatus(), repObj.getType());
+                reportReportObj.setUpdatedatel(ctime);
+                reportReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
+                int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(reportReportObj.getId(), reportReportObj.getData(),
+                        reportReportObj.getStatus(), reportReportObj.getType());
             }
 ////////////////
 ///////// put back to the main user
@@ -478,22 +536,24 @@ public class SsnsRegression {
             if (reportObjList.size() == 0) {
                 return;
             }
+            SsReport userReportObj = reportObjList.get(0);
+
             ReportData reportdata = new ReportData();
 
-            String dataSt = repObj.getData();
+            String dataSt = userReportObj.getData();
             if (dataSt.length() > 0) {
                 reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
             }
             reportdata.setReportList(testReportList);
-
             dataSt = new ObjectMapper().writeValueAsString(reportdata);
-            repObj.setData(dataSt);
+            userReportObj.setData(dataSt);
+
             Calendar dateNow = TimeConvertion.getCurrentCalendar();
             long ctime = dateNow.getTimeInMillis();
-            repObj.setUpdatedatel(ctime);
-            repObj.setUpdatedatedisplay(new java.sql.Date(ctime));
-            int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(repObj.getId(), repObj.getData(),
-                    repObj.getStatus(), repObj.getType());
+            userReportObj.setUpdatedatel(ctime);
+            userReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
+            int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(userReportObj.getId(), userReportObj.getData(),
+                    userReportObj.getStatus(), userReportObj.getType());
 
         } catch (Exception ex) {
 
@@ -503,6 +563,7 @@ public class SsnsRegression {
     public void getReportStat(ServiceAFweb serviceAFweb, String nameRepId, String app, ArrayList<String> reportList) {
         int Pass = 0;
         int Fail = 0;
+        float exec = 0;
 
         ArrayList<String> namelist = getSsnsDataImp().getSsReportObjListByFeatureOper(nameRepId, app);
 
@@ -533,7 +594,7 @@ public class SsnsRegression {
         if (operList != null) {
             for (int j = 0; j < operList.size(); j += 2) {
                 String oper = operList.get(j);
-                String reportLine = oper + "," + operList.get(j + 1);
+                String reportLine = app + "," + oper + ",size," + operList.get(j + 1);
                 reportList.add(reportLine);
 
                 ArrayList<SsReport> reportOperList = getSsnsDataImp().getSsReportByFeatureOperIdList(nameRepId, app, oper, 0);
@@ -543,15 +604,20 @@ public class SsnsRegression {
                         reportLine = rObj.getId() + "," + rObj.getCusid() + "," + rObj.getBanid() + "," + rObj.getTiid() + "," + rObj.getRet() + "," + rObj.getExec();
                         reportList.add(reportLine);
 
-                        if (rObj.getRet().equals(R_PASS)) {
+                        if (rObj.getRet().indexOf(R_PASS) != -1) {
                             Pass++;
+                            exec += rObj.getExec();
                         } else {
                             Fail++;
                         }
                     }
                 }
             }
-            String reportLine = app + "," + "Pass " + Pass + ",Fail " + Fail;
+            float execAvg = 0;
+            if (Pass > 0) {
+                execAvg = exec / Pass;
+            }
+            String reportLine = app + ",result," + "pass," + Pass + ",fail," + Fail + ",exec," + execAvg;
             reportList.add(reportLine);
         }
     }

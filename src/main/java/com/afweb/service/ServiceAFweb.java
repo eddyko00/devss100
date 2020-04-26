@@ -8,6 +8,7 @@ package com.afweb.service;
 import com.afweb.process.*;
 import com.afweb.model.*;
 import com.afweb.model.ssns.*;
+import static com.afweb.process.SsnsRegression.*;
 import static com.afweb.process.SsnsService.*;
 
 import com.afweb.util.*;
@@ -412,18 +413,20 @@ public class ServiceAFweb {
                     }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
-                    boolean monflag = true;
+                    boolean monflag = false;
                     if (monflag == true) {
 
 //                        this.getSsnsDataImp().deleteAllSsReport(0);
-
                         SsnsRegression regression = new SsnsRegression();
                         String name = CKey.ADMIN_USERNAME;
-//                        regression.startMonitor(this, name);
+                        regression.startMonitor(this, name);
 
-//                        for (int i = 0; i < 10; i++) {
-//                            regression.processMonitorTesting(this);
-//                        }
+                        for (int i = 0; i < 10; i++) {
+                            regression.processMonitorTesting(this);
+                            if (i == 1) {
+                                regression.stopMonitor(this, name);
+                            }
+                        }
                         regression.reportMoniter(this, name);
 
                     }
@@ -1853,6 +1856,56 @@ public class ServiceAFweb {
         }
         ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByApp(SsnsService.APP_APP, length);
         return ssnsAccObjList;
+
+    }
+
+    public SsReport getSsReportById(String EmailUserName, String IDSt, String pidSt) {
+
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        String name = CKey.ADMIN_USERNAME;
+        int id = 0;
+
+        if (pidSt != null) {
+            id = Integer.parseInt(pidSt);
+        }
+        SsReport reportObj = getSsnsDataImp().getSsReportByID(id);
+        return reportObj;
+
+    }
+
+    public ArrayList<SsReport> getSsReportMon(String EmailUserName, String IDSt) {
+
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        String name = CKey.ADMIN_USERNAME;
+        ArrayList<SsReport> ssReportList = new ArrayList();
+        ArrayList<SsReport> ssUserReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, SsnsRegression.REPORT_USER);
+        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, SsnsRegression.REPORT_REPORT);
+
+        ssReportList.addAll(ssUserReportObjList);
+        ssReportList.addAll(ssReportObjList);
+        return ssReportList;
 
     }
 
