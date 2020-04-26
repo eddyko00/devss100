@@ -677,6 +677,22 @@ public class SsnsDataDB {
         return 0;
     }
 
+    public int updatSsReportDataStatusTypeRetById(int id, String dataSt, int status, int type, String ret) {
+        try {
+
+            dataSt = dataSt.replaceAll("|", "");
+            dataSt = dataSt.replaceAll("'", "");
+            dataSt = dataSt.replaceAll("\"", "#");
+            String sqlCMD = "update ssreport set data='" + dataSt + "', status=" + status + ", type=" + type
+                    + ", ret='" + ret + "'"
+                    + " where id=" + id;
+            return processUpdateDB(sqlCMD);
+        } catch (Exception e) {
+            logger.info("> updatSsReportDataStatusTypeById exception " + e.getMessage());
+        }
+        return 0;
+    }
+
     public int updatSsReportDataStatusTypeById(int id, String dataSt, int status, int type) {
         try {
 
@@ -1020,7 +1036,7 @@ public class SsnsDataDB {
 
     public ArrayList<SsReport> getSsReportObjListByUid(String name, String uid) {
         String sql = "select * from ssreport where name='" + name + "' and uid='" + uid + "'";
-        if ((name != null) || (name.length()==0)) {
+        if ((name != null) || (name.length() == 0)) {
             sql = "select * from ssreport where uid='" + uid + "'";
         }
         ArrayList entries = getAllSsReportSQL(sql, 0);

@@ -76,6 +76,9 @@ public class SsnsDataImp {
     public int deleteSsnsData(String name) {
         return ssnsdb.deleteSsnsData(name);
     }
+    public int updatSsReportDataStatusTypeRetById(int id, String data, int status, int type, String ret) {
+        return ssnsdb.updatSsReportDataStatusTypeRetById(id, data, status, type, ret);
+    }
 
     public int updatSsReportDataStatusTypeById(int id, String data, int status, int type) {
         return ssnsdb.updatSsReportDataStatusTypeById(id, data, status, type);

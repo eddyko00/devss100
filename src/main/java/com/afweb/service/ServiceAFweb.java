@@ -421,7 +421,7 @@ public class ServiceAFweb {
                         String name = CKey.ADMIN_USERNAME;
                         regression.startMonitor(this, name);
 
-                        ArrayList NameArrayTemp = regression.getMoniterNameList("");
+                        ArrayList NameArrayTemp = regression.getMoniterIDList(name);
                         for (int i = 0; i < 10; i++) {
                             regression.processMonitorTesting(this);
                         }
