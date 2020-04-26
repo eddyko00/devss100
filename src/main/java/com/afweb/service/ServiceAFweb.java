@@ -456,7 +456,7 @@ public class ServiceAFweb {
                     }
 /////////
 /////////
-                    boolean wififlag = false;
+                    boolean wififlag = true;
                     if (wififlag == true) {
 
 //                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
@@ -478,7 +478,7 @@ public class ServiceAFweb {
                     }
 /////////
 /////////
-                    boolean appflag = true;
+                    boolean appflag = false;
                     if (appflag == true) {
 
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();

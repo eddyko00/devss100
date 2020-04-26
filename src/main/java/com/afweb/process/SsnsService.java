@@ -734,14 +734,22 @@ public class SsnsService {
     public boolean updateSsnsWifi(String oper, String banid, String uniquid, String prodClass, String serialid, String parm, String postParm, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
             String featTTV = "";
-
+            int connectDevice = 0;
             if (oper.equals(WI_GetDeviceStatus) || oper.equals(WI_Callback) || oper.equals(WI_config)) {
                 if ((banid.length() == 0) && (serialid.length() == 0)) {
                     return false;
                 } else {
                     String outputSt = null;
                     if (oper.equals(WI_GetDeviceStatus)) {
-                        outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, oper, banid, uniquid, prodClass, serialid, parm, null);
+                        outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, oper, banid, uniquid, prodClass, serialid, "", null);
+                        if (parm.length() > 0) {
+                            String outputStConnect = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, oper, banid, uniquid, prodClass, serialid, parm, null);
+                            if (outputStConnect.indexOf("macAddressTxt") != -1) {
+                                connectDevice = 1;
+                            }
+
+                        }
+
                     } else if (oper.equals(WI_config)) {
                         outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, WI_GetDeviceStatus, banid, uniquid, prodClass, serialid, parm, null);
                     }
@@ -759,6 +767,9 @@ public class SsnsService {
                     }
                     featTTV = parseWifiFeature(outputSt, oper, prodClass);
 
+                    if (connectDevice == 1) {
+                        featTTV += ":" + parm;
+                    }
                 }
             } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
                 featTTV = APP_FEAT_TYPE_APP;
@@ -799,7 +810,7 @@ public class SsnsService {
             NAccObj.setBanid(banid);
             NAccObj.setCusid(dataObj.getCusid());
 
-            String deviceInfo = uniquid + "#" + prodClass + "#" + serialid + "#" + parm;
+            String deviceInfo = uniquid + "#" + prodClass + "#" + serialid + "#" + parm + "#end";
             NAccObj.setTiid(deviceInfo);
 
             NAccObj.setUid(dataObj.getUid());
@@ -919,7 +930,6 @@ public class SsnsService {
             cujo = "CujoAgent";
         }
         featTTV += ":" + cujo;
-
         return featTTV;
     }
 
@@ -1047,6 +1057,11 @@ public class SsnsService {
                     + "/productclass/" + prodClass
                     + "/serialnumber/" + serialid
                     + "/status";
+
+            if (parm.indexOf("connectdevicelist") != -1) {
+                url += "?fields=connectDeviceList&connectdevicelist.statuscd=pause";
+            }
+
         } else {
             return "";
         }
@@ -1090,11 +1105,24 @@ public class SsnsService {
         String uniquid = WifiparL[0];
         String prodClass = WifiparL[1];
         String serialid = WifiparL[2];
+        String parm = "";
+
+        if (WifiparL.length > 3) {
+            parm = WifiparL[3];
+        }
 
         String outputSt = null;
+        int connectDevice = 0;
         ArrayList<String> inList = new ArrayList();
         if (Oper.equals(WI_GetDeviceStatus)) {
-            outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, Oper, banid, uniquid, prodClass, serialid, Oper, inList);
+            outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, Oper, banid, uniquid, prodClass, serialid, "", inList);
+            if (parm.length() > 0) {
+                String outputStConnect = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, Oper, banid, uniquid, prodClass, serialid, parm, null);
+                if (outputStConnect.indexOf("macAddressTxt") != -1) {
+                    connectDevice = 1;
+                }
+
+            }
             if (outputSt == null) {
 
                 return "";
@@ -1103,6 +1131,9 @@ public class SsnsService {
             String feat = parseWifiFeature(outputSt, Oper, prodClass);
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 feat += ":testfailed";
+            }
+            if (connectDevice == 1) {
+                feat += ":" + parm;
             }
             outputList.add(feat);
             outputList.addAll(inList);
@@ -1481,7 +1512,11 @@ public class SsnsService {
                 NumofStart++;
             }
         }
-        feat += ":startdate:" + NumofStart;
+        if (NumofStart > 0) {
+            feat += ":startdate:";
+        } else {
+            feat += ":nostartdate:";
+        }
 
         return feat;
     }
