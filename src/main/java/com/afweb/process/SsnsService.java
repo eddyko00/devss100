@@ -1195,8 +1195,12 @@ public class SsnsService {
                         }
                     }
                 }
-                cmd.add("getapp");
-                cmd.add(APP_GET_APP);
+                if ((banid.length() == 0) && (cust.length() == 0)) {
+                    ;
+                } else {
+                    cmd.add("getapp");
+                    cmd.add(APP_GET_APP);
+                }
                 cmd.add("gettimeslot");
                 cmd.add(APP_GET_TIMES);
                 pData.setCmd(cmd);
@@ -1239,8 +1243,12 @@ public class SsnsService {
                             continue;
                         }
                     }
-                    cmd.add("getapp");
-                    cmd.add(APP_GET_APP);
+                    if ((banid.length() == 0) && (cust.length() == 0)) {
+                        ;
+                    } else {
+                        cmd.add("getapp");
+                        cmd.add(APP_GET_APP);
+                    }
                     cmd.add("gettimeslot");
                     cmd.add(APP_GET_TIMES);
                     pData.setCmd(cmd);
@@ -1354,35 +1362,59 @@ public class SsnsService {
             String outputSt = null;
             if (oper.equals(APP_UPDATE) || oper.equals(APP_GET_TIMES) || oper.equals(APP_GET_APP)) {
                 if ((banid.length() == 0) && (cust.length() == 0)) {
-                    featTTV = APP_FEAT_TYPE_APP;
-                    featTTV += ":" + oper;
-                    featTTV += ":" + host;
-                    featTTV += ":ticketID";
 
-                    if (oper.equals(APP_GET_TIMES)) {  //"searchTimeSlot";
-//                        not sure why it does not work so just call get appointment to get the feature
-                        outputSt = SendSsnsAppointmentGetApp(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
+                    outputSt = SendSsnsAppointmentGetTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
+                    if (outputSt == null) {
+                        return false;
                     }
+                    if (outputSt.length() < 80) {
+                        // special case for no appointment {"status":{"statusCd":"200","statusTxt":"OK"},"appointmentList":[]}
+                        return false;
+                    }
+                    if (outputSt.indexOf("responseCode:400500") != -1) {
+                        return false;
+                    }
+                    featTTV = parseAppointmentTimeSlotFeature(outputSt, oper, host);
+
                 } else {
-//                    outputSt = SendSsnsAppointmentGetApp(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
+                    if (oper.equals(APP_GET_TIMES)) {
+                        outputSt = SendSsnsAppointmentGetTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
+                        if (outputSt == null) {
+                            return false;
+                        }
+                        if (outputSt.length() < 80) {
+                            // special case for no appointment {"status":{"statusCd":"200","statusTxt":"OK"},"appointmentList":[]}
+                            return false;
+                        }
+                        if (outputSt.indexOf("responseCode:400500") != -1) {
+                            return false;
+                        }
+                        featTTV = parseAppointmentTimeSlotFeature(outputSt, oper, host);
+                    } else {
+                        outputSt = SendSsnsAppointmentGetApp(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
+                        if (outputSt == null) {
+                            return false;
+                        }
+                        if (outputSt.length() < 80) {
+                            // special case for no appointment {"status":{"statusCd":"200","statusTxt":"OK"},"appointmentList":[]}
+                            return false;
+                        }
+                        if (outputSt.indexOf("responseCode:400500") != -1) {
+                            return false;
+                        }
+                        featTTV = parseAppointmentFeature(outputSt, oper);
+                    }
+
                 }
-                if (outputSt == null) {
-                    return false;
-                }
-                if (outputSt.length() < 80) {
-                    // special case for no appointment {"status":{"statusCd":"200","statusTxt":"OK"},"appointmentList":[]}
-                    return false;
-                }
-                if (outputSt.indexOf("responseCode:400500") != -1) {
-                    return false;
-                }
-                featTTV = parseAppointmentFeature(outputSt, oper);
+
             } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
                 featTTV = APP_FEAT_TYPE_APP;
                 featTTV += ":" + oper;
                 featTTV += ":" + host;
                 if ((banid.length() == 0) && (cust.length() == 0)) {
                     featTTV += ":ContactEng";
+                } else {
+                    featTTV += ":TD";
                 }
             } else {
                 return false;
@@ -1428,6 +1460,30 @@ public class SsnsService {
             logger.info("> updateSsnsAppointment Exception " + ex.getMessage());
         }
         return false;
+    }
+
+    public static String parseAppointmentTimeSlotFeature(String outputSt, String oper, String host) {
+
+        if (outputSt == null) {
+            return null;
+        }
+        ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+        String feat = APP_FEAT_TYPE_APP;
+        feat += ":" + oper;
+        feat += ":" + host;
+        feat += ":ticketID";
+
+        int NumofStart = 0;
+        for (int i = 0; i < outList.size(); i++) {
+            String inLine = outList.get(i);
+            inLine = ServiceAFweb.replaceAll("\"", "", inLine);
+            if (inLine.indexOf("startDate") != -1) {
+                NumofStart++;
+            }
+        }
+        feat += ":startdate:" + NumofStart;
+
+        return feat;
     }
 
     public static String parseAppointmentFeature(String outputSt, String oper) {
@@ -1628,39 +1684,15 @@ public class SsnsService {
                 return "";
             }
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-
-            String feat = dataObj.getName();
-            int NumofStart = 0;
-            for (int i = 0; i < outList.size(); i++) {
-                String inLine = outList.get(i);
-                inLine = ServiceAFweb.replaceAll("\"", "", inLine);
-                if (inLine.indexOf("startDate") != -1) {
-                    NumofStart++;
-                }
-            }
-            feat += ":startdate:" + NumofStart;
-            String featList[] = feat.split(":");
-            String newFeat = "";
-            for (int i = 0; i < featList.length; i++) {
-                String line = featList[i];
-                if (i == 0) {
-                    newFeat += line;
-                    continue;
-                }
-                if (i == 1) {
-                    newFeat += ":" + Oper;
-                    continue;
-                }
-                newFeat += ":" + line;
-            }
+            String feat = parseAppointmentTimeSlotFeature(outputSt, Oper, host);
 
             if (outputSt.indexOf("responseCode:400500") != -1) {
-                newFeat += ":testfailed";
+                feat += ":testfailed";
             }
-            outputList.add(newFeat);
+            outputList.add(feat);
             outputList.addAll(inList);
             outputList.addAll(outList);
-            return newFeat;
+            return feat;
         }
 
         return "";
