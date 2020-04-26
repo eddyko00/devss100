@@ -478,8 +478,12 @@ public class ServiceAFweb {
                     }
 /////////
 /////////
-                    boolean appflag = false;
+                    boolean appflag = true;
                     if (appflag == true) {
+
+//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
+
                         SsnsService ss = new SsnsService();
                         String feature = "";
                         ArrayList appNameArrayTemp = getAllOpenAppArray();
@@ -591,11 +595,11 @@ public class ServiceAFweb {
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
                 ;
                 processFeatureTTVC();
-                
+
                 //// process monitor
                 SsnsRegression regression = new SsnsRegression();
                 regression.processMonitorTesting(this);
-                
+
             } else if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                 //10 Sec * 5 ~ 1 minutes
                 processETL();

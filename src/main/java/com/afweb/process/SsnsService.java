@@ -42,7 +42,6 @@ public class SsnsService {
 
     protected static Logger logger = Logger.getLogger("SsnsService");
 
-    
     public static String APP_WIFI = "wifi";
     public static String APP_APP = "app";
     public static String APP_PRODUCT = "prod";
@@ -552,7 +551,7 @@ public class SsnsService {
             String feat = parseTTVCFeature(outputSt, oper, null);
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 feat += ":testfailed";
-            }            
+            }
             outputList.add(feat);
             outputList.addAll(inList);
             outputList.addAll(outList);
@@ -1136,7 +1135,7 @@ public class SsnsService {
             }
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 feat += ":testfailed";
-            }            
+            }
             outputList.add(feat);
             outputList.addAll(inList);
             outputList.addAll(outList);
@@ -1352,33 +1351,32 @@ public class SsnsService {
     public boolean updateSsnsAppointment(String oper, String appTId, String banid, String cust, String host, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
             String featTTV = "";
-
-            if (oper.equals(APP_UPDATE) || oper.equals(APP_GET_APP) || oper.equals(APP_GET_TIMES)) {
+            String outputSt = null;
+            if (oper.equals(APP_UPDATE) || oper.equals(APP_GET_TIMES) || oper.equals(APP_GET_APP)) {
                 if ((banid.length() == 0) && (cust.length() == 0)) {
                     featTTV = APP_FEAT_TYPE_APP;
                     featTTV += ":" + oper;
                     featTTV += ":" + host;
-                    featTTV += ":ContactEng";
-                } else {
-                    String outputSt = null;
+                    featTTV += ":ticketID";
+
                     if (oper.equals(APP_GET_TIMES)) {  //"searchTimeSlot";
 //                        not sure why it does not work so just call get appointment to get the feature
                         outputSt = SendSsnsAppointmentGetApp(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
-                    } else {
-                        outputSt = SendSsnsAppointmentGetApp(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
                     }
-                    if (outputSt == null) {
-                        return false;
-                    }
-                    if (outputSt.length() < 80) {
-                        // special case for no appointment {"status":{"statusCd":"200","statusTxt":"OK"},"appointmentList":[]}
-                        return false;
-                    }
-                    if (outputSt.indexOf("responseCode:400500") != -1) {
-                        return false;
-                    }
-                    featTTV = parseAppointmentFeature(outputSt, oper);
+                } else {
+//                    outputSt = SendSsnsAppointmentGetApp(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
                 }
+                if (outputSt == null) {
+                    return false;
+                }
+                if (outputSt.length() < 80) {
+                    // special case for no appointment {"status":{"statusCd":"200","statusTxt":"OK"},"appointmentList":[]}
+                    return false;
+                }
+                if (outputSt.indexOf("responseCode:400500") != -1) {
+                    return false;
+                }
+                featTTV = parseAppointmentFeature(outputSt, oper);
             } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
                 featTTV = APP_FEAT_TYPE_APP;
                 featTTV += ":" + oper;
@@ -1658,7 +1656,7 @@ public class SsnsService {
 
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 newFeat += ":testfailed";
-            }            
+            }
             outputList.add(newFeat);
             outputList.addAll(inList);
             outputList.addAll(outList);
