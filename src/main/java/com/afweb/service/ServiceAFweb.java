@@ -414,18 +414,17 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////                    
                     boolean monflag = true;
                     if (monflag == true) {
-                        
-//                         this.getSsnsDataImp().deleteAllSsReport(0);
-                         
+
+//                        this.getSsnsDataImp().deleteAllSsReport(0);
+
                         SsnsRegression regression = new SsnsRegression();
                         String name = CKey.ADMIN_USERNAME;
-                        regression.startMonitor(this, name);
+//                        regression.startMonitor(this, name);
 
-                        ArrayList NameArrayTemp = regression.getMoniterIDList(name);
-                        for (int i = 0; i < 10; i++) {
-                            regression.processMonitorTesting(this);
-                        }
-                        regression.reportMoniter(this);
+//                        for (int i = 0; i < 10; i++) {
+//                            regression.processMonitorTesting(this);
+//                        }
+                        regression.reportMoniter(this, name);
 
                     }
 /////////

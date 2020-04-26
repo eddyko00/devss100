@@ -1037,8 +1037,10 @@ public class SsnsDataDB {
     public ArrayList<SsReport> getSsReportObjListByUid(String name, String uid) {
         String sql = "select * from ssreport where name='" + name + "' and uid='" + uid + "'";
         if ((name != null) || (name.length() == 0)) {
-            sql = "select * from ssreport where uid='" + uid + "'";
+            sql = "select * from ssreport where uid='" + uid + "' ";
         }
+        sql += " order by updatedatel asc";
+
         ArrayList entries = getAllSsReportSQL(sql, 0);
         return entries;
     }
