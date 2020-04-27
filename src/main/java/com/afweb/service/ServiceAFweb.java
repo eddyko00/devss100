@@ -725,7 +725,7 @@ public class ServiceAFweb {
         String LockName = "ETL_" + SsnsService.APP_WIFI;
 
         try {
-            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureApp");
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processFeatureWifi");
             if (CKey.NN_DEBUG == true) {
                 lockReturn = 1;
             }
@@ -805,7 +805,7 @@ public class ServiceAFweb {
         String LockName = "ETL_TTVC";
 
         try {
-            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureApp");
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processFeatureTTVC");
             if (CKey.NN_DEBUG == true) {
                 lockReturn = 1;
             }
@@ -879,7 +879,7 @@ public class ServiceAFweb {
         String LockName = "ETL_" + SsnsService.APP_APP;
 
         try {
-            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureApp");
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processFeatureApp");
             if (CKey.NN_DEBUG == true) {
                 lockReturn = 1;
             }
@@ -953,7 +953,7 @@ public class ServiceAFweb {
 
         String LockName = "ETL_" + SsnsService.APP_PRODUCT;
         try {
-            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureProd");
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processFeatureProd");
             if (CKey.NN_DEBUG == true) {
                 lockReturn = 1;
             }
@@ -1932,7 +1932,22 @@ public class ServiceAFweb {
         }
         String name = CKey.ADMIN_USERNAME;
         SsnsRegression regression = new SsnsRegression();
-        return regression.startMonitor(this, name);
+
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        long lockDateValue = dateNow.getTimeInMillis();
+        String LockName = "MONSTART_" + EmailUserName;
+
+        int ret = 0;
+        try {
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.MONSTART_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " getSsReportMonStart");
+            if (lockReturn == 0) {
+                return 0;
+            }
+            ret = regression.startMonitor(this, name);
+        } catch (Exception ex) {
+        }
+        removeNameLock(LockName, ConstantKey.MONSTART_LOCKTYPE);
+        return ret;
     }
 
     public int getSsReportMonClearReport(String EmailUserName, String IDSt, String repIDSt) {
@@ -1959,11 +1974,10 @@ public class ServiceAFweb {
                 }
                 SsReport repObj = ssReportObjList.get(i);
                 String nameRepId = repObj.getName() + "_" + repObj.getId();
-                getSsnsDataImp().DeleteSsReportObjListByUid(nameRepId,  SsnsRegression.REPORT_TESE_CASE);
-                
+                getSsnsDataImp().DeleteSsReportObjListByUid(nameRepId, SsnsRegression.REPORT_TESE_CASE);
+
                 getSsnsDataImp().DeleteSsReportObjByID(repObj.getId());
-                
-                
+
             }
         }
 

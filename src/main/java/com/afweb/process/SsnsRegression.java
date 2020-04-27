@@ -317,7 +317,7 @@ public class SsnsRegression {
                 Calendar dateNow = TimeConvertion.getCurrentCalendar();
                 long lockDateValue = dateNow.getTimeInMillis();
 
-                int lockReturn = serviceAFweb.setLockNameProcess(LockName, ConstantKey.MON_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + "processFeatureApp");
+                int lockReturn = serviceAFweb.setLockNameProcess(LockName, ConstantKey.MON_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processMonitorTesting");
                 if (CKey.NN_DEBUG == true) {
                     lockReturn = 1;
                 }
@@ -405,6 +405,7 @@ public class SsnsRegression {
                     String ESTdate = format.format(d);
 
                     reportReportObj.setRet("start:" + ESTdate);
+                    logger.info("> execMonitorTesting " + reportReportObj.getName() + " " + reportReportObj.getRet());
                     int ret = getSsnsDataImp().updatSsReportDataStatusTypeRetById(reportReportObj.getId(), reportReportObj.getData(),
                             reportReportObj.getStatus(), reportReportObj.getType(), reportReportObj.getRet());
 
@@ -438,6 +439,7 @@ public class SsnsRegression {
                     String ESTdate = format.format(d);
                     retStat += " complete:" + ESTdate;
                     reportReportObj.setRet(retStat);
+                    logger.info("> execMonitorTesting " + reportReportObj.getName() + " " + reportReportObj.getRet());                    
                     int ret = getSsnsDataImp().updatSsReportDataStatusTypeRetById(reportReportObj.getId(), reportReportObj.getData(),
                             reportReportObj.getStatus(), reportReportObj.getType(), reportReportObj.getRet());
 
