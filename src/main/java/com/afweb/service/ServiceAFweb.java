@@ -1508,7 +1508,7 @@ public class ServiceAFweb {
                         return true;
                     }
                     app = SsnsService.APP_PRODUCT;
-                } else if (oper.equals(SsnsService.WI_GetDeviceStatus) || oper.equals(SsnsService.WI_Callback) || oper.equals(SsnsService.WI_Getdev) || oper.equals(SsnsService.WI_config)) {
+                } else if (oper.equals(SsnsService.WI_GetDeviceStatus) || oper.equals(SsnsService.WI_Callback) || oper.equals(SsnsService.WI_GetDevice) || oper.equals(SsnsService.WI_config)) {
                     if (app.equals(SsnsService.APP_WIFI) == false) {
                         logger.info("Wrong data file " + app + " detected:" + SsnsService.APP_WIFI);
                         return true;
@@ -2290,7 +2290,7 @@ public class ServiceAFweb {
                 SsnsService ss = new SsnsService();
                 String feat = "";
 
-                if (Oper.equals(SsnsService.WI_Getdev) || Oper.equals(SsnsService.WI_GetDeviceStatus)) {
+                if (Oper.equals(SsnsService.WI_GetDevice) || Oper.equals(SsnsService.WI_GetDeviceStatus)) {
                     feat = ss.TestFeatureSsnsProdWifi(ssnsAccObj, outputList, Oper);
 //                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
                     if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {

@@ -54,6 +54,9 @@ public class IndexController {
         arrayString.add("/cust/{username}/login&pass={pass}");
 
         arrayString.add("/cust/{username}/id/{id}/mon");
+        arrayString.add("/cust/{username}/id/{id}/mon/start");
+        arrayString.add("/cust/{username}/id/{id}/mon/stop");
+
         arrayString.add("/cust/{username}/id/{id}/serv");
 
         arrayString.add("/cust/{username}/id/{id}/serv/prod?length={0 for all}");
@@ -137,7 +140,6 @@ public class IndexController {
         return afWebService.getSsReportMonStart(username, idSt);
     }
 
-
     @RequestMapping(value = "/cust/{username}/id/{id}/mon/stop", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     int getAllmonStop(
@@ -153,7 +155,7 @@ public class IndexController {
 
         return afWebService.getSsReportMonStop(username, idSt);
     }
-    
+
     @RequestMapping(value = "/cust/{username}/id/{id}/mon/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     SsReport getmonpid(
@@ -451,7 +453,7 @@ public class IndexController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             return null;
         }
-        String oper = SsnsService.WI_Getdev;
+        String oper = SsnsService.WI_GetDevice;
         ArrayList<String> ret = afWebService.testSsnsprodWifiByIdRT(username, idSt, pidSt, SsnsService.APP_WIFI, oper);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;

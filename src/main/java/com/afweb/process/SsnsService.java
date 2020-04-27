@@ -68,7 +68,7 @@ public class SsnsService {
 
     public static String WI_GetDeviceStatus = "getDeviceStatus";
     public static String WI_Callback = "callbackNotification";
-    public static String WI_Getdev = "getDevices";
+    public static String WI_GetDevice = "getDevices";
     public static String WI_config = "configureDeviceStatus";
 
     public static String TT_GetSub = "getCustomerTvSubscription";
@@ -625,7 +625,7 @@ public class SsnsService {
                     }
                 }
                 cmd.add("getdevice"); // cmd
-                cmd.add(WI_Getdev);   // description
+                cmd.add(WI_GetDevice);   // description
                 cmd.add("getdevicestatus");
                 cmd.add(WI_GetDeviceStatus);
                 pData.setCmd(cmd);
@@ -663,7 +663,7 @@ public class SsnsService {
                     }
                 }
                 cmd.add("getdevice"); // cmd
-                cmd.add(WI_Getdev);   // description
+                cmd.add(WI_GetDevice);   // description
                 cmd.add("getdevicestatus");
                 cmd.add(WI_GetDeviceStatus);
                 pData.setCmd(cmd);
@@ -680,7 +680,7 @@ public class SsnsService {
                 logger.info("> getFeatureSsnsAppointment Other oper " + oper);
                 return "";
             }
-            if (oper.equals(WI_Getdev)) {
+            if (oper.equals(WI_GetDevice)) {
                 // for testing ignore WI_Getdev becase always no info
                 return "";
                 // for testing
@@ -735,6 +735,8 @@ public class SsnsService {
         try {
             String featTTV = "";
             int connectDevice = 0;
+            int boost = 0;
+            int extender = 0;
             if (oper.equals(WI_GetDeviceStatus) || oper.equals(WI_Callback) || oper.equals(WI_config)) {
                 if ((banid.length() == 0) && (serialid.length() == 0)) {
                     return false;
@@ -752,6 +754,14 @@ public class SsnsService {
 
                     } else if (oper.equals(WI_config)) {
                         outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, WI_GetDeviceStatus, banid, uniquid, prodClass, serialid, parm, null);
+                        String outputDeviceSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, WI_GetDevice, banid, uniquid, prodClass, serialid, parm, null);
+                        if (outputDeviceSt.indexOf("Boost Device") != -1) {
+                            boost = 1;
+                        }
+                        if (outputDeviceSt.indexOf("WirelessExtender") != -1) {
+                            extender = 1;
+                        }
+
                     }
                     if (outputSt == null) {
                         return false;
@@ -770,6 +780,13 @@ public class SsnsService {
                     if (connectDevice == 1) {
                         featTTV += ":" + parm;
                     }
+                    if (boost == 1) {
+                        featTTV += ":BoostD";
+                    }
+                    if (extender == 1) {
+                        featTTV += ":ExtenderD";
+                    }                    
+                    
                 }
             } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
                 featTTV = APP_FEAT_TYPE_APP;
@@ -1047,7 +1064,7 @@ public class SsnsService {
         if (banid.length() >= 10) {
             logger.info("> SendSsnsWifi Bandid is Phonenumber " + banid);
         }
-        if (oper.equals(WI_Getdev)) {
+        if (oper.equals(WI_GetDevice)) {
             url = ProductURL + "/v1/cmo/selfmgmt/wifimanagement/account/" + banid
                     + "/device";
         } else if (oper.equals(WI_GetDeviceStatus)) {
@@ -1140,7 +1157,7 @@ public class SsnsService {
             outputList.addAll(outList);
 
             return feat;
-        } else if (Oper.equals(WI_Getdev)) {
+        } else if (Oper.equals(WI_GetDevice)) {
 
             outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, Oper, banid, uniquid, prodClass, serialid, Oper, inList);
             if (outputSt == null) {
