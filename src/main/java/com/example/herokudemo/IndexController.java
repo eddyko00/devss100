@@ -54,6 +54,9 @@ public class IndexController {
         arrayString.add("/cust/{username}/login&pass={pass}");
 
         arrayString.add("/cust/{username}/id/{id}/mon");
+        arrayString.add("/cust/{username}/id/{id}/mon/report/{pid}");
+        arrayString.add("/cust/{username}/id/{id}/mon/id/{pid}");
+        
         arrayString.add("/cust/{username}/id/{id}/mon/start");
         arrayString.add("/cust/{username}/id/{id}/mon/stop");
 
@@ -129,7 +132,7 @@ public class IndexController {
     SsReport getAllmonId(
             @PathVariable("username") String username,
             @PathVariable("id") String idSt,
-            @PathVariable("pid") String pidSt,            
+            @PathVariable("pid") String pidSt,
             HttpServletRequest request, HttpServletResponse response
     ) {
         ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
@@ -138,18 +141,17 @@ public class IndexController {
             return null;
         }
 
-         SsReport ret = afWebService.getSsReportById(username, idSt, pidSt);
+        SsReport ret = afWebService.getSsReportById(username, idSt, pidSt);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
 
-    
     @RequestMapping(value = "/cust/{username}/id/{id}/mon/report/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<ProdSummary> getAllmonreport(
             @PathVariable("username") String username,
             @PathVariable("id") String idSt,
-            @PathVariable("pid") String pidSt,            
+            @PathVariable("pid") String pidSt,
             HttpServletRequest request, HttpServletResponse response
     ) {
         ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
