@@ -36,19 +36,20 @@ public class WebAppConfig {
 //MYSQL_DATABASE=sampledb
 //MYSQL_PASSWORD=admin
 //MYSQL_PORT_3306_TCP_PORT=3306
-//MYSQL_PORT_3306_TCP=tcp://100.65.132.113:3306
+//MYSQL_PORT_3306_TCP=tcp://100.65.146.239:3306
 //MYSQL_SERVICE_PORT_MYSQL=3306
 //MYSQL_PORT_3306_TCP_PROTO=tcp
-//MYSQL_PORT_3306_TCP_ADDR=100.65.132.113
+//MYSQL_PORT_3306_TCP_ADDR=100.65.146.239
 //MYSQL_SERVICE_PORT=3306
 //MYSQL_USER=sa
 //MYSQL_ROOT_PASSWORD=admin
-//MYSQL_PORT=tcp://100.65.132.113:3306
-//MYSQL_SERVICE_HOST=100.65.132.113
+//MYSQL_PORT=tcp://100.65.146.239:3306
+//MYSQL_SERVICE_HOST=100.65.146.239
 //sh-4.2$
 
+
             dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-            String dsUrl = "jdbc:mysql://100.65.132.113:3306/sampledb?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false";
+            String dsUrl = "jdbc:mysql://100.65.146.239:3306/sampledb?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false";
             dataSource.setUrl(dsUrl);
             dataSource.setUsername("sa");
             dataSource.setPassword("admin");
