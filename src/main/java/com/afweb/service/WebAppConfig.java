@@ -29,7 +29,7 @@ public class WebAppConfig {
         }
         if (CKey.SQL_DATABASE == CKey.MYSQL) {
           
-            
+//eddy corp            
 //sh-4.2$ env | grep MYSQL
 //MYSQL_PREFIX=/opt/rh/rh-mysql57/root/usr
 //MYSQL_VERSION=5.7
