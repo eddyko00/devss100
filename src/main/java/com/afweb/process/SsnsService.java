@@ -928,28 +928,28 @@ public class SsnsService {
 
         String sm = smartSteering;
         if (sm.length() == 0) {
-            sm = "noSmartSteering";
+            sm = "noSSteering";
         } else {
-            sm = "SmartSteering_" + sm;
+            sm = "SSteering_" + sm;
         }
         featTTV += ":" + sm;
 
         String freq = frequency;
         if (freq.length() == 0) {
-            freq = "noFrequency";
+            freq = "noFreq";
         } else {
             freq = "Freq_" + freq;
         }
         featTTV += ":" + freq;
 
-        String guest = "noGuestDevice";
+        String guest = "noGuestD";
         if (guestDevice == 1) {
-            guest = "GuestDevice";
+            guest = "GuestD";
         }
         featTTV += ":" + guest;
-        String cujo = "noCujoAgent";
+        String cujo = "noCujo";
         if (cujoAgent == 1) {
-            cujo = "CujoAgent";
+            cujo = "Cujo";
         }
         featTTV += ":" + cujo;
         return featTTV;
