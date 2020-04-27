@@ -1937,6 +1937,32 @@ public class ServiceAFweb {
         return regression.startMonitor(this, name);
     }
 
+       public ArrayList<SsReport> getSsReportMonReport(String EmailUserName, String IDSt, String repIDSt) {
+
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        String name = CKey.ADMIN_USERNAME;
+        ArrayList<SsReport> ssReportList = new ArrayList();
+     
+        ArrayList<SsReport> ssUserReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, SsnsRegression.REPORT_USER);
+        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, SsnsRegression.REPORT_REPORT);
+
+        ssReportList.addAll(ssUserReportObjList);
+        ssReportList.addAll(ssReportObjList);
+        return ssReportList;
+
+    }
+     
     public ArrayList<SsReport> getSsReportMon(String EmailUserName, String IDSt) {
 
         if (getServerObj().isSysMaintenance() == true) {

@@ -2369,12 +2369,16 @@ public class SsnsService {
             String mail = EmailFeatures;
             if (mail.length() == 0) {
                 mail = "noEmail";
+            } else {
+                mail = "Email";
             }
             featTTV += ":" + mail;
 
             String unlimit = UnlimitedUsage;
             if (unlimit.length() == 0) {
-                unlimit = "noUnlimitedUsage";
+                unlimit = "noUnlimitedU";
+            } else {
+                unlimit = "UnlimitedU";
             }
             featTTV += ":" + unlimit;
 
