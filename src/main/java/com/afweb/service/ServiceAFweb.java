@@ -1918,6 +1918,30 @@ public class ServiceAFweb {
         return regression.stopMonitor(this, name);
     }
 
+    public int getSsReportMonUpdateReport(String EmailUserName, String IDSt) {
+
+        if (getServerObj().isSysMaintenance() == true) {
+            return 0;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return 0;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return 0;
+            }
+        }
+        if (custObj.getType() != CustomerObj.INT_ADMIN_USER) {
+            return 10;
+        }
+        String name = CKey.ADMIN_USERNAME;
+        SsnsRegression regression = new SsnsRegression();
+        int ret = 0;
+        regression.reportMoniter(this, name);
+        return ret;
+    }
+
     public int getSsReportMonStart(String EmailUserName, String IDSt) {
 
         if (getServerObj().isSysMaintenance() == true) {
@@ -2393,7 +2417,7 @@ public class ServiceAFweb {
         }
         ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(prod, PIDSt);
         if (ssnsAccObjList != null) {
-                        if (ssnsAccObjList.size() > 0) {
+            if (ssnsAccObjList.size() > 0) {
                 SsnsAcc accObj = (SsnsAcc) ssnsAccObjList.get(0);
                 ArrayList<String> response = new ArrayList();
                 SsnsService ss = new SsnsService();
@@ -2443,8 +2467,6 @@ public class ServiceAFweb {
         return "";
     }
 
- 
-    
     public ArrayList<String> testSsnsprodWifiByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;

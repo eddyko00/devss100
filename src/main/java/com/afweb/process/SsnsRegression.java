@@ -584,34 +584,34 @@ public class SsnsRegression {
                         reportReportObj.getStatus(), reportReportObj.getType());
             }
 ////////////////
-///////// put back to the main user
-            uid = REPORT_USER;
-            reportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, uid);
-
-            if (reportObjList == null) {
-                return;
-            }
-            if (reportObjList.size() == 0) {
-                return;
-            }
-            SsReport userReportObj = reportObjList.get(0);
-
-            ReportData reportdata = new ReportData();
-
-            String dataSt = userReportObj.getData();
-            if (dataSt.length() > 0) {
-                reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
-            }
-            reportdata.setReportList(testReportList);
-            dataSt = new ObjectMapper().writeValueAsString(reportdata);
-            userReportObj.setData(dataSt);
-
-            Calendar dateNow = TimeConvertion.getCurrentCalendar();
-            long ctime = dateNow.getTimeInMillis();
-            userReportObj.setUpdatedatel(ctime);
-            userReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
-            int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(userReportObj.getId(), userReportObj.getData(),
-                    userReportObj.getStatus(), userReportObj.getType());
+/////////// put back to the main user
+//            uid = REPORT_USER;
+//            reportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, uid);
+//
+//            if (reportObjList == null) {
+//                return;
+//            }
+//            if (reportObjList.size() == 0) {
+//                return;
+//            }
+//            SsReport userReportObj = reportObjList.get(0);
+//
+//            ReportData reportdata = new ReportData();
+//
+//            String dataSt = userReportObj.getData();
+//            if (dataSt.length() > 0) {
+//                reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
+//            }
+//            reportdata.setReportList(testReportList);
+//            dataSt = new ObjectMapper().writeValueAsString(reportdata);
+//            userReportObj.setData(dataSt);
+//
+//            Calendar dateNow = TimeConvertion.getCurrentCalendar();
+//            long ctime = dateNow.getTimeInMillis();
+//            userReportObj.setUpdatedatel(ctime);
+//            userReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
+//            int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(userReportObj.getId(), userReportObj.getData(),
+//                    userReportObj.getStatus(), userReportObj.getType());
 
         } catch (Exception ex) {
 

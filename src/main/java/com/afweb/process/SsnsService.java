@@ -399,9 +399,20 @@ public class SsnsService {
         featTTV += ":Pack_" + packCd;
         featTTV += ":Channel_" + channelCd;
         featTTV += ":Disc_" + discountCd;
-        featTTV += ":Add_" + add;
-        featTTV += ":Remove_" + remove;
-
+        if (add == 0) {
+            featTTV += ":NAdd";
+        } else if (add < 3) {
+            featTTV += ":Add";
+        } else {
+            featTTV += ":Add_" + add;
+        }
+        if (remove == 0) {
+            featTTV += ":NRemove";
+        } else if (remove < 3) {
+            featTTV += ":Remove";
+        } else {
+            featTTV += ":Remove_" + remove;
+        }
         return featTTV;
     }
 
@@ -832,7 +843,7 @@ public class SsnsService {
             NAccObj.setBanid(banid);
             NAccObj.setCusid(dataObj.getCusid());
 
-            String deviceInfo = uniquid + "#" + prodClass + "#" + serialid + "#" + parm + "#end";
+            String deviceInfo = uniquid + ":" + prodClass + ":" + serialid + ":" + parm + ":end";
             NAccObj.setTiid(deviceInfo);
 
             NAccObj.setUid(dataObj.getUid());
@@ -1122,7 +1133,7 @@ public class SsnsService {
         if (appTId.length() == 0) {
             return "";
         }
-        String WifiparL[] = appTId.split("#");
+        String WifiparL[] = appTId.split(":");
 
         String uniquid = WifiparL[0];
         String prodClass = WifiparL[1];
@@ -2299,7 +2310,7 @@ public class SsnsService {
                         boolean exit = false;
 //                        String valueSt = checkProductRelationshipProductNm(j, outputList);
 //                        PrimaryPricePlan = valueSt;
-                        
+
                         for (int k = j; k <= outputList.size(); k++) {
                             String inL = outputList.get(outputList.size() - 1 - k);
                             if (inL.indexOf("productNm") != -1) {
@@ -2314,7 +2325,7 @@ public class SsnsService {
                             if (exit == true) {
                                 break;
                             }
-                        }                        
+                        }
                     }
                     continue;
                 }
