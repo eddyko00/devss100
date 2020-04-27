@@ -483,7 +483,6 @@ public class ServiceAFweb {
 
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
-
                         SsnsService ss = new SsnsService();
                         String feature = "";
                         ArrayList appNameArrayTemp = getAllOpenAppArray();
@@ -1937,7 +1936,7 @@ public class ServiceAFweb {
         return regression.startMonitor(this, name);
     }
 
-       public ArrayList<SsReport> getSsReportMonReport(String EmailUserName, String IDSt, String repIDSt) {
+    public ArrayList<ProdSummary> getSsReportMonReport(String EmailUserName, String IDSt, String repIDSt) {
 
         if (getServerObj().isSysMaintenance() == true) {
             return null;
@@ -1952,17 +1951,23 @@ public class ServiceAFweb {
             }
         }
         String name = CKey.ADMIN_USERNAME;
-        ArrayList<SsReport> ssReportList = new ArrayList();
-     
-        ArrayList<SsReport> ssUserReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, SsnsRegression.REPORT_USER);
-        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, SsnsRegression.REPORT_REPORT);
+        ArrayList<ProdSummary> ssReportList = new ArrayList();
 
-        ssReportList.addAll(ssUserReportObjList);
-        ssReportList.addAll(ssReportObjList);
+        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, SsnsRegression.REPORT_REPORT);
+        if (ssReportObjList != null) {
+            if (ssReportObjList.size() > 0) {
+                SsReport reportObj = ssReportObjList.get(0);
+                String nameRepId = reportObj.getName() + "_" + reportObj.getId();
+                ArrayList<ProdSummary> ssTestcaseObjList = getSsnsDataImp().getSsReportSummaryObjListByUid(nameRepId, SsnsRegression.REPORT_TESE_CASE);
+                
+                ssReportList.addAll(ssTestcaseObjList);
+            }
+        }
+
         return ssReportList;
 
     }
-     
+
     public ArrayList<SsReport> getSsReportMon(String EmailUserName, String IDSt) {
 
         if (getServerObj().isSysMaintenance() == true) {

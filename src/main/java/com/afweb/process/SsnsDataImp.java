@@ -219,6 +219,9 @@ public class SsnsDataImp {
         return null;
     }
 
+    public ArrayList<ProdSummary> getSsReportSummaryObjListByUid(String name, String uid) {
+        return ssnsdb.getSsReportSummaryObjListByUid(name, uid);
+    }        
     public ArrayList<SsReport> getSsReportObjListByUid(String name, String uid) {
         return ssnsdb.getSsReportObjListByUid(name, uid);
     }
