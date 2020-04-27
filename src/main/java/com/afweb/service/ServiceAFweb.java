@@ -529,6 +529,11 @@ public class ServiceAFweb {
             }
         }
         if (CKey.UI_ONLY == true) {
+            if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
+                //// process monitor
+                SsnsRegression regression = new SsnsRegression();
+                regression.processMonitorTesting(this);
+            }
             return;
         }
 
@@ -1945,8 +1950,8 @@ public class ServiceAFweb {
             }
             ret = regression.startMonitor(this, name);
             // clear old report
-            getSsReportMonClearReport( EmailUserName, IDSt);
-            
+            getSsReportMonClearReport(EmailUserName, IDSt);
+
         } catch (Exception ex) {
         }
         removeNameLock(LockName, ConstantKey.MONSTART_LOCKTYPE);
@@ -2112,10 +2117,10 @@ public class ServiceAFweb {
                 try {
                     pData = new ObjectMapper().readValue(output, ProductData.class);
                     String postParamSt = ProductDataHelper.getPostParamRestore(pData.getPostParam());
-                    sumObj.setPostParam(postParamSt);
+                    sumObj.setDown(postParamSt);
                     ArrayList<String> flowN = ProductDataHelper.getFlowRestore(pData.getFlow());
                     String st = new ObjectMapper().writeValueAsString(flowN);
-                    sumObj.setStatus(st);
+                    sumObj.setRet(st);
                 } catch (IOException ex) {
                 }
             }
@@ -2373,6 +2378,73 @@ public class ServiceAFweb {
         return null;
     }
 
+    public String testSsnsprodWifiByIdRTTtest(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return "";
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return "";
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return "";
+            }
+        }
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(prod, PIDSt);
+        if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() > 0) {
+                SsnsAcc accObj = (SsnsAcc) ssnsAccObjList.get(0);
+                ArrayList<String> response = new ArrayList();
+                SsnsService ss = new SsnsService();
+
+                if (Oper.equals(SsnsService.WI_GetDevice) || Oper.equals(SsnsService.WI_GetDeviceStatus)) {
+                    String oper = accObj.getRet();
+                    String featRet = ss.TestFeatureSsnsProdWifi(accObj, response, oper);
+                    if (response != null) {
+                        if (response.size() > 3) {
+                            String feat = response.get(0);
+                            String execSt = response.get(2);
+                            execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
+                            long exec = Long.parseLong(execSt);
+                            String passSt = R_FAIL;
+                            if (feat.equals(accObj.getName())) {
+                                passSt = R_PASS;
+                            } else {
+                                passSt = R_PASS;
+                                String[] featL = feat.split(":");
+                                String[] nameL = accObj.getName().split(":");
+                                if ((featL.length > 4) && (nameL.length > 4)) {
+                                    if (!featL[2].equals(nameL[2])) {
+                                        passSt = R_FAIL;
+                                    }
+                                    if (!featL[3].equals(nameL[3])) {
+                                        passSt = R_FAIL;
+                                    }
+                                    if (!featL[4].equals(nameL[4])) {
+                                        passSt = R_FAIL;
+                                    }
+                                } else if ((featL.length > 3) && (nameL.length > 3)) {
+                                    if (!featL[2].equals(nameL[2])) {
+                                        passSt = R_FAIL;
+                                    }
+                                    if (!featL[3].equals(nameL[3])) {
+                                        passSt = R_FAIL;
+                                    }
+                                }
+                            }
+                            passSt = feat + ":" + passSt;
+                            return passSt;
+                        }
+                    }
+                }
+            }
+        }
+        return "";
+    }
+
+ 
+    
     public ArrayList<String> testSsnsprodWifiByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;

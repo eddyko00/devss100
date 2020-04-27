@@ -12,13 +12,41 @@ import java.util.ArrayList;
  * @author koed
  */
 public class ProdSummary {
+
+    /**
+     * @return the ret
+     */
+    public String getRet() {
+        return ret;
+    }
+
+    /**
+     * @param ret the ret to set
+     */
+    public void setRet(String ret) {
+        this.ret = ret;
+    }
+
+    /**
+     * @return the down
+     */
+    public String getDown() {
+        return down;
+    }
+
+    /**
+     * @param down the down to set
+     */
+    public void setDown(String down) {
+        this.down = down;
+    }
     private int id;
     private String cusid;
     private String banid;
     private String tiid;
     private String oper;
-    private String postParam;
-    private String status;    
+    private String down;
+    private String ret;  
 
     /**
      * @return the banid
@@ -60,34 +88,6 @@ public class ProdSummary {
      */
     public void setOper(String oper) {
         this.oper = oper;
-    }
-
-    /**
-     * @return the postParam
-     */
-    public String getPostParam() {
-        return postParam;
-    }
-
-    /**
-     * @param postParam the postParam to set
-     */
-    public void setPostParam(String postParam) {
-        this.postParam = postParam;
-    }
-
-    /**
-     * @return the status
-     */
-    public String getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     /**

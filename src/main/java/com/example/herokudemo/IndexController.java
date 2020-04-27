@@ -54,9 +54,8 @@ public class IndexController {
         arrayString.add("/cust/{username}/login&pass={pass}");
 
         arrayString.add("/cust/{username}/id/{id}/mon");
+        arrayString.add("/cust/{username}/id/{id}/mon/pid/{pid}");        
         arrayString.add("/cust/{username}/id/{id}/mon/report/id/{pid}");
-        arrayString.add("/cust/{username}/id/{id}/mon/id/{pid}");
-
         arrayString.add("/cust/{username}/id/{id}/mon/start");
         arrayString.add("/cust/{username}/id/{id}/mon/stop");
 
@@ -65,8 +64,8 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/serv/prod?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/summary?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}");
-        arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}/rt");
-        arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}/rt/test");
+        arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}/rt/rt");
+        arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}/rttest/");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/feature?name=");
 
@@ -75,6 +74,8 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/getapp");
         arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/gettimeslot");
+        arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rttest/");        
+   
         arrayString.add("/cust/{username}/id/{id}/serv/app/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/app/feature?name=");
         arrayString.add("/cust/{username}/id/{id}/serv/app/feature/summary?name=");
@@ -84,6 +85,7 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevice");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevicestatus");
+        arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rttest/");          
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/feature?name=");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/feature/summary?name=");
@@ -214,7 +216,7 @@ public class IndexController {
         return afWebService.getSsReportMonStop(username, idSt);
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/mon/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/mon/pid/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     SsReport getmonpid(
             @PathVariable("username") String username,
@@ -516,7 +518,26 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/rttest/getdevicestatus", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String getprodwifiidrtTest(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @PathVariable("pid") String pidSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return "";
+        }
 
+        String ret = afWebService.testSsnsprodWifiByIdRTTtest(username, idSt, pidSt, SsnsService.APP_PRODUCT, "");
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+    
+    
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevicestatus", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getwifiidrtstatus(
@@ -818,7 +839,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/id/{pid}/rt/test", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/id/{pid}/rt/rttest/rt", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     String getprodttvidrtTest(
             @PathVariable("username") String username,
@@ -837,7 +858,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/id/{pid}/rt", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/id/{pid}/rt/rt", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getprodttvidrt(
             @PathVariable("username") String username,

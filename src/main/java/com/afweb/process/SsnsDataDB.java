@@ -1040,7 +1040,7 @@ public class SsnsDataDB {
 
     public ArrayList<ProdSummary> getSsReportSummaryObjListByUid(String name, String uid) {
         String sql = "select id as parm1, cusid as parm2, banid as parm3, tiid as parm4,"
-                + " oper as parm5, ret as parm6, status as parm7  from ssreport "
+                + " oper as parm5, exec as parm6, ret as parm7  from ssreport "
                 + " where name='" + name + "' and uid='" + uid + "'";
         sql += " order by updatedatel asc";
         ArrayList<Pram7RDB> entries = getAll7ParamSQL(sql);
@@ -1056,8 +1056,8 @@ public class SsnsDataDB {
                     sum.setBanid(parm.getParm3());
                     sum.setTiid(parm.getParm4());
                     sum.setOper(parm.getParm5());
-                    sum.setPostParam(parm.getParm6());
-                    sum.setStatus(parm.getParm7());
+                    sum.setDown(parm.getParm6());
+                    sum.setRet(parm.getParm7());
                     sumList.add(sum);
                 }
             }
@@ -1068,7 +1068,7 @@ public class SsnsDataDB {
 
     public ArrayList<ProdSummary> getSsnsAccObjSummaryListByApp(String app, int length) {
         String sql = "select id as parm1, cusid as parm2, banid as parm3, tiid as parm4,"
-                + " oper as parm5, postParam as parm6, status as parm7  from ssnsacc "
+                + " oper as parm5, down as parm6, ret as parm7  from ssnsacc "
                 + "where app='" + app + "'";
         ArrayList<Pram7RDB> entries = getAll7ParamSQL(sql);
         if (entries != null) {
@@ -1082,8 +1082,8 @@ public class SsnsDataDB {
                     sum.setBanid(parm.getParm3());
                     sum.setTiid(parm.getParm4());
                     sum.setOper(parm.getParm5());
-                    sum.setPostParam(parm.getParm6());
-                    sum.setStatus(parm.getParm7());
+                    sum.setDown(parm.getParm6());
+                    sum.setRet(parm.getParm7());
                     sumList.add(sum);
                 }
                 return sumList;
@@ -1258,8 +1258,8 @@ public class SsnsDataDB {
                     nn.setParm3(rs.getString("parm3"));
                     nn.setParm4(rs.getString("parm4"));
                     nn.setParm5(rs.getString("parm5"));
-                    nn.setParm4(rs.getString("parm6"));
-                    nn.setParm5(rs.getString("parm7"));
+                    nn.setParm6(rs.getString("parm6"));
+                    nn.setParm7(rs.getString("parm7"));
                     return nn;
                 }
             });
