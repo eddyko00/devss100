@@ -624,8 +624,8 @@ public class SsnsService {
                         }
                     }
                 }
-                cmd.add("WI_Getdev");
-                cmd.add(TT_GetSub);
+                cmd.add("getdevice"); // cmd
+                cmd.add(WI_Getdev);   // description
                 cmd.add("getdevicestatus");
                 cmd.add(WI_GetDeviceStatus);
                 pData.setCmd(cmd);
@@ -662,8 +662,8 @@ public class SsnsService {
                         }
                     }
                 }
-                cmd.add("WI_Getdev");
-                cmd.add(TT_GetSub);
+                cmd.add("getdevice"); // cmd
+                cmd.add(WI_Getdev);   // description
                 cmd.add("getdevicestatus");
                 cmd.add(WI_GetDeviceStatus);
                 pData.setCmd(cmd);
@@ -1229,8 +1229,8 @@ public class SsnsService {
                 if ((banid.length() == 0) && (cust.length() == 0)) {
                     ;
                 } else {
-                    cmd.add("getapp");
-                    cmd.add(APP_GET_APP);
+                    cmd.add("getapp"); // cmd
+                    cmd.add(APP_GET_APP);  // descriptoin
                 }
                 cmd.add("gettimeslot");
                 cmd.add(APP_GET_TIMES);
@@ -1513,9 +1513,9 @@ public class SsnsService {
             }
         }
         if (NumofStart > 0) {
-            feat += ":startdate:";
+            feat += ":startdate";
         } else {
-            feat += ":nostartdate:";
+            feat += ":nostartdate";
         }
 
         return feat;
