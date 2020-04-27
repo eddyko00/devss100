@@ -254,7 +254,7 @@ public class SsnsService {
             }
 
             if (legacyDiscount == 1) {
-                featTTV += ":legacyDisc";
+                featTTV += ":legacyDisc:failed";
                 if (failure == 0) {
                     featTTV += ":splunkfailed";
                 }

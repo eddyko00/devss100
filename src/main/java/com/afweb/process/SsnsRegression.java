@@ -46,7 +46,7 @@ public class SsnsRegression {
     protected static Logger logger = Logger.getLogger("SsnsRegression");
 
     public static String R_PASS = "pass";
-    public static String R_FAIL = "false";
+    public static String R_FAIL = "fail";
 
     public static String REPORT_USER = "user";
     public static String REPORT_MOMITOR = "monitor";
@@ -108,7 +108,7 @@ public class SsnsRegression {
 
                 for (int j = 0; j < featallList.size(); j += 2) {
                     String featN = featallList.get(j);
-                    if (featN.indexOf("fail") != -1) {
+                    if (featN.indexOf("failed") != -1) {
                         continue;
                     }
                     testFeatList.add(featN);
