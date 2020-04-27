@@ -744,6 +744,9 @@ public class SsnsService {
                     String outputSt = null;
                     if (oper.equals(WI_GetDeviceStatus)) {
                         outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, oper, banid, uniquid, prodClass, serialid, "", null);
+                        if (outputSt == null) {
+                            return false;
+                        }
                         if (parm.length() > 0) {
                             String outputStConnect = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, oper, banid, uniquid, prodClass, serialid, parm, null);
                             if (outputStConnect.indexOf("macAddressTxt") != -1) {
@@ -754,6 +757,9 @@ public class SsnsService {
 
                     } else if (oper.equals(WI_config)) {
                         outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, WI_GetDeviceStatus, banid, uniquid, prodClass, serialid, parm, null);
+                        if (outputSt == null) {
+                            return false;
+                        }
                         String outputDeviceSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, WI_GetDevice, banid, uniquid, prodClass, serialid, parm, null);
                         if (outputDeviceSt.indexOf("Boost Device") != -1) {
                             boost = 1;
@@ -761,7 +767,6 @@ public class SsnsService {
                         if (outputDeviceSt.indexOf("WirelessExtender") != -1) {
                             extender = 1;
                         }
-
                     }
                     if (outputSt == null) {
                         return false;
@@ -785,8 +790,8 @@ public class SsnsService {
                     }
                     if (extender == 1) {
                         featTTV += ":ExtenderD";
-                    }                    
-                    
+                    }
+
                 }
             } else if (oper.equals(APP_CAN_APP)) {   //"cancelAppointment";
                 featTTV = APP_FEAT_TYPE_APP;
