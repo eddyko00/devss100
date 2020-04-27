@@ -8,7 +8,7 @@ package com.afweb.service;
 import com.afweb.process.*;
 import com.afweb.model.*;
 import com.afweb.model.ssns.*;
-import static com.afweb.process.SsnsRegression.*;
+
 import static com.afweb.process.SsnsService.*;
 
 import com.afweb.util.*;
@@ -456,7 +456,7 @@ public class ServiceAFweb {
                     }
 /////////
 /////////
-                    boolean wififlag = true;
+                    boolean wififlag = false;
                     if (wififlag == true) {
 
 //                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
