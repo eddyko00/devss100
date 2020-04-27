@@ -8,7 +8,7 @@ package com.afweb.service;
 import com.afweb.process.*;
 import com.afweb.model.*;
 import com.afweb.model.ssns.*;
-
+import static com.afweb.process.SsnsRegression.*;
 import static com.afweb.process.SsnsService.*;
 
 import com.afweb.util.*;
@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
-import java.util.logging.Level;
 
 import java.util.logging.Logger;
 import javax.sql.DataSource;
@@ -1959,12 +1958,33 @@ public class ServiceAFweb {
                 SsReport reportObj = ssReportObjList.get(0);
                 String nameRepId = reportObj.getName() + "_" + reportObj.getId();
                 ArrayList<ProdSummary> ssTestcaseObjList = getSsnsDataImp().getSsReportSummaryObjListByUid(nameRepId, SsnsRegression.REPORT_TESE_CASE);
-                
+
                 ssReportList.addAll(ssTestcaseObjList);
             }
         }
 
         return ssReportList;
+
+    }
+
+    public String getSsReportMonExec(String EmailUserName, String IDSt) {
+
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        //// process monitor
+        SsnsRegression regression = new SsnsRegression();
+        regression.processMonitorTesting(this);
+        return "";
 
     }
 
@@ -2394,6 +2414,72 @@ public class ServiceAFweb {
             }
         }
         return null;
+    }
+
+    public String testSsnsprodByIdRTtest(String EmailUserName, String IDSt, String PIDSt, String prod, String ProdOper) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(prod, PIDSt);
+        if (ssnsAccObjList != null) {
+            if (ssnsAccObjList.size() > 0) {
+                SsnsAcc accObj = (SsnsAcc) ssnsAccObjList.get(0);
+                ArrayList<String> response = new ArrayList();
+                SsnsService ss = new SsnsService();
+
+                if (prod.equals(SsnsService.APP_PRODUCT)) {
+                    String oper = accObj.getRet();
+
+                    String featRet = ss.TestFeatureSsnsProductInventory(accObj, response, oper);
+                    if (response != null) {
+                        if (response.size() > 3) {
+                            String feat = response.get(0);
+                            String execSt = response.get(2);
+                            execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
+                            long exec = Long.parseLong(execSt);
+                            String passSt = R_FAIL;
+                            if (feat.equals(accObj.getName())) {
+                                passSt = R_PASS;
+                            } else {
+                                passSt = R_PASS;
+                                String[] featL = feat.split(":");
+                                String[] nameL = accObj.getName().split(":");
+                                if ((featL.length > 4) && (nameL.length > 4)) {
+                                    if (!featL[2].equals(nameL[2])) {
+                                        passSt = R_FAIL;
+                                    }
+                                    if (!featL[3].equals(nameL[3])) {
+                                        passSt = R_FAIL;
+                                    }
+                                    if (!featL[4].equals(nameL[4])) {
+                                        passSt = R_FAIL;
+                                    }
+                                } else if ((featL.length > 3) && (nameL.length > 3)) {
+                                    if (!featL[2].equals(nameL[2])) {
+                                        passSt = R_FAIL;
+                                    }
+                                    if (!featL[3].equals(nameL[3])) {
+                                        passSt = R_FAIL;
+                                    }
+                                }
+                            }
+                            passSt = accObj.getName() + ":" + passSt;
+                        }
+                    }
+                }
+            }
+        }
+        return "";
     }
 
     public ArrayList<String> testSsnsprodByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String ProdOper) {

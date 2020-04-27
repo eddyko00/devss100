@@ -54,9 +54,10 @@ public class IndexController {
         arrayString.add("/cust/{username}/login&pass={pass}");
 
         arrayString.add("/cust/{username}/id/{id}/mon");
+        arrayString.add("/cust/{username}/id/{id}/mon/monitor");
         arrayString.add("/cust/{username}/id/{id}/mon/report/{pid}");
         arrayString.add("/cust/{username}/id/{id}/mon/id/{pid}");
-        
+
         arrayString.add("/cust/{username}/id/{id}/mon/start");
         arrayString.add("/cust/{username}/id/{id}/mon/stop");
 
@@ -66,6 +67,7 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/serv/prod/summary?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}/rt");
+        arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}/rt/test");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/feature?name=");
 
@@ -123,6 +125,24 @@ public class IndexController {
         }
 
         ArrayList<SsReport> ret = afWebService.getSsReportMon(username, idSt);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/mon/monitor", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String getAllmonExec(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return "";
+        }
+
+        String ret = afWebService.getSsReportMonExec(username, idSt);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -797,6 +817,25 @@ public class IndexController {
             return null;
         }
         SsnsAcc ret = afWebService.getSsnsprodById(username, idSt, pidSt, SsnsService.APP_PRODUCT);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/id/{pid}/rt/test", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    String getprodttvidrtTest(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @PathVariable("pid") String pidSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return "";
+        }
+
+        String ret = afWebService.testSsnsprodByIdRTtest(username, idSt, pidSt, SsnsService.APP_PRODUCT, "");
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
