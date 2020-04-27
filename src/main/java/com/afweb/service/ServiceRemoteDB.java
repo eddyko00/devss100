@@ -791,6 +791,61 @@ public class ServiceRemoteDB {
         }
     }
 
+    public ArrayList<Pram7RDB> getAll7ParamSqlRemoteDB_RemoteMysql(String sqlCMD) throws Exception {
+
+        ServiceAFweb.getServerObj().setCntRESTrequest(ServiceAFweb.getServerObj().getCntRESTrequest() + 1);
+        try {
+            String subResourcePath = WEBPOST;
+            HashMap newmap = new HashMap();
+            newmap.put(CMD, "1");
+
+            HashMap newbodymap = new HashMap();
+            newbodymap.put(CMDPOST, sqlCMD);
+
+            String output = sendRequest_remotesql(METHOD_POST, subResourcePath, newmap, newbodymap);
+
+            int beg = output.indexOf("~~ ");
+            int end = output.indexOf(" ~~");
+            // create hash map
+            if (beg > end) {
+                return null;
+            }
+            output = output.substring(beg + 3, end);
+            if (output.length() == 0) {
+                return null;
+            }
+//            String[] dataArray = output.split("~");
+            String[] dataArray = splitIncludeEmpty(output, '~');
+            output = "[";
+
+            int recSize = 7;
+            for (int i = 0; i < dataArray.length; i += recSize) {
+                output += "{";
+                output += "\"parm1\":\"" + dataArray[i] + "\",";
+                output += "\"parm2\":\"" + dataArray[i + 1] + "\",";
+                output += "\"parm3\":\"" + dataArray[i + 2] + "\",";
+                output += "\"parm4\":\"" + dataArray[i + 3] + "\",";
+                output += "\"parm5\":\"" + dataArray[i + 4] + "\",";
+                output += "\"parm6\":\"" + dataArray[i + 5] + "\",";
+                output += "\"parm7\":\"" + dataArray[i + 6] + "\",";
+
+                if (i + recSize >= dataArray.length) {
+                    output += "}";
+                } else {
+                    output += "},";
+                }
+            }
+            output += "]";
+
+            return getAll7ParamSqlRemoteDB_RemoteMysql_Process(output);
+
+        } catch (Exception ex) {
+            log.info("getAll7ParamSqlRemoteDB_RemoteMysql exception " + ex);
+            ServiceAFweb.getServerObj().setCntRESTexception(ServiceAFweb.getServerObj().getCntRESTexception() + 1);
+            throw ex;
+        }
+    }
+
     public ArrayList<SsnsData> getAllSsnsDataSqlRemoteDB_RemoteMysql(String sqlCMD) throws Exception {
 
         ServiceAFweb.getServerObj().setCntRESTrequest(ServiceAFweb.getServerObj().getCntRESTrequest() + 1);
@@ -1149,6 +1204,38 @@ public class ServiceRemoteDB {
             log.info("getAllSQLqueryRemoteDB_RemoteMysql exception " + ex);
             ServiceAFweb.getServerObj().setCntRESTexception(ServiceAFweb.getServerObj().getCntRESTexception() + 1);
             throw ex;
+        }
+    }
+
+    private ArrayList<Pram7RDB> getAll7ParamSqlRemoteDB_RemoteMysql_Process(String output) {
+        if (output.equals("")) {
+            return null;
+        }
+        ArrayList<Pram7RDB> arrayDB = null;
+        ArrayList<Pram7RDB> arrayReturn = new ArrayList();
+        try {
+            Pram7RDB[] arrayItem = new ObjectMapper().readValue(output, Pram7RDB[].class);
+            List<Pram7RDB> listItem = Arrays.<Pram7RDB>asList(arrayItem);
+            arrayDB = new ArrayList<Pram7RDB>(listItem);
+
+            for (int i = 0; i < arrayDB.size(); i++) {
+                Pram7RDB rs = arrayDB.get(i);
+
+                Pram7RDB nn = new Pram7RDB();
+                nn.setParm1(rs.getParm1());
+                nn.setParm2(rs.getParm2());
+                nn.setParm3(rs.getParm3());
+                nn.setParm4(rs.getParm4());
+                nn.setParm5(rs.getParm5());
+                nn.setParm6(rs.getParm6());
+                nn.setParm7(rs.getParm7());
+
+                arrayReturn.add(nn);
+            }
+            return arrayReturn;
+        } catch (IOException ex) {
+            log.info("getAll7ParamSqlRemoteDB_RemoteMysql_Process exception " + output);
+            return null;
         }
     }
 

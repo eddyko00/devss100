@@ -1,6 +1,7 @@
 package com.afweb.process;
 
 import com.afweb.model.*;
+import com.afweb.model.ssns.*;
 
 import java.util.ArrayList;
 
@@ -76,6 +77,7 @@ public class SsnsDataImp {
     public int deleteSsnsData(String name) {
         return ssnsdb.deleteSsnsData(name);
     }
+
     public int updatSsReportDataStatusTypeRetById(int id, String data, int status, int type, String ret) {
         return ssnsdb.updatSsReportDataStatusTypeRetById(id, data, status, type, ret);
     }
@@ -114,7 +116,7 @@ public class SsnsDataImp {
         }
         return null;
     }
-    
+
     public SsnsAcc getSsnsAccObjByID(int id) {
         ArrayList<SsnsAcc> ssnsObjList = ssnsdb.getSsnsAccObjListByID(id);
         if (ssnsObjList != null) {
@@ -124,7 +126,7 @@ public class SsnsDataImp {
         }
         return null;
     }
-    
+
     public ArrayList<SsnsData> getSsnsDataObjListByUid(String app, String uid) {
         return ssnsdb.getSsnsDataObjListByUid(app, uid);
     }
@@ -157,20 +159,20 @@ public class SsnsDataImp {
 
     public String getSsReportObjListByFeatureOperCnt(String name, String oper) {
         return ssnsdb.getSsReportObjListByFeatureCnt(name, oper);
-    }        
+    }
+
     public String getSsnsAccObjListByFeatureCnt(String name) {
         return ssnsdb.getSsnsAccObjListByFeatureCnt(name);
     }
-    
-    
+
     public ArrayList<SsReport> getSsReportByFeatureOperIdList(String name, String app, String oper, int length) {
         return ssnsdb.getSsReportByFeatureOperIdList(name, app, oper, length);
     }
-    
+
     public ArrayList<String> getSsReportObjListByFeatureOper(String name, String app) {
         return ssnsdb.getSsReportObjListByFeatureOper(name, app);
     }
-    
+
     public ArrayList<String> getSsnsAccObjListByFeature(String app) {
         return ssnsdb.getSsnsAccObjListByFeature(app);
     }
@@ -181,6 +183,10 @@ public class SsnsDataImp {
 
     public ArrayList<SsnsAcc> getSsnsAccObjListByID(String app, String pid) {
         return ssnsdb.getSsnsAccObjListByID(app, pid);
+    }
+
+    public ArrayList<ProdSummary> getSsnsAccObjSummaryListByApp(String app, int length) {
+        return ssnsdb.getSsnsAccObjSummaryListByApp(app, length);
     }
 
     public ArrayList<SsnsAcc> getSsnsAccObjListByApp(String app, int length) {
@@ -202,7 +208,7 @@ public class SsnsDataImp {
     public ArrayList<SsnsAcc> getSsnsAccObjList(String name, String uid) {
         return ssnsdb.getSsnsAccObjList(name, uid);
     }
-    
+
     public SsReport getSsReportByID(int id) {
         ArrayList<SsReport> ssReportObjList = ssnsdb.getSsReportObjListByID(id);
         if (ssReportObjList != null) {
@@ -212,7 +218,7 @@ public class SsnsDataImp {
         }
         return null;
     }
-    
+
     public ArrayList<SsReport> getSsReportObjListByUid(String name, String uid) {
         return ssnsdb.getSsReportObjListByUid(name, uid);
     }
@@ -220,7 +226,7 @@ public class SsnsDataImp {
     public int deleteAllSsReport(int month) {
         return ssnsdb.deleteAllSsReport(month);
     }
-        
+
     public int deleteAllSsnsAcc(int month) {
         return ssnsdb.deleteAllSsnsAcc(month);
     }

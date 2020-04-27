@@ -6,9 +6,11 @@
 package com.afweb.process;
 
 import com.afweb.model.*;
+import com.afweb.model.ssns.ProdSummary;
 
 import com.afweb.service.ServiceAFweb;
 import com.afweb.service.ServiceRemoteDB;
+import com.afweb.service.db.Pram7RDB;
 
 import com.afweb.util.*;
 
@@ -1007,7 +1009,33 @@ public class SsnsDataDB {
     public ArrayList<SsnsAcc> getSsnsAccObjListByID(String app, String id) {
         String sql = "select * from ssnsacc where app='" + app + "' and id='" + id + "'";
         ArrayList entries = getAllSsnsAccSQL(sql, 0);
+
         return entries;
+    }
+
+    public ArrayList<ProdSummary> getSsnsAccObjSummaryListByApp(String app, int length) {
+        String sql = "select id as parm1, cusid as parm2, banid as parm3, tiid as parm4,"
+                + " oper as parm5, postParam as parm6, status as parm7  from ssnsacc where app='" + app + "'";
+        ArrayList<Pram7RDB> entries = getAll7ParamSQL(sql);
+        if (entries != null) {
+            if (entries.size() > 0) {
+                ArrayList<ProdSummary> sumList = new ArrayList();
+                for (int i = 0; i < entries.size(); i++) {
+                    Pram7RDB parm = entries.get(i);
+                    ProdSummary sum = new ProdSummary();
+                    sum.setId(Integer.parseInt(parm.getParm1()));
+                    sum.setCusid(parm.getParm2());
+                    sum.setBanid(parm.getParm3());
+                    sum.setTiid(parm.getParm4());
+                    sum.setOper(parm.getParm5());
+                    sum.setPostParam(parm.getParm6());
+                    sum.setStatus(parm.getParm7());
+                    sumList.add(sum);
+                }
+                return sumList;
+            }
+        }
+        return null;
     }
 
     public ArrayList<SsnsAcc> getSsnsAccObjListByApp(String app, int length) {
@@ -1151,6 +1179,39 @@ public class SsnsDataDB {
             return (ArrayList) entries;
         } catch (Exception e) {
             logger.info("> getAllNameSQL exception " + e.getMessage());
+        }
+        return null;
+    }
+
+    public ArrayList<Pram7RDB> getAll7ParamSQL(String sql) {
+        if (checkCallRemoveSQL_Mysql() == true) {
+            ArrayList<Pram7RDB> nnList;
+            try {
+                nnList = remoteDB.getAll7ParamSqlRemoteDB_RemoteMysql(sql);
+                return nnList;
+            } catch (Exception ex) {
+            }
+            return null;
+        }
+        try {
+            List<Pram7RDB> entries = new ArrayList<>();
+            entries.clear();
+            entries = this.jdbcTemplate.query(sql, new RowMapper() {
+                public Pram7RDB mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    Pram7RDB nn = new Pram7RDB();
+                    nn.setParm1(rs.getString("parm1"));
+                    nn.setParm2(rs.getString("parm2"));
+                    nn.setParm3(rs.getString("parm3"));
+                    nn.setParm4(rs.getString("parm4"));
+                    nn.setParm5(rs.getString("parm5"));
+                    nn.setParm4(rs.getString("parm6"));
+                    nn.setParm5(rs.getString("parm7"));
+                    return nn;
+                }
+            });
+            return (ArrayList) entries;
+        } catch (Exception e) {
+            logger.info("> getAll5ParamSQL exception " + e.getMessage());
         }
         return null;
     }
