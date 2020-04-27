@@ -697,7 +697,7 @@ public class SsnsService {
             boolean stat = this.updateSsnsWifi(oper, banid, uniquid, prodClass, serialid, parm, postParm, pData, dataObj, NAccObj);
             if (stat == true) {
                 if (async == 1) {
-                    String feat = NAccObj.getName() + ":AsyncReq";
+                    String feat = NAccObj.getName() + ":Async";
                     NAccObj.setName(feat);
                 }
 
