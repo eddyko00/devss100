@@ -1952,7 +1952,7 @@ public class ServiceAFweb {
         String name = CKey.ADMIN_USERNAME;
         ArrayList<ProdSummary> ssReportList = new ArrayList();
 
-        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, SsnsRegression.REPORT_REPORT);
+        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT);
         if (ssReportObjList != null) {
             if (ssReportObjList.size() > 0) {
                 SsReport reportObj = ssReportObjList.get(0);
@@ -2004,8 +2004,8 @@ public class ServiceAFweb {
         }
         String name = CKey.ADMIN_USERNAME;
         ArrayList<SsReport> ssReportList = new ArrayList();
-        ArrayList<SsReport> ssUserReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, SsnsRegression.REPORT_USER);
-        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, SsnsRegression.REPORT_REPORT);
+        ArrayList<SsReport> ssUserReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_USER);
+        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT);
 
         ssReportList.addAll(ssUserReportObjList);
         ssReportList.addAll(ssReportObjList);
@@ -2473,7 +2473,8 @@ public class ServiceAFweb {
                                     }
                                 }
                             }
-                            passSt = accObj.getName() + ":" + passSt;
+                            passSt = feat + ":" + passSt;
+                            return passSt;
                         }
                     }
                 }

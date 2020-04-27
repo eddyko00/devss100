@@ -222,8 +222,8 @@ public class SsnsDataImp {
     public ArrayList<ProdSummary> getSsReportSummaryObjListByUid(String name, String uid) {
         return ssnsdb.getSsReportSummaryObjListByUid(name, uid);
     }        
-    public ArrayList<SsReport> getSsReportObjListByUid(String name, String uid) {
-        return ssnsdb.getSsReportObjListByUid(name, uid);
+    public ArrayList<SsReport> getSsReportObjListByUidDesc(String name, String uid) {
+        return ssnsdb.getSsReportObjListByUidDesc(name, uid);
     }
 
     public int deleteAllSsReport(int month) {

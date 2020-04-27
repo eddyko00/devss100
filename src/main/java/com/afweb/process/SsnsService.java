@@ -301,7 +301,7 @@ public class SsnsService {
     public static String parseTTVCFeature(String outputSt, String oper, String postParm) {
 
         if (outputSt == null) {
-            return null;
+            return "";
         }
 
         int packCd = 0;
@@ -1518,7 +1518,7 @@ public class SsnsService {
     public static String parseAppointmentTimeSlotFeature(String outputSt, String oper, String host) {
 
         if (outputSt == null) {
-            return null;
+            return "";
         }
         ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
         String feat = APP_FEAT_TYPE_APP;
@@ -1546,7 +1546,7 @@ public class SsnsService {
     public static String parseAppointmentFeature(String outputSt, String oper) {
 
         if (outputSt == null) {
-            return null;
+            return "";
         }
 
         int catCdInit = 0;
@@ -1823,9 +1823,9 @@ public class SsnsService {
 
         return featTTV;
     }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////    
-
     public String getFeatureSsnsProdiuctInventory(SsnsData dataObj) {
         String feat = "";
         try {
@@ -2042,7 +2042,7 @@ public class SsnsService {
 
     public static String parseProductPhoneFeature(String outputSt, String oper) {
         if (outputSt == null) {
-            return null;
+            return "";
         }
         try {
 
@@ -2169,7 +2169,26 @@ public class SsnsService {
         } catch (Exception ex) {
 
         }
-        return null;
+        return "";
+    }
+
+    public static String checkProductRelationshipProductNm(int j, ArrayList<String> outputList) {
+        for (int k = j; k <= outputList.size(); k++) {
+            String inL = outputList.get(outputList.size() - 1 - k);
+            if (inL.indexOf("productRelationship") != -1) {
+                for (int m = k; m <= outputList.size(); m++) {
+                    String inLL = outputList.get(outputList.size() - 1 - m);
+                    if (inLL.indexOf("productNm") != -1) {
+                        String valueSt = outputList.get(outputList.size() - 1 - m + 1);
+                        valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                        valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
+                        valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
+                        return valueSt;
+                    }
+                }
+            }
+        }
+        return "";
     }
 
     public static String checkPhonePlan(int j, ArrayList<String> outputList) {
@@ -2194,7 +2213,7 @@ public class SsnsService {
     public static String parseProductInternetFeature(String outputSt, String oper) {
 
         if (outputSt == null) {
-            return null;
+            return "";
         }
         try {
 
@@ -2258,72 +2277,29 @@ public class SsnsService {
                     }
                     quotaAmtInit = 1;
                     boolean exit = false;
-                    for (int k = j; k <= outputList.size(); k++) {
-                        String inL = outputList.get(outputList.size() - 1 - k);
-                        if (inL.indexOf("productRelationship") != -1) {
-                            for (int m = k; m <= outputList.size(); m++) {
-                                String inLL = outputList.get(outputList.size() - 1 - m);
-                                if (inLL.indexOf("productNm") != -1) {
-                                    String valueSt = outputList.get(outputList.size() - 1 - m + 1);
-                                    valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
-                                    valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
-                                    valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
-                                    SecurityBundle = valueSt;
-                                    exit = true;
-                                    break;
-                                }
-                                if (exit == true) {
-                                    break;
-                                }
-                            }
-                            if (exit == true) {
-                                break;
-                            }
-                        }
-                        if (exit == true) {
-                            break;
-                        }
-                    }
+
+                    String valueSt = checkPhonePlan(j, outputList);
+                    SecurityBundle = valueSt;
 
                     continue;
                 }
 
                 if (inLine.indexOf("PrimaryPricePlan") != -1) {
-
                     if (planInit == 1) {
                         continue;
                     }
+
                     planInit = 1;
                     if (fifaFlag == 0) {
                         boolean exit = false;
-                        for (int k = j; k <= outputList.size(); k++) {
-                            String inL = outputList.get(outputList.size() - 1 - k);
-                            if (inL.indexOf("productRelationship") != -1) {
-                                for (int m = k; m <= outputList.size(); m++) {
-                                    String inLL = outputList.get(outputList.size() - 1 - m);
-                                    if (inLL.indexOf("productNm") != -1) {
-                                        String valueSt = outputList.get(outputList.size() - 1 - m + 1);
-                                        valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
-                                        valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
-                                        valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
-                                        PrimaryPricePlan = valueSt;
-                                        exit = true;
-                                        break;
-                                    }
-                                    if (exit == true) {
-                                        break;
-                                    }
-                                }
-                                if (exit == true) {
-                                    break;
-                                }
-                            }
-                            if (exit == true) {
-                                break;
-                            }
-                        }
+                        String valueSt = checkProductRelationshipProductNm(j, outputList);
+                        PrimaryPricePlan = valueSt;
+
                     } else if (fifaFlag == 1) {
                         boolean exit = false;
+//                        String valueSt = checkProductRelationshipProductNm(j, outputList);
+//                        PrimaryPricePlan = valueSt;
+                        
                         for (int k = j; k <= outputList.size(); k++) {
                             String inL = outputList.get(outputList.size() - 1 - k);
                             if (inL.indexOf("productNm") != -1) {
@@ -2334,12 +2310,11 @@ public class SsnsService {
                                 PrimaryPricePlan = valueSt;
                                 exit = true;
                                 break;
-
                             }
                             if (exit == true) {
                                 break;
                             }
-                        }
+                        }                        
                     }
                     continue;
                 }
@@ -2348,7 +2323,7 @@ public class SsnsService {
                     continue;
                 }
                 if (inLine.indexOf("UnlimitedUsage") != -1) {
-                    EmailFeatures = "UnlimitedUsage";
+                    UnlimitedUsage = "UnlimitedUsage";
                     continue;
                 }
             }
@@ -2386,7 +2361,7 @@ public class SsnsService {
         } catch (Exception ex) {
 
         }
-        return null;
+        return "";
     }
 
     public boolean updateSsnsProdiuctInventoryByProdId(String oper, String banid, String prodid, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
@@ -2526,7 +2501,7 @@ public class SsnsService {
     public static String parseProductTtvFeature(String outputSt, String oper) {
 
         if (outputSt == null) {
-            return null;
+            return "";
         }
 
         int productCdInit = 0;

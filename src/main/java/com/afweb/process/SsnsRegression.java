@@ -14,8 +14,12 @@ import static com.afweb.service.ServiceAFweb.AFSleep;
 import com.afweb.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 
 /**
@@ -55,7 +59,7 @@ public class SsnsRegression {
 
             //check if outstanding testing
             SsReport userReportObj = null;
-            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, REPORT_USER);
+            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, REPORT_USER);
             if (ssReportObjList != null) {
                 if (ssReportObjList.size() > 0) {
                     userReportObj = ssReportObjList.get(0);
@@ -84,7 +88,7 @@ public class SsnsRegression {
 
             //check if outstanding testing
             SsReport userReportObj = null;
-            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, REPORT_USER);
+            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, REPORT_USER);
             if (ssReportObjList != null) {
                 if (ssReportObjList.size() > 0) {
                     userReportObj = ssReportObjList.get(0);
@@ -94,7 +98,8 @@ public class SsnsRegression {
                     }
                 }
             }
-
+            int exitTest = 10;  // 1000000;
+            int added = 0;
             ReportData reportdata = new ReportData();
             ArrayList<String> servList = serviceAFweb.getSsnsprodAll(name, null, 0);
             for (int i = 0; i < servList.size(); i += 2) {
@@ -109,7 +114,6 @@ public class SsnsRegression {
                     testFeatList.add(featN);
 
                     ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, 15);
-                    int added = 0;
                     if (SsnsAcclist != null) {
                         for (int k = 0; k < SsnsAcclist.size(); k++) {
                             SsnsAcc accObj = SsnsAcclist.get(k);
@@ -125,16 +129,18 @@ public class SsnsRegression {
                             testIdList.add(st);
                             added++;
 ////////////////////////////////////////////////
-//                            break;  // just for testing
+                            if (added > exitTest) {
+                                break;
+                            }
 ////////////////////////////////////////////////
                         }
-                        logger.info("> startMonitor  " + featN + "id added " + added);
                     }
-//                    ///////just for testing
-//                    break;
+                    if (added > exitTest) {
+                        break;
+                    }
                 }
             }
-
+            logger.info("> startMonitor added " + added);
             testData tObj = new testData();
             tObj.setAccid(0);
             tObj.setType(ConstantKey.INITIAL);
@@ -182,6 +188,16 @@ public class SsnsRegression {
                 dataSt = new ObjectMapper().writeValueAsString(reportdata);
                 userReportObj.setData(dataSt);
 
+                String tzid = "America/New_York"; //EDT
+                TimeZone tz = TimeZone.getTimeZone(tzid);
+                Date d = new Date();
+                // timezone symbol (z) included in the format pattern 
+                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                // format date in target timezone
+                format.setTimeZone(tz);
+                String ESTdate = format.format(d);
+
+                userReportObj.setRet("start:" + ESTdate);
                 userReportObj.setUpdatedatel(ctime);
                 userReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
 
@@ -217,7 +233,7 @@ public class SsnsRegression {
         try {
             //Start process
             String uid = REPORT_REPORT;
-            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, uid);
+            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, uid);
             if (ssReportObjList != null) {
                 for (int i = 0; i < ssReportObjList.size(); i++) {
                     SsReport reportObj = ssReportObjList.get(i);
@@ -282,7 +298,7 @@ public class SsnsRegression {
 //
             SsReport reportReportObj = null;
             String uid = REPORT_REPORT;
-            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUid(name, uid);
+            ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, uid);
             if (ssReportObjList != null) {
                 if (ssReportObjList.size() > 0) {
                     reportReportObj = ssReportObjList.get(0);
@@ -315,7 +331,7 @@ public class SsnsRegression {
                 long lockDate1Min = TimeConvertion.addMinutes(currentTime, 1);
 
                 SsReport userReportObj = null;
-                ArrayList<SsReport> ssReportUserObjList = getSsnsDataImp().getSsReportObjListByUid(name, REPORT_USER);
+                ArrayList<SsReport> ssReportUserObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, REPORT_USER);
                 if (ssReportUserObjList != null) {
                     if (ssReportUserObjList.size() > 0) {
                         userReportObj = ssReportUserObjList.get(0);
@@ -333,6 +349,7 @@ public class SsnsRegression {
                     AFSleep();
                 }
 
+                logger.info("processMonitorTesting done " + name + " size " + idList.size());
                 if (reportReportObj != null) {
                     String dataSt = reportReportObj.getData();
                     if (dataSt.length() > 0) {
@@ -364,6 +381,34 @@ public class SsnsRegression {
             testData tObj = new ObjectMapper().readValue(tObjSt, testData.class);
             if (tObj.getType() == ConstantKey.INITIAL) {
                 // send communication to start
+                if (reportReportObj != null) {
+
+                    reportReportObj.setStatus(ConstantKey.COMPLETED);
+                    reportReportObj.setType(ConstantKey.OPEN);
+
+                    ReportData reportdata = new ReportData();
+                    String dataSt = new ObjectMapper().writeValueAsString(reportdata);
+                    reportReportObj.setData(dataSt);
+
+                    Calendar dateNow = TimeConvertion.getCurrentCalendar();
+                    long ctime = dateNow.getTimeInMillis();
+                    reportReportObj.setUpdatedatel(ctime);
+                    reportReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
+
+                    String tzid = "America/New_York"; //EDT
+                    TimeZone tz = TimeZone.getTimeZone(tzid);
+                    Date d = new Date();
+                    // timezone symbol (z) included in the format pattern 
+                    DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                    // format date in target timezone
+                    format.setTimeZone(tz);
+                    String ESTdate = format.format(d);
+
+                    reportReportObj.setRet("start:" + ESTdate);
+                    int ret = getSsnsDataImp().updatSsReportDataStatusTypeRetById(reportReportObj.getId(), reportReportObj.getData(),
+                            reportReportObj.getStatus(), reportReportObj.getType(), reportReportObj.getRet());
+
+                }
                 return;
             }
             if (tObj.getType() == ConstantKey.COMPLETED) {
@@ -382,7 +427,17 @@ public class SsnsRegression {
                     long ctime = dateNow.getTimeInMillis();
                     reportReportObj.setUpdatedatel(ctime);
                     reportReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
-                    reportReportObj.setRet("complete:" + new java.sql.Date(ctime));
+                    String retStat = reportReportObj.getRet();
+                    String tzid = "America/New_York"; //EDT
+                    TimeZone tz = TimeZone.getTimeZone(tzid);
+                    Date d = new Date();
+                    // timezone symbol (z) included in the format pattern 
+                    DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                    // format date in target timezone
+                    format.setTimeZone(tz);
+                    String ESTdate = format.format(d);
+                    retStat += " complete:" + ESTdate;
+                    reportReportObj.setRet(retStat);
                     int ret = getSsnsDataImp().updatSsReportDataStatusTypeRetById(reportReportObj.getId(), reportReportObj.getData(),
                             reportReportObj.getStatus(), reportReportObj.getType(), reportReportObj.getRet());
 
@@ -487,7 +542,7 @@ public class SsnsRegression {
         // report
         try {
             String uid = REPORT_REPORT;
-            ArrayList<SsReport> reportObjList = getSsnsDataImp().getSsReportObjListByUid(name, uid);
+            ArrayList<SsReport> reportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, uid);
 
             if (reportObjList == null) {
                 return;
@@ -528,7 +583,7 @@ public class SsnsRegression {
 ////////////////
 ///////// put back to the main user
             uid = REPORT_USER;
-            reportObjList = getSsnsDataImp().getSsReportObjListByUid(name, uid);
+            reportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, uid);
 
             if (reportObjList == null) {
                 return;

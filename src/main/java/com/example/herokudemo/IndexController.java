@@ -54,7 +54,6 @@ public class IndexController {
         arrayString.add("/cust/{username}/login&pass={pass}");
 
         arrayString.add("/cust/{username}/id/{id}/mon");
-        arrayString.add("/cust/{username}/id/{id}/mon/monitor");
         arrayString.add("/cust/{username}/id/{id}/mon/report/{pid}");
         arrayString.add("/cust/{username}/id/{id}/mon/id/{pid}");
 
@@ -129,7 +128,7 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/mon/monitor", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/mon/exec", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     String getAllmonExec(
             @PathVariable("username") String username,
@@ -143,25 +142,6 @@ public class IndexController {
         }
 
         String ret = afWebService.getSsReportMonExec(username, idSt);
-        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
-        return ret;
-    }
-
-    @RequestMapping(value = "/cust/{username}/id/{id}/mon/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    SsReport getAllmonId(
-            @PathVariable("username") String username,
-            @PathVariable("id") String idSt,
-            @PathVariable("pid") String pidSt,
-            HttpServletRequest request, HttpServletResponse response
-    ) {
-        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
-        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            return null;
-        }
-
-        SsReport ret = afWebService.getSsReportById(username, idSt, pidSt);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
