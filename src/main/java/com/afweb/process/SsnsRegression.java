@@ -383,13 +383,6 @@ public class SsnsRegression {
                 // send communication to start
                 if (reportReportObj != null) {
 
-                    reportReportObj.setStatus(ConstantKey.COMPLETED);
-                    reportReportObj.setType(ConstantKey.OPEN);
-
-                    ReportData reportdata = new ReportData();
-                    String dataSt = new ObjectMapper().writeValueAsString(reportdata);
-                    reportReportObj.setData(dataSt);
-
                     Calendar dateNow = TimeConvertion.getCurrentCalendar();
                     long ctime = dateNow.getTimeInMillis();
                     reportReportObj.setUpdatedatel(ctime);
@@ -403,11 +396,15 @@ public class SsnsRegression {
                     // format date in target timezone
                     format.setTimeZone(tz);
                     String ESTdate = format.format(d);
-
-                    reportReportObj.setRet("start:" + ESTdate);
+                    String retStat = " start:" + ESTdate;
+                    reportReportObj.setRet(retStat);
                     logger.info("> execMonitorTesting " + reportReportObj.getName() + " " + reportReportObj.getRet());
                     int ret = getSsnsDataImp().updatSsReportDataStatusTypeRetById(reportReportObj.getId(), reportReportObj.getData(),
                             reportReportObj.getStatus(), reportReportObj.getType(), reportReportObj.getRet());
+
+                    usreReportObj.setRet(retStat);
+                    ret = getSsnsDataImp().updatSsReportDataStatusTypeRetById(usreReportObj.getId(), usreReportObj.getData(),
+                            usreReportObj.getStatus(), usreReportObj.getType(), usreReportObj.getRet());
 
                 }
                 return;
@@ -439,10 +436,14 @@ public class SsnsRegression {
                     String ESTdate = format.format(d);
                     retStat += " complete:" + ESTdate;
                     reportReportObj.setRet(retStat);
-                    logger.info("> execMonitorTesting " + reportReportObj.getName() + " " + reportReportObj.getRet());                    
+                    logger.info("> execMonitorTesting " + reportReportObj.getName() + " " + reportReportObj.getRet());
                     int ret = getSsnsDataImp().updatSsReportDataStatusTypeRetById(reportReportObj.getId(), reportReportObj.getData(),
                             reportReportObj.getStatus(), reportReportObj.getType(), reportReportObj.getRet());
 
+                    usreReportObj.setStatus(ConstantKey.COMPLETED);
+                    usreReportObj.setRet(retStat);
+                    ret = getSsnsDataImp().updatSsReportDataStatusTypeRetById(usreReportObj.getId(), usreReportObj.getData(),
+                            usreReportObj.getStatus(), usreReportObj.getType(), usreReportObj.getRet());
                 }
                 return;
             }

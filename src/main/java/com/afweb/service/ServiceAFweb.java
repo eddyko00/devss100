@@ -1944,13 +1944,16 @@ public class ServiceAFweb {
                 return 0;
             }
             ret = regression.startMonitor(this, name);
+            // clear old report
+            getSsReportMonClearReport( EmailUserName, IDSt);
+            
         } catch (Exception ex) {
         }
         removeNameLock(LockName, ConstantKey.MONSTART_LOCKTYPE);
         return ret;
     }
 
-    public int getSsReportMonClearReport(String EmailUserName, String IDSt, String repIDSt) {
+    public int getSsReportMonClearReport(String EmailUserName, String IDSt) {
 
         if (getServerObj().isSysMaintenance() == true) {
             return 0;

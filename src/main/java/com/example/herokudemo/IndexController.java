@@ -158,7 +158,7 @@ public class IndexController {
             return 0;
         }
 
-        int ret = afWebService.getSsReportMonClearReport(username, idSt, "");
+        int ret = afWebService.getSsReportMonClearReport(username, idSt);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
