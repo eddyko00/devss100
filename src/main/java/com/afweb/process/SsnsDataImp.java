@@ -219,9 +219,18 @@ public class SsnsDataImp {
         return null;
     }
 
+    public int DeleteSsReportObjByID(int id) {
+        return ssnsdb.DeleteSsReportObjByID(id);
+    }
+
+    public int DeleteSsReportObjListByUid(String name, String uid) {
+        return ssnsdb.DeleteSsReportObjListByUid(name, uid);
+    }
+
     public ArrayList<ProdSummary> getSsReportSummaryObjListByUid(String name, String uid) {
         return ssnsdb.getSsReportSummaryObjListByUid(name, uid);
-    }        
+    }
+
     public ArrayList<SsReport> getSsReportObjListByUidDesc(String name, String uid) {
         return ssnsdb.getSsReportObjListByUidDesc(name, uid);
     }

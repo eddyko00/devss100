@@ -1935,6 +1935,42 @@ public class ServiceAFweb {
         return regression.startMonitor(this, name);
     }
 
+    public int getSsReportMonClearReport(String EmailUserName, String IDSt, String repIDSt) {
+
+        if (getServerObj().isSysMaintenance() == true) {
+            return 0;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return 0;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return 0;
+            }
+        }
+        String name = CKey.ADMIN_USERNAME;
+
+        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT);
+        if (ssReportObjList != null) {
+            for (int i = 0; i < ssReportObjList.size(); i++) {
+                if (i < 2) {
+                    continue;
+                }
+                SsReport repObj = ssReportObjList.get(i);
+                String nameRepId = repObj.getName() + "_" + repObj.getId();
+                getSsnsDataImp().DeleteSsReportObjListByUid(nameRepId,  SsnsRegression.REPORT_TESE_CASE);
+                
+                getSsnsDataImp().DeleteSsReportObjByID(repObj.getId());
+                
+                
+            }
+        }
+
+        return 1;
+
+    }
+
     public ArrayList<ProdSummary> getSsReportMonReport(String EmailUserName, String IDSt, String repIDSt) {
 
         if (getServerObj().isSysMaintenance() == true) {

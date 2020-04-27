@@ -1013,15 +1013,41 @@ public class SsnsDataDB {
         return entries;
     }
 
+    public int DeleteSsReportObjByID(int id) {
+        try {
+            String deleteSQL = "delete from ssreport where id=" + id;
+            processExecuteDB(deleteSQL);
+            return 1;
+        } catch (Exception e) {
+            logger.info("> DeleteAllLock exception " + e.getMessage());
+        }
+        return 0;
+
+    }
+
+    public int DeleteSsReportObjListByUid(String name, String uid) {
+        try {
+            String deleteSQL = "delete from ssreport "
+                    + " where name='" + name + "' and uid='" + uid + "'";
+            processExecuteDB(deleteSQL);
+            return 1;
+        } catch (Exception e) {
+            logger.info("> DeleteAllLock exception " + e.getMessage());
+        }
+        return 0;
+
+    }
+
     public ArrayList<ProdSummary> getSsReportSummaryObjListByUid(String name, String uid) {
         String sql = "select id as parm1, cusid as parm2, banid as parm3, tiid as parm4,"
                 + " oper as parm5, ret as parm6, status as parm7  from ssreport "
                 + " where name='" + name + "' and uid='" + uid + "'";
         sql += " order by updatedatel asc";
         ArrayList<Pram7RDB> entries = getAll7ParamSQL(sql);
+        ArrayList<ProdSummary> sumList = new ArrayList();
         if (entries != null) {
             if (entries.size() > 0) {
-                ArrayList<ProdSummary> sumList = new ArrayList();
+
                 for (int i = 0; i < entries.size(); i++) {
                     Pram7RDB parm = entries.get(i);
                     ProdSummary sum = new ProdSummary();
@@ -1034,8 +1060,8 @@ public class SsnsDataDB {
                     sum.setStatus(parm.getParm7());
                     sumList.add(sum);
                 }
-                return sumList;
             }
+            return sumList;
         }
         return null;
     }
