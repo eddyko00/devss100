@@ -98,7 +98,7 @@ public class SsnsRegression {
                     }
                 }
             }
-            int exitTest = 10;  // 1000000;
+            int exitTest = 200;  // 1000000;
             int added = 0;
             ReportData reportdata = new ReportData();
             ArrayList<String> servList = serviceAFweb.getSsnsprodAll(name, null, 0);
@@ -364,6 +364,9 @@ public class SsnsRegression {
                     reportReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
                     int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(reportReportObj.getId(), reportReportObj.getData(),
                             reportReportObj.getStatus(), reportReportObj.getType());
+
+                    // update report statistic
+                    reportMoniter(serviceAFweb, name);
                 }
                 serviceAFweb.removeNameLock(LockName, ConstantKey.MON_LOCKTYPE);
             }
@@ -555,14 +558,14 @@ public class SsnsRegression {
             }
 
             SsReport reportReportObj = reportObjList.get(0);
-
+            ArrayList<String> overviewTestReportList = new ArrayList();
             ArrayList<String> testReportList = new ArrayList();
             String nameRepId = name + "_" + reportReportObj.getId();
 
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_PRODUCT, testReportList);
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WIFI, testReportList);
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_APP, testReportList);
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_TTVC, testReportList);
+            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_PRODUCT, testReportList, overviewTestReportList);
+            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WIFI, testReportList, overviewTestReportList);
+            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_APP, testReportList, overviewTestReportList);
+            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_TTVC, testReportList, overviewTestReportList);
             logger.info("> reportList  " + testReportList.size());
 
             if (reportReportObj.getStatus() == ConstantKey.COMPLETED) {
@@ -585,40 +588,40 @@ public class SsnsRegression {
             }
 ////////////////
 /////////// put back to the main user
-//            uid = REPORT_USER;
-//            reportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, uid);
-//
-//            if (reportObjList == null) {
-//                return;
-//            }
-//            if (reportObjList.size() == 0) {
-//                return;
-//            }
-//            SsReport userReportObj = reportObjList.get(0);
-//
-//            ReportData reportdata = new ReportData();
-//
-//            String dataSt = userReportObj.getData();
-//            if (dataSt.length() > 0) {
-//                reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
-//            }
-//            reportdata.setReportList(testReportList);
-//            dataSt = new ObjectMapper().writeValueAsString(reportdata);
-//            userReportObj.setData(dataSt);
-//
-//            Calendar dateNow = TimeConvertion.getCurrentCalendar();
-//            long ctime = dateNow.getTimeInMillis();
-//            userReportObj.setUpdatedatel(ctime);
-//            userReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
-//            int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(userReportObj.getId(), userReportObj.getData(),
-//                    userReportObj.getStatus(), userReportObj.getType());
+            uid = REPORT_USER;
+            reportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, uid);
+
+            if (reportObjList == null) {
+                return;
+            }
+            if (reportObjList.size() == 0) {
+                return;
+            }
+            SsReport userReportObj = reportObjList.get(0);
+
+            ReportData reportdata = new ReportData();
+
+            String dataSt = userReportObj.getData();
+            if (dataSt.length() > 0) {
+                reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
+            }
+            reportdata.setReportList(overviewTestReportList);
+            dataSt = new ObjectMapper().writeValueAsString(reportdata);
+            userReportObj.setData(dataSt);
+
+            Calendar dateNow = TimeConvertion.getCurrentCalendar();
+            long ctime = dateNow.getTimeInMillis();
+            userReportObj.setUpdatedatel(ctime);
+            userReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
+            int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(userReportObj.getId(), userReportObj.getData(),
+                    userReportObj.getStatus(), userReportObj.getType());
 
         } catch (Exception ex) {
 
         }
     }
 
-    public void getReportStat(ServiceAFweb serviceAFweb, String nameRepId, String app, ArrayList<String> reportList) {
+    public void getReportStat(ServiceAFweb serviceAFweb, String nameRepId, String app, ArrayList<String> reportList, ArrayList<String> overviewTestReportList) {
         int Pass = 0;
         int Fail = 0;
         float exec = 0;
@@ -676,6 +679,7 @@ public class SsnsRegression {
                 execAvg = exec / Pass;
             }
             String reportLine = app + ",result," + "pass," + Pass + ",fail," + Fail + ",exec," + execAvg;
+            overviewTestReportList.add(reportLine);
             reportList.add(reportLine);
         }
     }
