@@ -531,28 +531,13 @@ public class ServiceAFweb {
             }
         }
         if (CKey.UI_ONLY == true) {
-            if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
-                //// process monitor
-//                SsnsRegression regression = new SsnsRegression();
-//                regression.processMonitorTesting(this);
-            }
+//            if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
+//
+//            }
             return;
         }
 
-        String LockName = null;
         try {
-            Calendar dateNow = TimeConvertion.getCurrentCalendar();
-            long lockDateValue = dateNow.getTimeInMillis();
-
-            LockName = "LOCK_" + ServiceAFweb.getServerObj().getServerName();
-//            long lockReturn = setLockNameProcess(LockName, ConstantKey.SRV_LOCKTYPE, lockDateValue, "ProcessTimerCnt " + getServerObj().getProcessTimerCnt());
-//
-//            if (CKey.NN_DEBUG == true) {
-//                lockReturn = 1;
-//            }
-//            if (lockReturn == 0) {
-//                return;
-//            }
             if (getServerObj().getProcessTimerCnt() < 0) {
                 getServerObj().setProcessTimerCnt(0);
             }
@@ -618,7 +603,6 @@ public class ServiceAFweb {
         } catch (Exception ex) {
             logger.info("> processTimer Exception" + ex.getMessage());
         }
-        removeNameLock(LockName, ConstantKey.SRV_LOCKTYPE);
     }
 
     /**
@@ -2347,7 +2331,7 @@ public class ServiceAFweb {
         return null;
     }
 
-    public ArrayList<String> testSsnsprodTTVCByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
+    public ArrayList<String> testSsnsprodTTVCByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -2368,7 +2352,7 @@ public class ServiceAFweb {
                 SsnsService ss = new SsnsService();
                 String feat = "";
                 if ((Oper.equals(TT_GetSub) || Oper.equals(TT_Vadulate) || Oper.equals(TT_Quote) || Oper.equals(TT_SaveOrder))) {
-                    feat = ss.TestFeatureSsnsProdTTVC(ssnsAccObj, outputList, Oper);
+                    feat = ss.TestFeatureSsnsProdTTVC(ssnsAccObj, outputList, Oper, LABURL);
 //                    logger.info("> testSsnsprodTTVCByIdRT " + Oper + " feat " + feat);
                     if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {
                         // disabled this Acc Obj
@@ -2394,20 +2378,20 @@ public class ServiceAFweb {
         return null;
     }
 
-    public ArrayList<String> testSsnsprodPRocessByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
+    public ArrayList<String> testSsnsprodPRocessByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
         if (prod.equals(SsnsService.APP_APP)) {
-            return this.testSsnsprodAppByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper);
+            return this.testSsnsprodAppByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         } else if (prod.equals(SsnsService.APP_TTVC)) {
-            return this.testSsnsprodTTVCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper);
+            return this.testSsnsprodTTVCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         } else if (prod.equals(SsnsService.APP_WIFI)) {
-            return this.testSsnsprodWifiByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper);
+            return this.testSsnsprodWifiByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         } else if (prod.equals(SsnsService.APP_PRODUCT)) {
-            return testSsnsprodByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper);
+            return testSsnsprodByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         }
         return null;
     }
 
-    public String testSsnsprodWifiByIdRTTtest(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
+    public String testSsnsprodWifiByIdRTTtest(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {
             return "";
         }
@@ -2429,7 +2413,7 @@ public class ServiceAFweb {
 
                 if (Oper.equals(SsnsService.WI_GetDevice) || Oper.equals(SsnsService.WI_GetDeviceStatus)) {
                     String oper = accObj.getRet();
-                    String featRet = ss.TestFeatureSsnsProdWifi(accObj, response, oper);
+                    String featRet = ss.TestFeatureSsnsProdWifi(accObj, response, oper, LABURL);
                     if (response != null) {
                         if (response.size() > 3) {
                             String feat = response.get(0);
@@ -2472,7 +2456,7 @@ public class ServiceAFweb {
         return "";
     }
 
-    public ArrayList<String> testSsnsprodWifiByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
+    public ArrayList<String> testSsnsprodWifiByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -2494,7 +2478,7 @@ public class ServiceAFweb {
                 String feat = "";
 
                 if (Oper.equals(SsnsService.WI_GetDevice) || Oper.equals(SsnsService.WI_GetDeviceStatus)) {
-                    feat = ss.TestFeatureSsnsProdWifi(ssnsAccObj, outputList, Oper);
+                    feat = ss.TestFeatureSsnsProdWifi(ssnsAccObj, outputList, Oper, LABURL);
 //                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
                     if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {
                         // disabled this Acc Obj
@@ -2520,7 +2504,7 @@ public class ServiceAFweb {
         return null;
     }
 
-    public ArrayList<String> testSsnsprodAppByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper) {
+    public ArrayList<String> testSsnsprodAppByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -2542,7 +2526,7 @@ public class ServiceAFweb {
                 String feat = "";
 
                 if (Oper.equals(SsnsService.APP_GET_APP) || Oper.equals(SsnsService.APP_GET_TIMES)) {
-                    feat = ss.TestFeatureSsnsProdApp(ssnsAccObj, outputList, Oper);
+                    feat = ss.TestFeatureSsnsProdApp(ssnsAccObj, outputList, Oper, LABURL);
 //                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
                     if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {
                         // disabled this Acc Obj
@@ -2568,7 +2552,7 @@ public class ServiceAFweb {
         return null;
     }
 
-    public String testSsnsprodByIdRTtest(String EmailUserName, String IDSt, String PIDSt, String prod, String ProdOper) {
+    public String testSsnsprodByIdRTtest(String EmailUserName, String IDSt, String PIDSt, String prod, String ProdOper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -2592,7 +2576,7 @@ public class ServiceAFweb {
                 if (prod.equals(SsnsService.APP_PRODUCT)) {
                     String oper = accObj.getRet();
 
-                    String featRet = ss.TestFeatureSsnsProductInventory(accObj, response, oper);
+                    String featRet = ss.TestFeatureSsnsProductInventory(accObj, response, oper, LABURL);
                     if (response != null) {
                         if (response.size() > 3) {
                             String feat = response.get(0);
@@ -2635,7 +2619,7 @@ public class ServiceAFweb {
         return "";
     }
 
-    public ArrayList<String> testSsnsprodByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String ProdOper) {
+    public ArrayList<String> testSsnsprodByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String ProdOper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -2658,7 +2642,7 @@ public class ServiceAFweb {
                 if (prod.equals(SsnsService.APP_PRODUCT)) {
                     String oper = ssnsAccObj.getRet();
 
-                    feat = ss.TestFeatureSsnsProductInventory(ssnsAccObj, outputList, oper);
+                    feat = ss.TestFeatureSsnsProductInventory(ssnsAccObj, outputList, oper, LABURL);
                     if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {
                         // disabled this Acc Obj
                         int type = ssnsAccObj.getType();

@@ -462,7 +462,9 @@ public class SsnsRegression {
             }
 
             int id = tObj.getAccid();
-
+            String LABURL = tObj.getTesturl();  // " empty for monitor, not empay for regression
+            
+            
             SsnsAcc accObj = getSsnsDataImp().getSsnsAccObjByID(id);
             String dataSt = accObj.getData();
             ProductData pData = new ObjectMapper().readValue(dataSt, ProductData.class);
@@ -472,7 +474,7 @@ public class SsnsRegression {
                     for (int j = 0; j < cmdList.size(); j += 2) {
                         String oper = cmdList.get(j + 1);
 
-                        ArrayList<String> response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper);
+                        ArrayList<String> response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
                         if (response != null) {
                             if (response.size() > 3) {
                                 String feat = response.get(0);
