@@ -574,6 +574,13 @@ public class SsnsRegression {
                         pDataNew.setDetailResp(labResponse);
 
                         String nameSt = new ObjectMapper().writeValueAsString(pDataNew);
+
+                        //////exception with not sure why so make sure not special #
+                        if (nameSt.indexOf("#") != -1) {
+                            logger.info("# found");
+                        }
+                        nameSt = dataSt.replaceAll("#", "");
+                        //////exception with not sure why so make sure not special #
                         reportObj.setData(nameSt);
 
                         Calendar dateNow = TimeConvertion.getCurrentCalendar();
