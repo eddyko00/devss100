@@ -152,6 +152,7 @@ public class SsnsRegression {
             tObj.setUsername(name);
             tObj.setTesturl("");
             String st = new ObjectMapper().writeValueAsString(tObj);
+            st = st.replace('"', '^');
             testIdList.add(0, st);  // add front
 
             tObj.setAccid(0);
@@ -159,6 +160,7 @@ public class SsnsRegression {
             tObj.setUsername(name);
             tObj.setTesturl("");
             st = new ObjectMapper().writeValueAsString(tObj);
+            st = st.replace('"', '^');
             testIdList.add(st);
 
             SsReport reportObj = new SsReport();
@@ -357,7 +359,7 @@ public class SsnsRegression {
                 logger.info("processMonitorTesting done " + name + " size " + idList.size());
                 if (reportReportObj != null) {
                     String dataSt = reportReportObj.getData();
-                    if (dataSt.length() > 0) {
+                    if (dataSt.length() > 0) {                    
                         ReportData reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
                         reportdata.setTestListObj(idList);
                         dataSt = new ObjectMapper().writeValueAsString(reportdata);
@@ -386,6 +388,7 @@ public class SsnsRegression {
 
     public void execMonitorTesting(ServiceAFweb serviceAFweb, String tObjSt, SsReport reportReportObj, SsReport usreReportObj) {
         try {
+
             tObjSt = tObjSt.replace('^', '"');
             testData tObj = new ObjectMapper().readValue(tObjSt, testData.class);
             if (tObj.getType() == ConstantKey.INITIAL) {

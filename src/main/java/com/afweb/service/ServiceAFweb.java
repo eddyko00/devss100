@@ -414,21 +414,24 @@ public class ServiceAFweb {
 //                    }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
-                    boolean monflag = false;
+                    boolean monflag = true;
                     if (monflag == true) {
-
 //                        this.getSsnsDataImp().deleteAllSsReport(0);
                         SsnsRegression regression = new SsnsRegression();
                         String name = CKey.ADMIN_USERNAME;
+
+                        ArrayList<SsReport> ret = new ArrayList();
+                        ret = getSsReportMon(name, null);
                         regression.startMonitor(this, name);
 
                         for (int i = 0; i < 10; i++) {
                             regression.processMonitorTesting(this);
-                            if (i == 1) {
+                            if (i == 2) {
                                 regression.stopMonitor(this, name);
                             }
+                            ret = getSsReportMon(name, null);
                         }
-                        regression.reportMoniter(this, name);
+                        ret = getSsReportMon(name, null);
 
                     }
 /////////
@@ -2138,10 +2141,16 @@ public class ServiceAFweb {
         String name = CKey.ADMIN_USERNAME;
         ArrayList<SsReport> ssReportList = new ArrayList();
         ArrayList<SsReport> ssUserReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_USER);
+        if (ssUserReportObjList == null) {
+            return ssReportList;
+        }
         ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT);
-
-        ssReportList.addAll(ssUserReportObjList);
-        ssReportList.addAll(ssReportObjList);
+        if (ssUserReportObjList != null) {
+            ssReportList.addAll(ssUserReportObjList);
+        }
+        if (ssReportObjList != null) {
+            ssReportList.addAll(ssReportObjList);
+        }
         return ssReportList;
 
     }

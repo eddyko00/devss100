@@ -960,6 +960,78 @@ public class ServiceRemoteDB {
         }
     }
 
+    public ArrayList getAllNameTXTSqlRemoteDB_RemoteMysql(String sqlCMD) throws Exception {
+
+        ServiceAFweb.getServerObj().setCntRESTrequest(ServiceAFweb.getServerObj().getCntRESTrequest() + 1);
+//        log.info("getAllNameSqlRemoteDB_RemoteMysql " + sqlCMD);
+        try {
+            String subResourcePath = WEBPOST;
+            HashMap newmap = new HashMap();
+            newmap.put(CMD, "1");
+
+            HashMap newbodymap = new HashMap();
+            newbodymap.put(CMDPOST, sqlCMD);
+
+            String output = sendRequest_remotesql(METHOD_POST, subResourcePath, newmap, newbodymap);
+
+            int beg = output.indexOf("~~ ");
+            int end = output.indexOf(" ~~");
+            // create hash map
+            if (beg > end) {
+                return null;
+            }
+            output = output.substring(beg + 3, end);
+            ArrayList<String> retArray = new ArrayList();
+            if (output.length() == 0) {
+                return retArray;
+            }
+
+//            String[] dataArray = output.split("~");
+            String[] dataArray = splitIncludeEmpty(output, '~');
+            output = "[";
+            int recSize = 1;
+            for (int i = 0; i < dataArray.length; i += recSize) {
+                output += "{";
+                output += "\"nametxt\":\"" + dataArray[i] + "\"";
+                if (i + recSize >= dataArray.length) {
+                    output += "}";
+                } else {
+                    output += "},";
+                }
+            }
+            output += "]";
+            return getAllNameTXTSqlRemoteDB_Process(output);
+
+        } catch (Exception ex) {
+            log.info("getAllNameSqlRemoteDB exception " + ex);
+            ServiceAFweb.getServerObj().setCntRESTexception(ServiceAFweb.getServerObj().getCntRESTexception() + 1);
+            throw ex;
+        }
+    }
+
+    private ArrayList<String> getAllNameTXTSqlRemoteDB_Process(String output) {
+        if (output.equals("")) {
+            return null;
+        }
+        ArrayList<NameTXTRDB> arrayDB = null;
+        ArrayList<String> arrayReturn = new ArrayList();
+        try {
+            NameTXTRDB[] arrayItem = new ObjectMapper().readValue(output, NameTXTRDB[].class);
+            List<NameTXTRDB> listItem = Arrays.<NameTXTRDB>asList(arrayItem);
+            arrayDB = new ArrayList<NameTXTRDB>(listItem);
+
+            for (int i = 0; i < arrayDB.size(); i++) {
+                NameTXTRDB nameRDB = arrayDB.get(i);
+                arrayReturn.add(nameRDB.getNametxt());
+            }
+            return arrayReturn;
+        } catch (IOException ex) {
+            log.info("getAllNameTXTSqlRemoteDB_Process exception " + output);
+            return null;
+        }
+    }
+        
+        
     public ArrayList getAllNameSqlRemoteDB_RemoteMysql(String sqlCMD) throws Exception {
 
         ServiceAFweb.getServerObj().setCntRESTrequest(ServiceAFweb.getServerObj().getCntRESTrequest() + 1);

@@ -133,43 +133,43 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/mon/updatereport", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    String getAllmonUpdateRep(
-            @PathVariable("username") String username,
-            @PathVariable("id") String idSt,
-            HttpServletRequest request, HttpServletResponse response
-    ) {
-        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
-        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            return "";
-        }
+//    @RequestMapping(value = "/cust/{username}/id/{id}/mon/updatereport", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+//    public @ResponseBody
+//    String getAllmonUpdateRep(
+//            @PathVariable("username") String username,
+//            @PathVariable("id") String idSt,
+//            HttpServletRequest request, HttpServletResponse response
+//    ) {
+//        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+//        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+//            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+//            return "";
+//        }
+//
+//        int ret = afWebService.getSsReportMonUpdateReport(username, idSt);
+//
+//        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+//        return ret + "";
+//    }
 
-        int ret = afWebService.getSsReportMonUpdateReport(username, idSt);
-
-        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
-        return ret + "";
-    }
-
-    @RequestMapping(value = "/cust/{username}/id/{id}/mon/exec", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    String getAllmonExec(
-            @PathVariable("username") String username,
-            @PathVariable("id") String idSt,
-            HttpServletRequest request, HttpServletResponse response
-    ) {
-        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
-        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            return "";
-        }
-
-        String ret = afWebService.getSsReportMonExec(username, idSt);
-
-        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
-        return ret;
-    }
+//    @RequestMapping(value = "/cust/{username}/id/{id}/mon/exec", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+//    public @ResponseBody
+//    String getAllmonExec(
+//            @PathVariable("username") String username,
+//            @PathVariable("id") String idSt,
+//            HttpServletRequest request, HttpServletResponse response
+//    ) {
+//        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+//        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+//            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+//            return "";
+//        }
+//
+//        String ret = afWebService.getSsReportMonExec(username, idSt);
+//
+//        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+//        return ret;
+//    }
 
     @RequestMapping(value = "/cust/{username}/id/{id}/mon/clearreport", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody

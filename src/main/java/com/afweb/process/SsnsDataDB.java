@@ -13,6 +13,7 @@ import com.afweb.service.ServiceRemoteDB;
 import com.afweb.service.db.Pram7RDB;
 
 import com.afweb.util.*;
+import static com.afweb.util.CKey.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -996,12 +997,19 @@ public class SsnsDataDB {
 
     public ArrayList<String> getSsReportObjListByFeatureOper(String name, String app) {
         String sql = "select DISTINCT oper as name from ssreport where name='" + name + "' and app='" + app + "' order by oper asc";
+
+        if ((CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) && (CKey.SQL_RemoveServerDB == true)) {
+            sql = "select DISTINCT oper from ssreport where name='" + name + "' and app='" + app + "' order by oper asc";
+        }
         ArrayList array = getAllNameSQL(sql);
         return array;
     }
 
     public ArrayList<String> getSsnsAccObjListByFeature(String app) {
         String sql = "select DISTINCT name as name from ssnsacc where app='" + app + "' order by name asc";
+        if ((CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) && (CKey.SQL_RemoveServerDB == true)) {
+            sql = "select DISTINCT name from ssnsacc where app='" + app + "' order by name asc";
+        }
         ArrayList array = getAllNameSQL(sql);
         return array;
     }
@@ -1208,6 +1216,33 @@ public class SsnsDataDB {
         String sql = "select * from ssreport where name='" + name + "'" + " order by updatedatel asc";
         ArrayList entries = getAllSsnsDataSQL(sql, length);
         return entries;
+    }
+
+    public ArrayList getAllNameTXTSQL(String sql) {
+        if (checkCallRemoveSQL_Mysql() == true) {
+            ArrayList nnList;
+            try {
+                nnList = remoteDB.getAllNameTXTSqlRemoteDB_RemoteMysql(sql);
+                return nnList;
+            } catch (Exception ex) {
+            }
+            return null;
+        }
+
+        try {
+            List<String> entries = new ArrayList<>();
+            entries.clear();
+            entries = this.jdbcTemplate.query(sql, new RowMapper() {
+                public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    String name = rs.getString("nametxt");
+                    return name;
+                }
+            });
+            return (ArrayList) entries;
+        } catch (Exception e) {
+            logger.info("> getAllNameTXTSQL exception " + e.getMessage());
+        }
+        return null;
     }
 
     public ArrayList getAllNameSQL(String sql) {
