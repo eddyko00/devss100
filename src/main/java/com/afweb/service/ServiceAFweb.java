@@ -416,7 +416,7 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////                    
                     boolean monflag = true;
                     if (monflag == true) {
-//                        this.getSsnsDataImp().deleteAllSsReport(0);
+                        this.getSsnsDataImp().deleteAllSsReport(0);
                         SsnsRegression regression = new SsnsRegression();
                         String name = CKey.ADMIN_USERNAME;
 
