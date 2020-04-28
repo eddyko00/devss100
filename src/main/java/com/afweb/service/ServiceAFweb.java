@@ -3014,6 +3014,14 @@ public class ServiceAFweb {
         return 0;
     }
 
+    public int restoresSsnsAcc() {
+        logger.info("restoreSsnsAccDB start");
+        this.getSsnsDataImp().deleteAllSsnsAcc(0);
+        boolean retSatus = getAccountImp().restoreSsnsAccDB(this);
+        logger.info("restoreSsnsAccDB end");
+        return 1;
+    }
+
     ////////////////////////
     public ArrayList getAllLock() {
 

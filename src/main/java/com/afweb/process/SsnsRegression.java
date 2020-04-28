@@ -532,14 +532,23 @@ public class SsnsRegression {
                         } else {
                             //regression testing///
                             //regression testing///
+                            passSt = R_FAIL;
                             String PR = "";
                             response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, PR);
-                            labResponse = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
-                            boolean result = compareArraySame(response, labResponse);
-                            if (result = true) {
-                                passSt = R_PASS;
-                            } else {
-                                passSt = R_FAIL;
+                            if (response != null) {
+                                if (response.size() > 3) {
+                                    String feat = response.get(0);
+                                    String execSt = response.get(2);
+                                    execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
+                                    exec = Long.parseLong(execSt);
+                                    labResponse = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
+                                    boolean result = compareArraySame(response, labResponse);
+                                    if (result = true) {
+                                        passSt = R_PASS;
+                                    } else {
+                                        passSt = R_FAIL;
+                                    }
+                                }
                             }
                             passSt = accObj.getName() + ":" + passSt;
                         }
@@ -553,7 +562,7 @@ public class SsnsRegression {
                         reportObj.setApp(accObj.getApp());
                         reportObj.setCusid(accObj.getCusid());
                         reportObj.setBanid(accObj.getBanid());
-                        reportObj.setOper(accObj.getOper());
+                        reportObj.setOper(oper);   // this test case for this operation not the general operation
                         reportObj.setTiid(accObj.getTiid());
 
                         reportObj.setType(reportReportObj.getId()); // reference to report test case
@@ -710,20 +719,6 @@ public class SsnsRegression {
         float exec = 0;
 
         ArrayList<String> namelist = getSsnsDataImp().getSsReportObjListByFeatureOper(nameRepId, app);
-
-        ArrayList<String> retlist = new ArrayList();
-        if (namelist != null) {
-            if (namelist.size() == 0) {
-                return;
-            }
-            for (int i = 0; i < namelist.size(); i++) {
-                String oper = namelist.get(i);
-                retlist.add(oper);
-                String cnt = getSsnsDataImp().getSsReportObjListByFeatureOperCnt(nameRepId, oper);
-                retlist.add(cnt);
-            }
-        }
-        namelist = getSsnsDataImp().getSsReportObjListByFeatureOper(nameRepId, app);
 
         ArrayList<String> operList = new ArrayList();
         if (namelist != null) {

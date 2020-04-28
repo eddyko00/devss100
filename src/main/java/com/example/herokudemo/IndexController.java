@@ -55,14 +55,13 @@ public class IndexController {
 
         arrayString.add("/cust/{username}/id/{id}/regression");
         arrayString.add("/cust/{username}/id/{id}/regression/start");
-        arrayString.add("/cust/{username}/id/{id}/regression/stop");    
-        
+        arrayString.add("/cust/{username}/id/{id}/regression/stop");
+
         arrayString.add("/cust/{username}/id/{id}/mon");
         arrayString.add("/cust/{username}/id/{id}/mon/start");
-        arrayString.add("/cust/{username}/id/{id}/mon/stop");        
+        arrayString.add("/cust/{username}/id/{id}/mon/stop");
         arrayString.add("/cust/{username}/id/{id}/mon/pid/{pid}");
         arrayString.add("/cust/{username}/id/{id}/mon/report/id/{pid}");
-
 
         arrayString.add("/cust/{username}/id/{id}/regression/start?url=");
         arrayString.add("/cust/{username}/id/{id}/regression/stop");
@@ -141,12 +140,12 @@ public class IndexController {
         return ret;
     }
 
-        @RequestMapping(value = "/cust/{username}/id/{id}/regression/start", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/regression/start", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     int getAllregressionStart(
             @PathVariable("username") String username,
             @PathVariable("id") String idSt,
-            @RequestParam(value = "app", required = true) String appSt,            
+            @RequestParam(value = "app", required = true) String appSt,
             @RequestParam(value = "url", required = true) String urlSt,
             HttpServletRequest request, HttpServletResponse response
     ) {
@@ -179,7 +178,6 @@ public class IndexController {
         return afWebService.getSsReportRegressionStop(username, idSt);
     }
 
-        
     @RequestMapping(value = "/cust/{username}/id/{id}/mon", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsReport> getAllmon(
@@ -234,7 +232,6 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-
 
     @RequestMapping(value = "/cust/{username}/id/{id}/mon/start", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
@@ -1260,6 +1257,13 @@ public class IndexController {
     ) {
 
         return afWebService.ServerSendURL(urlSt);
+    }
+
+    @RequestMapping(value = "/server/restoressnsacc", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    int getServerResourceAccObj() {
+
+        return afWebService.restoresSsnsAcc();
     }
 
     @RequestMapping(value = "/server", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
