@@ -1726,7 +1726,7 @@ public class SsnsService {
         if (dataObj == null) {
             return "";
         }
-        if (LABURL.length() != 0) {
+        if (LABURL.length() == 0) {
             LABURL = ServiceAFweb.URL_PRODUCT;
         }
         dataObj.getData();

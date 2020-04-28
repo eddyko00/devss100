@@ -463,8 +463,7 @@ public class SsnsRegression {
 
             int id = tObj.getAccid();
             String LABURL = tObj.getTesturl();  // " empty for monitor, not empay for regression
-            
-            
+
             SsnsAcc accObj = getSsnsDataImp().getSsnsAccObjByID(id);
             String dataSt = accObj.getData();
             ProductData pData = new ObjectMapper().readValue(dataSt, ProductData.class);
@@ -473,44 +472,58 @@ public class SsnsRegression {
                 if (cmdList != null) {
                     for (int j = 0; j < cmdList.size(); j += 2) {
                         String oper = cmdList.get(j + 1);
-
-                        ArrayList<String> response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
-                        if (response != null) {
-                            if (response.size() > 3) {
-                                String feat = response.get(0);
-                                String execSt = response.get(2);
-                                execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
-                                long exec = Long.parseLong(execSt);
-                                String passSt = R_FAIL;
-                                if (feat.equals(accObj.getName())) {
-                                    passSt = R_PASS;
-                                } else {
-                                    passSt = R_PASS;
-                                    String[] featL = feat.split(":");
-                                    String[] nameL = accObj.getName().split(":");
-                                    if ((featL.length > 4) && (nameL.length > 4)) {
-                                        if (!featL[2].equals(nameL[2])) {
-                                            passSt = R_FAIL;
-                                        }
-                                        if (!featL[3].equals(nameL[3])) {
-                                            passSt = R_FAIL;
-                                        }
-                                        if (!featL[4].equals(nameL[4])) {
-                                            passSt = R_FAIL;
-                                        }
-                                    } else if ((featL.length > 3) && (nameL.length > 3)) {
-                                        if (!featL[2].equals(nameL[2])) {
-                                            passSt = R_FAIL;
-                                        }
-                                        if (!featL[3].equals(nameL[3])) {
-                                            passSt = R_FAIL;
+                        String passSt = "";
+                        long exec = 0;
+                        ArrayList<String> response = new ArrayList();
+                        ArrayList<String> labResponse = new ArrayList();
+                        if (LABURL.length() == 0) {
+                            response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
+                            if (response != null) {
+                                if (response.size() > 3) {
+                                    String feat = response.get(0);
+                                    String execSt = response.get(2);
+                                    execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
+                                    exec = Long.parseLong(execSt);
+                                    passSt = R_FAIL;
+                                    if (feat.equals(accObj.getName())) {
+                                        passSt = R_PASS;
+                                    } else {
+                                        passSt = R_PASS;
+                                        String[] featL = feat.split(":");
+                                        String[] nameL = accObj.getName().split(":");
+                                        if ((featL.length > 4) && (nameL.length > 4)) {
+                                            if (!featL[2].equals(nameL[2])) {
+                                                passSt = R_FAIL;
+                                            }
+                                            if (!featL[3].equals(nameL[3])) {
+                                                passSt = R_FAIL;
+                                            }
+                                            if (!featL[4].equals(nameL[4])) {
+                                                passSt = R_FAIL;
+                                            }
+                                        } else if ((featL.length > 3) && (nameL.length > 3)) {
+                                            if (!featL[2].equals(nameL[2])) {
+                                                passSt = R_FAIL;
+                                            }
+                                            if (!featL[3].equals(nameL[3])) {
+                                                passSt = R_FAIL;
+                                            }
                                         }
                                     }
+                                    passSt = accObj.getName() + ":" + passSt;
+                                } else {
+                                    String PR = "";
+                                    response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, PR);
+                                    labResponse = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
+                                    boolean result = compareArraySame(response, labResponse);
+                                    if (result = true) {
+                                        passSt = R_PASS;
+                                    } else {
+                                        passSt = R_FAIL;
+                                    }
+                                    passSt = accObj.getName() + ":" + passSt;
+
                                 }
-                                passSt = accObj.getName() + ":" + passSt;
-//                                if (passSt.equals("false")) {
-//                                    logger.info("> execMonitorTesting false " + feat + " name:" + accObj.getName());
-//                                }
                                 SsReport reportObj = new SsReport();
                                 String nameRepId = reportReportObj.getName() + "_" + reportReportObj.getId();
                                 reportObj.setName(nameRepId);
@@ -530,6 +543,7 @@ public class SsnsRegression {
                                 ProductData pDataNew = new ProductData();
                                 pDataNew.setPostParam(pData.getPostParam());
                                 pDataNew.setFlow(response);
+                                pDataNew.setDetailResp(labResponse);
 
                                 String nameSt = new ObjectMapper().writeValueAsString(pDataNew);
                                 reportObj.setData(nameSt);
@@ -548,6 +562,51 @@ public class SsnsRegression {
         } catch (Exception ex) {
             logger.info("> execMonitorTesting Exception " + ex.getMessage());
         }
+    }
+
+    public boolean compareArraySame(ArrayList<String> listOne, ArrayList<String> listTwo) {
+        boolean ret = false;
+        //https://howtodoinjava.com/java/collections/arraylist/compare-two-arraylists/           
+        //remove all elements of second list
+//      response.removeAll(labResponse);
+//      labResponse.removeAll(response);
+
+        int sizeOne = listOne.size();
+        int sizeTwo = listTwo.size();
+        if (sizeOne != sizeTwo) {
+            return false;
+        }
+        if ((sizeOne < 5) || (sizeTwo < 5)) {
+            return false;
+        }
+
+        ArrayList<String> listOneTmp = new ArrayList();
+        for (int i = 4; i < listOne.size(); i++) {
+            listOneTmp.add(listOne.get(i));
+        }
+        ArrayList<String> listTwoTmp = new ArrayList();
+        for (int i = 4; i < listTwo.size(); i++) {
+            listTwoTmp.add(listTwo.get(i));
+        }
+        listOneTmp.removeAll(listTwoTmp);
+        if (listOneTmp.size() != 0) {
+            return false;
+        }
+
+        listOneTmp = new ArrayList();
+        for (int i = 4; i < listOne.size(); i++) {
+            listOneTmp.add(listOne.get(i));
+        }
+        listTwoTmp = new ArrayList();
+        for (int i = 4; i < listTwo.size(); i++) {
+            listTwoTmp.add(listTwo.get(i));
+        }
+        listTwoTmp.removeAll(listOneTmp);
+        if (listTwoTmp.size() != 0) {
+            return false;
+        }
+
+        return true;
     }
 
     public void reportMoniter(ServiceAFweb serviceAFweb, String name) {
