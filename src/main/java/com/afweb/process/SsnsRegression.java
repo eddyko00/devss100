@@ -130,6 +130,7 @@ public class SsnsRegression {
                             tObj.setUsername(name);
                             tObj.setTesturl(labURL);
                             String st = new ObjectMapper().writeValueAsString(tObj);
+                            st = st.replace('"', '^');
                             testIdList.add(st);
                             added++;
 ////////////////////////////////////////////////
@@ -385,6 +386,7 @@ public class SsnsRegression {
 
     public void execMonitorTesting(ServiceAFweb serviceAFweb, String tObjSt, SsReport reportReportObj, SsReport usreReportObj) {
         try {
+            tObjSt = tObjSt.replace('^', '"');
             testData tObj = new ObjectMapper().readValue(tObjSt, testData.class);
             if (tObj.getType() == ConstantKey.INITIAL) {
                 // send communication to start
