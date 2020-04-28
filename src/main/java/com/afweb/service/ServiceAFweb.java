@@ -401,15 +401,17 @@ public class ServiceAFweb {
 
                     boolean restoreSsnsAccFlag = true; // work for remote d
                     if (restoreSsnsAccFlag == true) {
+                        logger.info("restoreSsnsAccDB start");
                         this.getSsnsDataImp().deleteAllSsnsAcc(0);
                         boolean retSatus = getAccountImp().restoreSsnsAccDB(this);
+                        logger.info("restoreSsnsAccDB end");
                     }
 
-                    boolean restoreSsnsDataFlag = false; // work for remote d
-                    if (restoreSsnsDataFlag == true) {
-                        this.getSsnsDataImp().deleteAllSsnsData(0);
-                        boolean retSatus = getAccountImp().restoreSsnsDataDB(this);
-                    }
+//                    boolean restoreSsnsDataFlag = false; // work for remote d
+//                    if (restoreSsnsDataFlag == true) {
+//                        this.getSsnsDataImp().deleteAllSsnsData(0);
+//                        boolean retSatus = getAccountImp().restoreSsnsDataDB(this);
+//                    }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
                     boolean monflag = false;
@@ -531,8 +533,8 @@ public class ServiceAFweb {
         if (CKey.UI_ONLY == true) {
             if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
                 //// process monitor
-                SsnsRegression regression = new SsnsRegression();
-                regression.processMonitorTesting(this);
+//                SsnsRegression regression = new SsnsRegression();
+//                regression.processMonitorTesting(this);
             }
             return;
         }

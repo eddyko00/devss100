@@ -46,7 +46,9 @@ public class ServiceAFwebREST {
 
             String output = sendRequest_2(METHOD_POST, subResourcePath, null, sqlSt);
             sendNum++;
-//            logger.info("getSQLRequest sendNum " + sendNum);
+            if ((sendNum % 10) == 0) {
+                logger.info("getSQLRequest sendNum " + sendNum);
+            }
             return output;
         } catch (Exception ex) {
             logger.info("getSQLRequest exception " + ex);
