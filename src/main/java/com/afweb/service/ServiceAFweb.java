@@ -1931,6 +1931,68 @@ public class ServiceAFweb {
         return ret;
     }
 
+    public int getSsReportMonRegressionStop(String EmailUserName, String IDSt) {
+
+        if (getServerObj().isSysMaintenance() == true) {
+            return 0;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return 0;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return 0;
+            }
+        }
+        if (custObj.getType() == CustomerObj.INT_ADMIN_USER) {
+            return 0;
+        }
+        String name = EmailUserName;
+        SsnsRegression regression = new SsnsRegression();
+        return regression.stopMonitor(this, name);
+    }
+
+    public int getSsReportMonRegressionStart(String EmailUserName, String IDSt, String urlSt) {
+
+        if (getServerObj().isSysMaintenance() == true) {
+            return 0;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return 0;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return 0;
+            }
+        }
+        if (custObj.getType() == CustomerObj.INT_ADMIN_USER) {
+            return 0;
+        }
+        String name = EmailUserName;
+        SsnsRegression regression = new SsnsRegression();
+
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        long lockDateValue = dateNow.getTimeInMillis();
+        String LockName = "MONSTART_" + EmailUserName;
+
+        int ret = 0;
+        try {
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.MONSTART_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " getSsReportMonStart");
+            if (lockReturn == 0) {
+                return 0;
+            }
+            ret = regression.startMonitorRegression(this, name, urlSt);
+            // clear old report
+            getSsReportMonClearReport(name, IDSt);
+
+        } catch (Exception ex) {
+        }
+        removeNameLock(LockName, ConstantKey.MONSTART_LOCKTYPE);
+        return ret;
+    }
+
     public int getSsReportMonStart(String EmailUserName, String IDSt) {
 
         if (getServerObj().isSysMaintenance() == true) {
@@ -1963,7 +2025,7 @@ public class ServiceAFweb {
             }
             ret = regression.startMonitor(this, name);
             // clear old report
-            getSsReportMonClearReport(EmailUserName, IDSt);
+            getSsReportMonClearReport(name, IDSt);
 
         } catch (Exception ex) {
         }
