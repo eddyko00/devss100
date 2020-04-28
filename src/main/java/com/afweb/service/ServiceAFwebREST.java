@@ -34,9 +34,6 @@ public class ServiceAFwebREST {
     public String getSQLRequestRemote(RequestObj sqlObj) {
         ServiceAFweb.getServerObj().setCntRESTrequest(ServiceAFweb.getServerObj().getCntRESTrequest() + 1);
         String subResourcePath = ServiceAFweb.SERVERDB_URL + "/cust/" + CKey.ADMIN_USERNAME + "/sys/mysql";
-//        if (sendNum > 75) {
-//            logger.info("getSQLRequest error");
-//        }
         if (sqlObj.getReq().length() < 3) {
             logger.info("getSQLRequest not correct num " + sendNum + " sql " + sqlObj.getReq());
             return "";
