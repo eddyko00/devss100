@@ -81,6 +81,10 @@ public class SsnsRegression {
     }
 
     public int startMonitor(ServiceAFweb serviceAFweb, String name) { //CKey.ADMIN_USERNAME) {
+        return startMonitorRegression(serviceAFweb, name, "");
+    }
+
+    public int startMonitorRegression(ServiceAFweb serviceAFweb, String name, String labURL) { //CKey.ADMIN_USERNAME) {
         try {
             //creat monitor
             ArrayList<String> testIdList = new ArrayList();
@@ -124,7 +128,7 @@ public class SsnsRegression {
                             testData tObj = new testData();
                             tObj.setAccid(accObj.getId());
                             tObj.setUsername(name);
-                            tObj.setTesturl("");
+                            tObj.setTesturl(labURL);
                             String st = new ObjectMapper().writeValueAsString(tObj);
                             testIdList.add(st);
                             added++;

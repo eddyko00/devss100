@@ -6,7 +6,6 @@
 package com.afweb.service;
 
 import com.afweb.model.RequestObj;
-import static com.afweb.service.ServiceRemoteDB.log;
 import com.afweb.util.CKey;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
@@ -17,6 +16,7 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.util.Map;
+import java.util.logging.Logger;
 import static org.apache.http.protocol.HTTP.USER_AGENT;
 
 /**
@@ -24,23 +24,32 @@ import static org.apache.http.protocol.HTTP.USER_AGENT;
  * @author koed
  */
 public class ServiceAFwebREST {
-    // operations names constants
 
+    // operations names constants
+    public static Logger logger = Logger.getLogger("ServiceAFwebREST");
     private static final String METHOD_POST = "post";
     private static final String METHOD_GET = "get";
+    private static int sendNum = 0;
 
     public String getSQLRequestRemote(RequestObj sqlObj) {
         ServiceAFweb.getServerObj().setCntRESTrequest(ServiceAFweb.getServerObj().getCntRESTrequest() + 1);
         String subResourcePath = ServiceAFweb.SERVERDB_URL + "/cust/" + CKey.ADMIN_USERNAME + "/sys/mysql";
-
+//        if (sendNum > 75) {
+//            logger.info("getSQLRequest error");
+//        }
+        if (sqlObj.getReq().length() < 3) {
+            logger.info("getSQLRequest not correct num " + sendNum + " sql " + sqlObj.getReq());
+            return "";
+        }
         try {
             String sqlSt = new ObjectMapper().writeValueAsString(sqlObj);
 
             String output = sendRequest_2(METHOD_POST, subResourcePath, null, sqlSt);
-
+            sendNum++;
+//            logger.info("getSQLRequest sendNum " + sendNum);
             return output;
         } catch (Exception ex) {
-            log.info("getSQLRequest exception " + ex);
+            logger.info("getSQLRequest exception " + ex);
             ServiceAFweb.getServerObj().setCntRESTexception(ServiceAFweb.getServerObj().getCntRESTexception() + 1);
         }
         return null;
@@ -130,11 +139,11 @@ public class ServiceAFwebREST {
                 // print result
                 return response.toString();
             } else {
-                log.info("POST request not worked");
+                logger.info("POST request not worked");
             }
 
         } catch (Exception e) {
-            log.info("Error sending REST request:" + e);
+            logger.info("Error sending REST request:" + e);
             throw e;
         }
         return null;

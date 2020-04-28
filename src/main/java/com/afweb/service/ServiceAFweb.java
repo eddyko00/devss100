@@ -399,7 +399,7 @@ public class ServiceAFweb {
                         }
                     }
 
-                    boolean restoreSsnsAccFlag = false; // work for remote d
+                    boolean restoreSsnsAccFlag = true; // work for remote d
                     if (restoreSsnsAccFlag == true) {
                         this.getSsnsDataImp().deleteAllSsnsAcc(0);
                         boolean retSatus = getAccountImp().restoreSsnsAccDB(this);
@@ -1659,6 +1659,9 @@ public class ServiceAFweb {
     public int sendRequestObj(ArrayList<String> writeSQLArray) {
 //        logger.info("> sendRequestObj " + writeSQLArray.size());
         try {
+            if (writeSQLArray.size() == 0) {
+                return 1;
+            }
             RequestObj sqlObj = new RequestObj();
             sqlObj.setCmd(ServiceAFweb.UpdateSQLList + "");
             String st = new ObjectMapper().writeValueAsString(writeSQLArray);
