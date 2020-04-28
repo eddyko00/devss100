@@ -53,11 +53,16 @@ public class IndexController {
         arrayString.add("/cust/login?email={email}&pass={pass}");
         arrayString.add("/cust/{username}/login&pass={pass}");
 
+        arrayString.add("/cust/{username}/id/{id}/regression");
+        arrayString.add("/cust/{username}/id/{id}/regression/start");
+        arrayString.add("/cust/{username}/id/{id}/regression/stop");    
+        
         arrayString.add("/cust/{username}/id/{id}/mon");
+        arrayString.add("/cust/{username}/id/{id}/mon/start");
+        arrayString.add("/cust/{username}/id/{id}/mon/stop");        
         arrayString.add("/cust/{username}/id/{id}/mon/pid/{pid}");
         arrayString.add("/cust/{username}/id/{id}/mon/report/id/{pid}");
-        arrayString.add("/cust/{username}/id/{id}/mon/start");
-        arrayString.add("/cust/{username}/id/{id}/mon/stop");
+
 
         arrayString.add("/cust/{username}/id/{id}/regression/start?url=");
         arrayString.add("/cust/{username}/id/{id}/regression/stop");
@@ -114,7 +119,67 @@ public class IndexController {
         return arrayString;
     }
 ////////////////////// 
+//        arrayString.add("/cust/{username}/id/{id}/regression");
+//        arrayString.add("/cust/{username}/id/{id}/regression/start");
+//        arrayString.add("/cust/{username}/id/{id}/regression/stop");   
 
+    @RequestMapping(value = "/cust/{username}/id/{id}/regression", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<SsReport> getAllregression(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+
+        ArrayList<SsReport> ret = afWebService.getSsReportRegression(username, idSt);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+        @RequestMapping(value = "/cust/{username}/id/{id}/regression/start", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    int getAllregressionStart(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "app", required = true) String appSt,            
+            @RequestParam(value = "url", required = true) String urlSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return 0;
+        }
+
+        if (urlSt.length() == 0) {
+            return 0;
+        }
+
+        return afWebService.getSsReportRegressionStart(username, idSt, appSt, urlSt);
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/regression/stop", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    int getAllregressionStop(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return 0;
+        }
+
+        return afWebService.getSsReportRegressionStop(username, idSt);
+    }
+
+        
     @RequestMapping(value = "/cust/{username}/id/{id}/mon", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<SsReport> getAllmon(
@@ -133,42 +198,6 @@ public class IndexController {
         return ret;
     }
 
-//    @RequestMapping(value = "/cust/{username}/id/{id}/mon/updatereport", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-//    public @ResponseBody
-//    String getAllmonUpdateRep(
-//            @PathVariable("username") String username,
-//            @PathVariable("id") String idSt,
-//            HttpServletRequest request, HttpServletResponse response
-//    ) {
-//        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
-//        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
-//            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-//            return "";
-//        }
-//
-//        int ret = afWebService.getSsReportMonUpdateReport(username, idSt);
-//
-//        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
-//        return ret + "";
-//    }
-//    @RequestMapping(value = "/cust/{username}/id/{id}/mon/exec", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-//    public @ResponseBody
-//    String getAllmonExec(
-//            @PathVariable("username") String username,
-//            @PathVariable("id") String idSt,
-//            HttpServletRequest request, HttpServletResponse response
-//    ) {
-//        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
-//        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
-//            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-//            return "";
-//        }
-//
-//        String ret = afWebService.getSsReportMonExec(username, idSt);
-//
-//        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
-//        return ret;
-//    }
     @RequestMapping(value = "/cust/{username}/id/{id}/mon/clearreport", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     int getAllmonreport(
@@ -206,42 +235,6 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/regression/start", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    int getAllregressionStart(
-            @PathVariable("username") String username,
-            @PathVariable("id") String idSt,
-            @RequestParam(value = "url", required = true) String urlSt,
-            HttpServletRequest request, HttpServletResponse response
-    ) {
-        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
-        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            return 0;
-        }
-
-        if (urlSt.length() == 0) {
-            return 0;
-        }
-
-        return afWebService.getSsReportMonRegressionStart(username, idSt, urlSt);
-    }
-
-    @RequestMapping(value = "/cust/{username}/id/{id}/regression/stop", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    int getAllregressionStop(
-            @PathVariable("username") String username,
-            @PathVariable("id") String idSt,
-            HttpServletRequest request, HttpServletResponse response
-    ) {
-        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
-        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            return 0;
-        }
-
-        return afWebService.getSsReportMonRegressionStop(username, idSt);
-    }
 
     @RequestMapping(value = "/cust/{username}/id/{id}/mon/start", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody

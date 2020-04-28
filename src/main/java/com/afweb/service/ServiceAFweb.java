@@ -222,7 +222,11 @@ public class ServiceAFweb {
                 getServerObj().setLocalDBservice(CKey.LocalPCflag);
 
                 if (CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) {
-                    logger.info(">>>>> System Openshift DB1 URL:" + URL_PATH_OP_DB_PHP1);
+                    if (CKey.SQL_RemoveServerDB == false) {
+                        logger.info(">>>>> System Openshift DB1 URL:" + URL_PATH_OP_DB_PHP1);
+                    } else {
+                        logger.info(">>>>> System Openshift Remote URL:" + URL_PATH_OP);
+                    }
                 }
                 if (CKey.SQL_DATABASE == CKey.MYSQL) {
                     String dsURL = CKey.dataSourceURL;
@@ -413,26 +417,39 @@ public class ServiceAFweb {
 //                        boolean retSatus = getAccountImp().restoreSsnsDataDB(this);
 //                    }
 ///////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////                    
+///////////////////////////////////////////////////////////////////////////////////   
                     boolean monflag = false;
                     if (monflag == true) {
 //                        this.getSsnsDataImp().deleteAllSsReport(0);
                         SsnsRegression regression = new SsnsRegression();
                         String name = CKey.ADMIN_USERNAME;
-
                         ArrayList<SsReport> ret = new ArrayList();
-                        ret = getSsReportMon(name, null);
-                        regression.startMonitor(this, name);
+                        /////////Regression
+                        name = "GUEST";
 
+                        getSsReportRegressionStart(name, null, APP_APP, DEF_LABURL); //"http://L097105:8080");
+                        ret = getSsReportRegression(name, null);
                         for (int i = 0; i < 10; i++) {
                             regression.processMonitorTesting(this);
                             if (i == 2) {
                                 regression.stopMonitor(this, name);
                             }
-                            ret = getSsReportMon(name, null);
+                            ret = getSsReportRegression(name, null);
                         }
-                        ret = getSsReportMon(name, null);
+                        ret = getSsReportRegression(name, null);
 
+                        /////////monitor
+//                        ret = getSsReportMon(name, null);
+//                        regression.startMonitor(this, name);
+//
+//                        for (int i = 0; i < 10; i++) {
+//                            regression.processMonitorTesting(this);
+//                            if (i == 2) {
+//                                regression.stopMonitor(this, name);
+//                            }
+//                            ret = getSsReportMon(name, null);
+//                        }
+//                        ret = getSsReportMon(name, null);
                     }
 /////////
 /////////
@@ -1910,31 +1927,30 @@ public class ServiceAFweb {
         return regression.stopMonitor(this, name);
     }
 
-    public int getSsReportMonUpdateReport(String EmailUserName, String IDSt) {
-
-        if (getServerObj().isSysMaintenance() == true) {
-            return 0;
-        }
-        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
-        if (custObj == null) {
-            return 0;
-        }
-        if (IDSt != null) {
-            if (IDSt.equals(custObj.getId() + "") != true) {
-                return 0;
-            }
-        }
-        if (custObj.getType() != CustomerObj.INT_ADMIN_USER) {
-            return 10;
-        }
-        String name = CKey.ADMIN_USERNAME;
-        SsnsRegression regression = new SsnsRegression();
-        int ret = 0;
-        regression.reportMoniter(this, name);
-        return ret;
-    }
-
-    public int getSsReportMonRegressionStop(String EmailUserName, String IDSt) {
+//    public int getSsReportMonUpdateReport(String EmailUserName, String IDSt) {
+//
+//        if (getServerObj().isSysMaintenance() == true) {
+//            return 0;
+//        }
+//        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+//        if (custObj == null) {
+//            return 0;
+//        }
+//        if (IDSt != null) {
+//            if (IDSt.equals(custObj.getId() + "") != true) {
+//                return 0;
+//            }
+//        }
+//        if (custObj.getType() != CustomerObj.INT_ADMIN_USER) {
+//            return 10;
+//        }
+//        String name = CKey.ADMIN_USERNAME;
+//        SsnsRegression regression = new SsnsRegression();
+//        int ret = 0;
+//        regression.reportMoniter(this, name);
+//        return ret;
+//    }
+    public int getSsReportRegressionStop(String EmailUserName, String IDSt) {
 
         if (getServerObj().isSysMaintenance() == true) {
             return 0;
@@ -1949,14 +1965,14 @@ public class ServiceAFweb {
             }
         }
         if (custObj.getType() == CustomerObj.INT_ADMIN_USER) {
-            return 0;
+            return 0;  // regression not for admin , only monitor for admin
         }
         String name = EmailUserName;
         SsnsRegression regression = new SsnsRegression();
         return regression.stopMonitor(this, name);
     }
 
-    public int getSsReportMonRegressionStart(String EmailUserName, String IDSt, String urlSt) {
+    public int getSsReportRegressionStart(String EmailUserName, String IDSt, String app, String urlSt) {
 
         if (getServerObj().isSysMaintenance() == true) {
             return 0;
@@ -1971,7 +1987,7 @@ public class ServiceAFweb {
             }
         }
         if (custObj.getType() == CustomerObj.INT_ADMIN_USER) {
-            return 0;
+            return 0;  //regression not for admin , only monitor for admin
         }
         String name = EmailUserName;
         SsnsRegression regression = new SsnsRegression();
@@ -1986,7 +2002,7 @@ public class ServiceAFweb {
             if (lockReturn == 0) {
                 return 0;
             }
-            ret = regression.startMonitorRegression(this, name, urlSt);
+            ret = regression.startMonitorRegression(this, name, app, urlSt);
             // clear old report
             getSsReportMonClearReport(name, IDSt);
 
@@ -2130,6 +2146,37 @@ public class ServiceAFweb {
         String output = ss.SendSsnsTestURL(urlSt, inList);
         inList.add(output);
         return inList;
+    }
+
+    public ArrayList<SsReport> getSsReportRegression(String EmailUserName, String IDSt) {
+
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        String name = EmailUserName;
+        ArrayList<SsReport> ssReportList = new ArrayList();
+        ArrayList<SsReport> ssUserReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_USER);
+        if (ssUserReportObjList == null) {
+            return ssReportList;
+        }
+        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT);
+        if (ssUserReportObjList != null) {
+            ssReportList.addAll(ssUserReportObjList);
+        }
+        if (ssReportObjList != null) {
+            ssReportList.addAll(ssReportObjList);
+        }
+        return ssReportList;
+
     }
 
     public ArrayList<SsReport> getSsReportMon(String EmailUserName, String IDSt) {
