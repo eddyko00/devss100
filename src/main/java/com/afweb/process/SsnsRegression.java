@@ -383,7 +383,7 @@ public class SsnsRegression {
                             reportReportObj.getStatus(), reportReportObj.getType());
 
                     // update report statistic
-                    reportMoniter(serviceAFweb, name);
+//                    reportUpdateStatistic(serviceAFweb, name);
                 }
                 serviceAFweb.removeNameLock(LockName, ConstantKey.MON_LOCKTYPE);
             }
@@ -636,7 +636,7 @@ public class SsnsRegression {
         return true;
     }
 
-    public void reportMoniter(ServiceAFweb serviceAFweb, String name) {
+    public void reportUpdateStatistic(ServiceAFweb serviceAFweb, String name) {
         // report
         try {
             String uid = REPORT_REPORT;

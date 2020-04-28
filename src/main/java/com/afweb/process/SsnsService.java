@@ -2168,10 +2168,8 @@ public class SsnsService {
                     if (planInit == 1) {
                         continue;
                     }
-
                     LocalLine = 1;
                     continue;
-
                 }
 
                 if (inLine.indexOf("HomePhoneBundle") != -1) {
@@ -2317,7 +2315,8 @@ public class SsnsService {
                     }
                     continue;
                 }
-                if (inLine.indexOf("SecurityBundle") != -1) {
+                if ((inLine.indexOf("SecurityBundle") != -1) 
+                        || (inLine.indexOf("TELUSOnlineSec") != -1)) {
 
                     if (quotaAmtInit == 1) {
                         continue;
