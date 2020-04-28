@@ -414,7 +414,7 @@ public class ServiceAFweb {
 //                    }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////                    
-                    boolean monflag = true;
+                    boolean monflag = false;
                     if (monflag == true) {
 //                        this.getSsnsDataImp().deleteAllSsReport(0);
                         SsnsRegression regression = new SsnsRegression();
@@ -2127,7 +2127,8 @@ public class ServiceAFweb {
     public ArrayList<String> ServerSendURL(String urlSt) {
         ArrayList<String> inList = new ArrayList();
         SsnsService ss = new SsnsService();
-        String output = ss.SendSsnsTestURL(PROXYURL, inList);
+        String output = ss.SendSsnsTestURL(urlSt, inList);
+        inList.add(output);
         return inList;
     }
 

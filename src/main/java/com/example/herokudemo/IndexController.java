@@ -1259,7 +1259,7 @@ public class IndexController {
         return "";
     }
 
-    @RequestMapping(value = "/serversendurl", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/server/sendurl", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<String> setServerSendURL(
             @RequestParam(value = "url", required = true) String urlSt,
