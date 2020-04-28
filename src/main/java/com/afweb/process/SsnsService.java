@@ -1078,6 +1078,32 @@ public class SsnsService {
 //            }
     }
 
+    public String SendSsnsTestURL(String ProductURL, ArrayList<String> inList) {
+        String url = ProductURL;
+        try {
+            if (inList != null) {
+                inList.add(url);
+            }
+            // calculate elapsed time in milli seconds
+            long startTime = TimeConvertion.currentTimeMillis();
+
+            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);
+
+            long endTime = TimeConvertion.currentTimeMillis();
+            long elapsedTime = endTime - startTime;
+//            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
+            if (inList != null) {
+                inList.add("elapsedTime:" + elapsedTime);
+                inList.add("output:");
+            }
+
+            return output;
+        } catch (Exception ex) {
+            logger.info("> SsnsAppointment exception " + ex.getMessage());
+        }
+        return null;
+    }
+    
     public String SendSsnsWifi(String ProductURL, String oper, String banid, String uniquid, String prodClass, String serialid, String parm, ArrayList<String> inList) {
         String url = "";
         if (banid.length() >= 10) {
@@ -2848,7 +2874,7 @@ public class SsnsService {
 
             int responseCode = con.getResponseCode();
             if (responseCode != 200) {
-//                System.out.println("Response Code:: " + responseCode);
+                System.out.println("Response Code:: " + responseCode);
 
 //                if ((responseCode == 400) || (responseCode == 500)) {
                 InputStream inputstream = null;
@@ -2870,7 +2896,7 @@ public class SsnsService {
             if (responseCode >= 200 && responseCode < 300) {
                 ;
             } else {
-//                System.out.println("Response Code:: " + responseCode);
+                System.out.println("Response Code:: " + responseCode);
 //                System.out.println("bodyElement :: " + bodyElement);
                 return null;
             }
@@ -2893,7 +2919,7 @@ public class SsnsService {
             }
 
         } catch (Exception e) {
-//            logger.info("Error sending REST request:" + e);
+            logger.info("Error sending REST request:" + e);
             throw e;
         }
         return null;

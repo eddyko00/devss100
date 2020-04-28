@@ -151,7 +151,6 @@ public class IndexController {
 //        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
 //        return ret + "";
 //    }
-
 //    @RequestMapping(value = "/cust/{username}/id/{id}/mon/exec", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
 //    public @ResponseBody
 //    String getAllmonExec(
@@ -170,7 +169,6 @@ public class IndexController {
 //        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
 //        return ret;
 //    }
-
     @RequestMapping(value = "/cust/{username}/id/{id}/mon/clearreport", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     int getAllmonreport(
@@ -207,7 +205,6 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-
 
     @RequestMapping(value = "/cust/{username}/id/{id}/regression/start", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
@@ -1260,6 +1257,16 @@ public class IndexController {
             }
         }
         return "";
+    }
+
+    @RequestMapping(value = "/serversendurl", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<String> setServerSendURL(
+            @RequestParam(value = "url", required = true) String urlSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+
+        return afWebService.ServerSendURL(urlSt);
     }
 
     @RequestMapping(value = "/server", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})

@@ -416,7 +416,7 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////                    
                     boolean monflag = true;
                     if (monflag == true) {
-                        this.getSsnsDataImp().deleteAllSsReport(0);
+//                        this.getSsnsDataImp().deleteAllSsReport(0);
                         SsnsRegression regression = new SsnsRegression();
                         String name = CKey.ADMIN_USERNAME;
 
@@ -2122,6 +2122,13 @@ public class ServiceAFweb {
         regression.processMonitorTesting(this);
         return "";
 
+    }
+
+    public ArrayList<String> ServerSendURL(String urlSt) {
+        ArrayList<String> inList = new ArrayList();
+        SsnsService ss = new SsnsService();
+        String output = ss.SendSsnsTestURL(PROXYURL, inList);
+        return inList;
     }
 
     public ArrayList<SsReport> getSsReportMon(String EmailUserName, String IDSt) {
