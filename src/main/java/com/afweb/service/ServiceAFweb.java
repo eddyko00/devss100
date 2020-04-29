@@ -2922,7 +2922,6 @@ public class ServiceAFweb {
                 return null;
             }
         }
-        LABURL = "DEVOP";
         ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(prod, PIDSt);
         if (ssnsAccObjList != null) {
             if (ssnsAccObjList.size() > 0) {
