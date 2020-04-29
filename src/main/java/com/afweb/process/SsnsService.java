@@ -2145,21 +2145,9 @@ public class SsnsService {
                         continue;
                     }
                     quotaAmtInit = 1;
-                    boolean exit = false;
-                    for (int k = j; k <= outputList.size(); k++) {
-                        String inL = outputList.get(outputList.size() - 1 - k);
-                        if (inL.indexOf("productNm") != -1) {
-                            String valueSt = outputList.get(outputList.size() - 1 - k + 1);
-                            valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
-                            valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
-                            valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
-                            CallControl = valueSt;
-                            exit = true;
-                            break;
-                        }
-                        if (exit == true) {
-                            break;
-                        }
+                    String valueSt = checkProductNm(j, outputList);
+                    if (valueSt.length() != 0) {
+                        CallControl = valueSt;
                     }
                     continue;
                 }
@@ -2177,7 +2165,7 @@ public class SsnsService {
                         continue;
                     }
                     planInit = 1;
-                    String valueSt = checkProductNm(j, outputList);
+                    String valueSt = checkProductOfferingProductNm(j, outputList);
                     if (valueSt.length() != 0) {
                         PrimaryPricePlan = valueSt;
                     }
@@ -2245,6 +2233,25 @@ public class SsnsService {
                 valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
                 valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
                 return valueSt;
+            }
+        }
+        return "";
+    }
+
+    public static String checkProductOfferingProductNm(int j, ArrayList<String> outputList) {
+        for (int k = j; k <= outputList.size(); k++) {
+            String inL = outputList.get(outputList.size() - 1 - k);
+            if (inL.indexOf("productOffering") != -1) {
+                for (int m = k; m <= outputList.size(); m++) {
+                    String inLL = outputList.get(outputList.size() - 1 - m);
+                    if (inLL.indexOf("productNm") != -1) {
+                        String valueSt = outputList.get(outputList.size() - 1 - m + 1);
+                        valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                        valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
+                        valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
+                        return valueSt;
+                    }
+                }
             }
         }
         return "";
@@ -2320,6 +2327,7 @@ public class SsnsService {
                     boolean exit = false;
 
                     String valueSt = checkProductNm(j, outputList);
+                    valueSt = valueSt.replaceAll("_", "");
                     SecurityBundle = valueSt;
 
                     continue;
@@ -2332,29 +2340,13 @@ public class SsnsService {
 
                     planInit = 1;
                     if (fifaFlag == 0) {
-                        boolean exit = false;
                         String valueSt = checkProductRelationshipProductNm(j, outputList);
                         PrimaryPricePlan = valueSt;
 
                     } else if (fifaFlag == 1) {
-                        boolean exit = false;
-//                        String valueSt = checkProductRelationshipProductNm(j, outputList);
-//                        PrimaryPricePlan = valueSt;
-
-                        for (int k = j; k <= outputList.size(); k++) {
-                            String inL = outputList.get(outputList.size() - 1 - k);
-                            if (inL.indexOf("productNm") != -1) {
-                                String valueSt = outputList.get(outputList.size() - 1 - k + 1);
-                                valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
-                                valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
-                                valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
-                                PrimaryPricePlan = valueSt;
-                                exit = true;
-                                break;
-                            }
-                            if (exit == true) {
-                                break;
-                            }
+                        String valueSt = checkProductNm(j, outputList);
+                        if (valueSt.length() != 0) {
+                            PrimaryPricePlan = valueSt;
                         }
                     }
                     continue;
