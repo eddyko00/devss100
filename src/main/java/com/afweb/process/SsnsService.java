@@ -531,6 +531,11 @@ public class SsnsService {
             if (outputSt == null) {
                 return "";
             }
+            ////special char #, need to ignore for this system
+            outputSt = outputSt.replaceAll("#", "");
+            outputSt = outputSt.replaceAll("~", "");
+            outputSt = outputSt.replaceAll("^", "");
+
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             String feat = parseTTVCFeature(outputSt, oper, null);
             if (outputSt.indexOf("responseCode:400500") != -1) {
@@ -561,6 +566,10 @@ public class SsnsService {
             if (outputSt == null) {
                 return "";
             }
+            ////special char #, need to ignore for this system
+            outputSt = outputSt.replaceAll("#", "");
+            outputSt = outputSt.replaceAll("~", "");
+            outputSt = outputSt.replaceAll("^", "");
 
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             String feat = parseTTVCFeature(outputSt, oper, null);
@@ -1192,6 +1201,11 @@ public class SsnsService {
 
                 return "";
             }
+            ////special char #, need to ignore for this system
+            outputSt = outputSt.replaceAll("#", "");
+            outputSt = outputSt.replaceAll("~", "");
+            outputSt = outputSt.replaceAll("^", "");
+
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             String feat = parseWifiFeature(outputSt, Oper, prodClass);
             if (outputSt.indexOf("responseCode:400500") != -1) {
@@ -1211,6 +1225,10 @@ public class SsnsService {
             if (outputSt == null) {
                 return "";
             }
+            ////special char #, need to ignore for this system
+            outputSt = outputSt.replaceAll("#", "");
+            outputSt = outputSt.replaceAll("~", "");
+            outputSt = outputSt.replaceAll("^", "");
 
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
 
@@ -1769,6 +1787,10 @@ public class SsnsService {
             if (outputSt == null) {
                 return "";
             }
+            ////special char #, need to ignore for this system
+            outputSt = outputSt.replaceAll("#", "");
+            outputSt = outputSt.replaceAll("~", "");
+            outputSt = outputSt.replaceAll("^", "");
 
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             String feat = parseAppointmentFeature(outputSt, Oper);
@@ -1785,6 +1807,11 @@ public class SsnsService {
             if (outputSt == null) {
                 return "";
             }
+            ////special char #, need to ignore for this system
+            outputSt = outputSt.replaceAll("#", "");
+            outputSt = outputSt.replaceAll("~", "");
+            outputSt = outputSt.replaceAll("^", "");
+
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
             String feat = parseAppointmentTimeSlotFeature(outputSt, Oper, host);
 
@@ -1850,6 +1877,10 @@ public class SsnsService {
             return "";
         }
         String featTTV = "";
+        ////special char #, need to ignore for this system
+        outputSt = outputSt.replaceAll("#", "");
+        outputSt = outputSt.replaceAll("~", "");
+        outputSt = outputSt.replaceAll("^", "");
         ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
         if (oper.equals(APP_FEAT_TYPE_HSIC)) {
             featTTV = parseProductInternetFeature(outputSt, dataObj.getOper());
