@@ -537,11 +537,17 @@ public class SsnsRegression {
                     for (int j = 0; j < cmdList.size(); j += 2) {
                         String oper = cmdList.get(j + 1);
                         String passSt = "";
+                        if (oper.equals(SsnsService.PROD_GET_PROD)) {
+                            //ignore this becase too large response
+                            //ignore this becase too large response
+                            continue;
+                        }
                         long exec = 0;
                         ArrayList<String> response = new ArrayList();
                         ArrayList<String> labResponse = new ArrayList();
                         if (LABURL.length() == 0) {
                             passSt = R_FAIL;
+                            
                             response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
                             if (response != null) {
                                 if (response.size() > 3) {
