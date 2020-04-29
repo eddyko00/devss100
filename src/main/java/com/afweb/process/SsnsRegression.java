@@ -745,6 +745,9 @@ public class SsnsRegression {
             }
 
             SsReport reportReportObj = reportObjList.get(0);
+
+            ArrayList<String> idList = getMoniterIDList(reportReportObj);
+
             ArrayList<String> overviewList = new ArrayList();
             ArrayList<String> testRList = new ArrayList();
             String nameRepId = name + "_" + reportReportObj.getId();
@@ -771,7 +774,23 @@ public class SsnsRegression {
             if (dataSt.length() > 0) {
                 reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
             }
+            if (idList != null) {
+
+                String tzid = "America/New_York"; //EDT
+                TimeZone tz = TimeZone.getTimeZone(tzid);
+                Date d = new Date();
+                // timezone symbol (z) included in the format pattern 
+                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                // format date in target timezone
+                format.setTimeZone(tz);
+                String ESTdate = format.format(d);
+
+                String NumTC = name + "TC remaining " + idList.size() + " time:" + ESTdate;;
+                testRList.add(0, NumTC);
+                overviewList.add(0, NumTC);
+            }
             reportdata.setReportList(testRList);
+
             dataSt = new ObjectMapper().writeValueAsString(reportdata);
             restulReportObj.setData(dataSt);
 
