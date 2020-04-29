@@ -1879,6 +1879,26 @@ public class ServiceAFweb {
         return ssnsAccObjList;
         
     }
+    public ArrayList<SsReport> getSsReportAll(String EmailUserName, String IDSt) {
+        
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        int id = 0;
+        
+
+        ArrayList<SsReport> reportObjList = getSsnsDataImp().getSsReportAll();
+        return reportObjList;
+    }
     
     public SsReport getSsReportById(String EmailUserName, String IDSt, String pidSt) {
         
@@ -1894,7 +1914,6 @@ public class ServiceAFweb {
                 return null;
             }
         }
-        String name = CKey.ADMIN_USERNAME;
         int id = 0;
         
         if (pidSt != null) {
@@ -1902,7 +1921,6 @@ public class ServiceAFweb {
         }
         SsReport reportObj = getSsnsDataImp().getSsReportByID(id);
         return reportObj;
-        
     }
     
     public int getSsReportMonStop(String EmailUserName, String IDSt) {
@@ -2004,7 +2022,7 @@ public class ServiceAFweb {
             }
             ret = regression.startMonitorRegression(this, name, app, urlSt);
             // clear old report
-            getSsReportClearAll(name, IDSt);
+            SsReportClearExceptLast2(name, IDSt);
             
         } catch (Exception ex) {
         }
@@ -2065,7 +2083,7 @@ public class ServiceAFweb {
             }
             ret = regression.startMonitor(this, name);
             // clear old report
-            getSsReportClearAll(name, IDSt);
+            SsReportClearExceptLast2(name, IDSt);
             
         } catch (Exception ex) {
         }
@@ -2073,7 +2091,7 @@ public class ServiceAFweb {
         return ret;
     }
     
-    public int getSsReportClearAll(String EmailUserName, String IDSt) {
+    public int SsReportClearExceptLast2(String EmailUserName, String IDSt) {
         
         if (getServerObj().isSysMaintenance() == true) {
             return 0;
@@ -2087,23 +2105,21 @@ public class ServiceAFweb {
                 return 0;
             }
         }
-        this.getSsnsDataImp().deleteAllSsReport(0);
-//        String name = CKey.ADMIN_USERNAME;
-        
-//        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT);
-//        if (ssReportObjList != null) {
-//            for (int i = 0; i < ssReportObjList.size(); i++) {
-//                if (i < 2) {
-//                    continue;
-//                }
-//                SsReport repObj = ssReportObjList.get(i);
-//                String nameRepId = repObj.getName() + "_" + repObj.getId();
-//                getSsnsDataImp().DeleteSsReportObjListByUid(nameRepId, SsnsRegression.REPORT_TESE_CASE);
-//                
-//                getSsnsDataImp().DeleteSsReportObjByID(repObj.getId());
-//                
-//            }
-//        }
+        String name = CKey.ADMIN_USERNAME;       
+        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT);
+        if (ssReportObjList != null) {
+            for (int i = 0; i < ssReportObjList.size(); i++) {
+                if (i < 2) {
+                    continue;
+                }
+                SsReport repObj = ssReportObjList.get(i);
+                String nameRepId = repObj.getName() + "_" + repObj.getId();
+                getSsnsDataImp().DeleteSsReportObjListByUid(nameRepId, SsnsRegression.REPORT_TESE_CASE);
+                
+                getSsnsDataImp().DeleteSsReportObjByID(repObj.getId());
+                
+            }
+        }
         
         return 1;
         
