@@ -8,6 +8,7 @@ package com.afweb.process;
 import com.afweb.model.*;
 import com.afweb.model.ssns.*;
 import com.afweb.service.ServiceAFweb;
+import com.afweb.service.ServiceAFwebREST;
 
 import com.afweb.util.*;
 
@@ -2809,7 +2810,15 @@ public class SsnsService {
     }
 
     private String sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, Map<String, String> bodyParams) {
+
         try {
+//            if (CKey.SQL_Devop == true) {
+//                if (subResourcePath.indexOf("DEVOP") != -1) {
+//                    // send to devop client
+//
+//                    return sendRequest_Process_Devop(method, subResourcePath, queryParams, bodyParams);
+//                }
+//            }
             if (subResourcePath.indexOf("https") != -1) {
                 return this.https_sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams);
             }
@@ -2819,6 +2828,42 @@ public class SsnsService {
         }
         return null;
     }
+
+//    private String sendRequest_Process_Devop(String method, String subResourcePath, Map<String, String> queryParams, Map<String, String> bodyParams)
+//            throws Exception {
+//        try {
+//
+//            String URLPath = subResourcePath;
+//
+//            String webResourceString = "";
+//            // assume only one param
+//            if (queryParams != null && !queryParams.isEmpty()) {
+//                for (String key : queryParams.keySet()) {
+//                    webResourceString = "?" + key + "=" + queryParams.get(key);
+//                }
+//            }
+//
+//            String bodyElement = "";
+//            if (bodyParams != null) {
+//                bodyElement = new ObjectMapper().writeValueAsString(bodyParams);
+//            }
+//            URLPath += webResourceString;
+//
+//            ServiceAFwebREST remoteREST = new ServiceAFwebREST();
+//            RequestObj sqlObj = new RequestObj();
+//            String cmd = "99";
+//            sqlObj.setCmd(cmd);
+//            sqlObj.setReq(method);
+//            sqlObj.setReq1(URLPath);
+//            sqlObj.setReq2(bodyElement);
+//            String resp = remoteREST.getSQLRequestRemote(sqlObj);
+//            return resp;
+//
+//        } catch (Exception e) {
+////            logger.info("Error sending REST request:" + e);
+//            throw e;
+//        }
+//    }
 
     private String https_sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, Map<String, String> bodyParams)
             throws Exception {
