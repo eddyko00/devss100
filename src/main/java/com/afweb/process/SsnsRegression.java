@@ -88,7 +88,7 @@ public class SsnsRegression {
 
     public int startMonitorRegression(ServiceAFweb serviceAFweb, String name, String app, String labURL) { //CKey.ADMIN_USERNAME) {
         try {
-            
+
             logger.info("> startMonitorRegression " + name);
             //creat monitor
             ArrayList<String> testIdList = new ArrayList();
@@ -190,7 +190,7 @@ public class SsnsRegression {
             reportObj.setStatus(ConstantKey.INITIAL);
             reportObj.setUid(REPORT_REPORT);  // 
             reportObj.setRet(StartTC);
-            
+
 //            reportdata.setFeatList(testFeatList);
             reportdata.setTestListObj(testIdList);
             String dataSt = new ObjectMapper().writeValueAsString(reportdata);
@@ -622,7 +622,7 @@ public class SsnsRegression {
                         if (nameSt.indexOf("#") != -1) {
                             logger.info("# found");
                         }
-                        nameSt = dataSt.replaceAll("#", "");
+                        nameSt = nameSt.replaceAll("#", "");
                         //////exception with not sure why so make sure not special #
                         reportObj.setData(nameSt);
 
@@ -718,23 +718,24 @@ public class SsnsRegression {
             }
             if (reportObjList.size() == 0) {
                 return;
-            }            
+            }
+            SsReport restulReportObj = reportObjList.get(0);
             ReportData reportdata = new ReportData();
 
-            String dataSt = reportReportObj.getData();
+            String dataSt = restulReportObj.getData();
             if (dataSt.length() > 0) {
                 reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
             }
             reportdata.setReportList(testRList);
             dataSt = new ObjectMapper().writeValueAsString(reportdata);
-            reportReportObj.setData(dataSt);
+            restulReportObj.setData(dataSt);
 
             Calendar dateNow = TimeConvertion.getCurrentCalendar();
             long ctime = dateNow.getTimeInMillis();
-            reportReportObj.setUpdatedatel(ctime);
-            reportReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
-            int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(reportReportObj.getId(), reportReportObj.getData(),
-                    reportReportObj.getStatus(), reportReportObj.getType());
+            restulReportObj.setUpdatedatel(ctime);
+            restulReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
+            int ret = getSsnsDataImp().updatSsReportDataStatusTypeById(restulReportObj.getId(), restulReportObj.getData(),
+                    restulReportObj.getStatus(), restulReportObj.getType());
 
 ////////////////
 /////////// put back to the main user
