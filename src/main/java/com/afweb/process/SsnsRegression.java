@@ -151,10 +151,10 @@ public class SsnsRegression {
                             if (added > exitTest) {
                                 break;
                             }
-                            if (added > exitSrv){  // 100 each product
+                            if (added > exitSrv) {  // 100 each product
                                 break;
                             }
-                                
+
 ////////////////////////////////////////////////
                         }
                     }
@@ -547,7 +547,7 @@ public class SsnsRegression {
                         ArrayList<String> labResponse = new ArrayList();
                         if (LABURL.length() == 0) {
                             passSt = R_FAIL;
-                            
+
                             response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
                             if (response != null) {
                                 if (response.size() > 3) {
@@ -624,6 +624,11 @@ public class SsnsRegression {
                         reportObj.setType(reportReportObj.getId()); // reference to report test case
                         reportObj.setUid(REPORT_TESE_CASE);
 
+                        if (accObj.getName().indexOf("TTV:getProductList") != -1) {
+                            ; // chop half of the size
+                        } else  if (accObj.getName().indexOf("TTV:getProductList") != -1) {
+                            ;// chop half of the size
+                        }                        
                         ProductData pDataNew = new ProductData();
                         pDataNew.setPostParam(pData.getPostParam());
                         pDataNew.setFlow(response);
