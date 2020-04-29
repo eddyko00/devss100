@@ -787,7 +787,7 @@ public class SsnsRegression {
                 format.setTimeZone(tz);
                 String ESTdate = format.format(d);
 
-                String NumTC = name + "TC remaining " + idList.size() + " time:" + ESTdate;;
+                String NumTC = name + " TC remaining " + idList.size() + " time:" + ESTdate;;
                 testRList.add(0, NumTC);
                 overviewList.add(0, NumTC);
             }
