@@ -593,18 +593,18 @@ public class ServiceAFweb {
             }
             if ((getServerObj().getProcessTimerCnt() % 13) == 0) {
                 ;
-//                processFeatureProd();
+                processFeatureProd();
             } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
                 ;
-//                processFeatureApp();
+                processFeatureApp();
             } else if ((getServerObj().getProcessTimerCnt() % 7) == 0) {
                 //////require to save memory
                 System.gc();
                 //////require to save memory
-//                processFeatureWifi();
+                processFeatureWifi();
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
                 ;
-//                processFeatureTTVC();
+                processFeatureTTVC();
 
                 //// process monitor
                 SsnsRegression regression = new SsnsRegression();
@@ -1005,7 +1005,7 @@ public class ServiceAFweb {
 
     }
 
-    void processETL() {
+    public void processETL() {
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
         String LockName = "ETLALL";
@@ -1016,7 +1016,12 @@ public class ServiceAFweb {
         if (lockReturn == 0) {
             return;
         }
+        processETL_process();
+        removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
 
+    }
+
+    void processETL_process() {
         String file = FileLocalPath + "clear.txt";
         if (FileUtil.FileTest(file) == true) {
             this.getSsnsDataImp().deleteAllSsnsData(0);
@@ -1073,7 +1078,7 @@ public class ServiceAFweb {
             }
             return;
         }
-        removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
+
     }
 
     public int proceSssendRequestObj(ArrayList<String> sqlCMDList) {
