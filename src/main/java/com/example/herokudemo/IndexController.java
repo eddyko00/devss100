@@ -197,7 +197,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
-    
+
     @RequestMapping(value = "/cust/{username}/id/{id}/mon/clearreport", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     int getAllmonreport(
@@ -233,6 +233,22 @@ public class IndexController {
         ArrayList<ProdSummary> ret = afWebService.getSsReportMonReport(username, idSt, pidSt);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/mon/execmonitore", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    int getAllmonExec(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return 0;
+        }
+        afWebService.getSsReportExectMon(username, idSt);
+        return 1;
     }
 
     @RequestMapping(value = "/cust/{username}/id/{id}/mon/updatestatistic", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -295,7 +311,7 @@ public class IndexController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             return null;
         }
-         ArrayList<SsReport> ret = afWebService.getSsReportAll(username, idSt);
+        ArrayList<SsReport> ret = afWebService.getSsReportAll(username, idSt);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }

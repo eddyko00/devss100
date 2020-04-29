@@ -2030,6 +2030,28 @@ public class ServiceAFweb {
         return ret;
     }
     
+    public int getSsReportExectMon(String EmailUserName, String IDSt) {
+        
+        if (getServerObj().isSysMaintenance() == true) {
+            return 0;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return 0;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return 0;
+            }
+        }
+
+        String name = EmailUserName;
+        SsnsRegression regression = new SsnsRegression();
+        regression.processMonitorTesting(this);
+        return 1;
+    }    
+    
+    
     public int getSsReportMonStatistic(String EmailUserName, String IDSt) {
         
         if (getServerObj().isSysMaintenance() == true) {
