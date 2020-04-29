@@ -163,7 +163,7 @@ public class SsnsRegression {
                     }
                 }
             }
-            logger.info("> startMonitor " + name + " TC added " + added);
+
             String tzid = "America/New_York"; //EDT
             TimeZone tz = TimeZone.getTimeZone(tzid);
             Date d = new Date();
@@ -173,6 +173,8 @@ public class SsnsRegression {
             format.setTimeZone(tz);
             String ESTdate = format.format(d);
             String StartTC = "TC:" + added + " start:" + ESTdate;
+            logger.info("> startMonitor " + name + " " + StartTC);
+            testFeatList.add(StartTC);
 
             testData tObj = new testData();
             tObj.setAccid(0);
