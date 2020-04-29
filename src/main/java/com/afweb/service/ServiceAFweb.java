@@ -593,18 +593,18 @@ public class ServiceAFweb {
             }
             if ((getServerObj().getProcessTimerCnt() % 13) == 0) {
                 ;
-                processFeatureProd();
+//                processFeatureProd();
             } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
                 ;
-                processFeatureApp();
+//                processFeatureApp();
             } else if ((getServerObj().getProcessTimerCnt() % 7) == 0) {
                 //////require to save memory
                 System.gc();
                 //////require to save memory
-                processFeatureWifi();
+//                processFeatureWifi();
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
                 ;
-                processFeatureTTVC();
+//                processFeatureTTVC();
 
                 //// process monitor
                 SsnsRegression regression = new SsnsRegression();
@@ -1006,6 +1006,16 @@ public class ServiceAFweb {
     }
 
     void processETL() {
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        long lockDateValue = dateNow.getTimeInMillis();
+        String LockName = "ETLALL";
+        int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processETL ");
+        if (CKey.NN_DEBUG == true) {
+            lockReturn = 1;
+        }
+        if (lockReturn == 0) {
+            return;
+        }
 
         String file = FileLocalPath + "clear.txt";
         if (FileUtil.FileTest(file) == true) {
@@ -1063,6 +1073,7 @@ public class ServiceAFweb {
             }
             return;
         }
+        removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
     }
 
     public int proceSssendRequestObj(ArrayList<String> sqlCMDList) {
@@ -2185,7 +2196,6 @@ public class ServiceAFweb {
 //        return ssTestcaseSumObjList;
 //
 //    }
-
     public ArrayList<ProdSummary> getSsReportMonReport(String EmailUserName, String IDSt, String repIDSt) {
 
         if (getServerObj().isSysMaintenance() == true) {
@@ -2271,11 +2281,11 @@ public class ServiceAFweb {
             return ssReportList;
         }
         ssReportList.addAll(ssUserReportObjList);
-        
+
         ArrayList<SsReport> ssResultReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT);
         if (ssResultReportObjList != null) {
             ssReportList.addAll(ssResultReportObjList);
-        }  
+        }
         return ssReportList;
 
     }
@@ -2301,11 +2311,11 @@ public class ServiceAFweb {
             return ssReportList;
         }
         ssReportList.addAll(ssUserReportObjList);
-        
+
         ArrayList<SsReport> ssResultReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT);
         if (ssResultReportObjList != null) {
             ssReportList.addAll(ssResultReportObjList);
-        }        
+        }
         return ssReportList;
 
     }
@@ -2881,7 +2891,7 @@ public class ServiceAFweb {
                 return null;
             }
         }
-        LABURL="DEVOP";
+        LABURL = "DEVOP";
         ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(prod, PIDSt);
         if (ssnsAccObjList != null) {
             if (ssnsAccObjList.size() > 0) {
