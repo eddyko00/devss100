@@ -703,7 +703,14 @@ public class SsnsRegression {
         if ((sizeOne < 6) || (sizeTwo < 6)) {
             return false;
         }
-
+        String tmp = listOne.get(0);
+        if (tmp.indexOf("testfailed") != -1) {
+            return false;
+        }
+        tmp = listTwo.get(0);
+        if (tmp.indexOf("testfailed") != -1) {
+            return false;
+        }
         ArrayList<String> listOneTmp = new ArrayList();
         for (int i = 5; i < listOne.size(); i++) {
             listOneTmp.add(listOne.get(i));
