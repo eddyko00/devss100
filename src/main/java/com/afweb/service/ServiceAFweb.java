@@ -588,22 +588,23 @@ public class ServiceAFweb {
             if ((getServerObj().getProcessTimerCnt() % 280) == 0) {
                 // 30 sec per tick ~ 5 hour   60 s*60 * 4/ 30 
             }
-            if ((getServerObj().getProcessTimerCnt() % 200) == 0) {
-                // 30 sec per tick ~  for 3 hour   60 s*60 *3 /30 
+            if ((getServerObj().getProcessTimerCnt() % 20) == 0) {
+                ProcessAllLockCleanup();
             }
             if ((getServerObj().getProcessTimerCnt() % 13) == 0) {
-                ;
                 processFeatureProd();
+                
             } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
-                ;
                 processFeatureApp();
+                
             } else if ((getServerObj().getProcessTimerCnt() % 7) == 0) {
                 //////require to save memory
                 System.gc();
                 //////require to save memory
+                
                 processFeatureWifi();
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
-                ;
+                
                 processFeatureTTVC();
 
                 //// process monitor
@@ -624,6 +625,31 @@ public class ServiceAFweb {
             logger.info("> processTimer Exception" + ex.getMessage());
         }
     }
+
+    
+        private void ProcessAllLockCleanup() {
+        // clean up old lock name
+        // clean Lock entry pass 30 min
+        ArrayList<AFLockObject> lockArray = getAllLock();
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        int numCnt = 0;
+        if (lockArray != null) {
+            for (int i = 0; i < lockArray.size(); i++) {
+                AFLockObject lockObj = lockArray.get(i);
+                long lastUpdate = lockObj.getLockdatel();
+                long lastUpdateAdd30 = TimeConvertion.addMinutes(lastUpdate, 30); // remove lock for 30min
+
+                if (lastUpdateAdd30 < dateNow.getTimeInMillis()) {
+                    removeNameLock(lockObj.getLockname(), lockObj.getType());
+                    numCnt++;
+                    if (numCnt > 10) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * A simple implementation to pretty-print JSON file.
