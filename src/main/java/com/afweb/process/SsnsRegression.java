@@ -543,12 +543,15 @@ public class SsnsRegression {
                             continue;
                         }
                         long exec = 0;
+                        int totalTC = 0;
+
                         ArrayList<String> response = new ArrayList();
                         ArrayList<String> labResponse = new ArrayList();
                         if (LABURL.length() == 0) {
                             passSt = R_FAIL;
 
                             response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
+                            totalTC++;
                             if (response != null) {
                                 if (response.size() > 3) {
                                     String feat = response.get(0);
@@ -590,6 +593,7 @@ public class SsnsRegression {
                             passSt = R_FAIL;
                             String PR = "";
                             response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, PR);
+                            totalTC++;
                             if (response != null) {
                                 if (response.size() > 3) {
                                     String feat = response.get(0);
@@ -613,6 +617,9 @@ public class SsnsRegression {
                         reportObj.setName(nameRepId);
                         reportObj.setStatus(ConstantKey.OPEN);
                         reportObj.setRet(passSt);
+                        if (totalTC > 0) {
+                            exec = exec / totalTC;
+                        }
                         reportObj.setExec(exec);
 
                         reportObj.setApp(accObj.getApp());
@@ -623,12 +630,31 @@ public class SsnsRegression {
 
                         reportObj.setType(reportReportObj.getId()); // reference to report test case
                         reportObj.setUid(REPORT_TESE_CASE);
+                        if (response.size() > 7001) {
+                            // data too big
+                            ArrayList responseTmp = new ArrayList();
+                            for (int i = 0; i < 7000; i++) {
+                                responseTmp.add(response.get(j));
+                            }
+                            response = responseTmp;
+                        }
+                        if (labResponse.size() > 7001) {
+                            // data too big
+                            ArrayList responseTmp = new ArrayList();
+                            for (int i = 0; i < 7000; i++) {
+                                responseTmp.add(labResponse.get(j));
+                            }
+                            labResponse = responseTmp;
+                        }
 
-                        if (accObj.getName().indexOf("TTV:getProductList") != -1) {
-                            ; // chop half of the size
-                        } else  if (accObj.getName().indexOf("TTV:getProductList") != -1) {
-                            ;// chop half of the size
-                        }                        
+//                        if (accObj.getName().indexOf("TTV:getProductList") != -1) {
+//                            ; // chop half of the size
+//                            logger.info("response " + response.size() + " labResponse" + labResponse.size());
+//
+//                        } else if (accObj.getName().indexOf("TTV:getProductList") != -1) {
+//                            ;// chop half of the size
+//                            logger.info("response " + response.size() + " labResponse" + labResponse.size());
+//                        }
                         ProductData pDataNew = new ProductData();
                         pDataNew.setPostParam(pData.getPostParam());
                         pDataNew.setFlow(response);
