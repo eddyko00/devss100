@@ -620,10 +620,11 @@ public class SsnsRegression {
 
                         //////exception with not sure why so make sure not special #
                         if (nameSt.indexOf("#") != -1) {
-                            logger.info("# found");
+//                            logger.info("# found");
+                            nameSt = nameSt.replaceAll("#", "");
+                            //////exception with not sure why so make sure not special #                            
                         }
-                        nameSt = nameSt.replaceAll("#", "");
-                        //////exception with not sure why so make sure not special #
+
                         reportObj.setData(nameSt);
 
                         Calendar dateNow = TimeConvertion.getCurrentCalendar();
