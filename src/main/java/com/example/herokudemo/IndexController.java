@@ -81,7 +81,6 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/getappointment");
         arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/searchtimeslot");
 
-
         arrayString.add("/cust/{username}/id/{id}/serv/app/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/app/feature?name=");
         arrayString.add("/cust/{username}/id/{id}/serv/app/feature/summary?name=");
@@ -172,6 +171,9 @@ public class IndexController {
         if (urlSt != null) {
             if (urlSt.length() > 0) {
                 labURL = urlSt;
+                if (urlSt.equals("locallab")) {
+                    labURL = ServiceAFweb.LOCALAB_URL;
+                }
             }
         }
 

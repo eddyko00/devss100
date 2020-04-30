@@ -66,6 +66,7 @@ public class ServiceAFweb {
     public static String URL_LOCALDB = "";
     public static String FileLocalPath = "";
 
+        public static String LOCALAB_URL = "http://L097105:8080"; //"http://localhost:8080";
     /**
      * @return the serverObj
      */
