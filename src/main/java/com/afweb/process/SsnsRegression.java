@@ -113,7 +113,7 @@ public class SsnsRegression {
             ArrayList<String> servList = serviceAFweb.getSsnsprodAll(name, null, 0);
             for (int i = 0; i < servList.size(); i += 2) {
                 String servProd = servList.get(i);
-                int exitSrv = 200;
+                int exitSrv = 100;
                 if (app != null) {
                     if (app.length() > 0) {
                         if (app.equals(servProd)) {
@@ -129,9 +129,15 @@ public class SsnsRegression {
                     if (featN.indexOf("failed") != -1) {
                         continue;
                     }
+                    if (featN.indexOf("failed") != -1) {
+                        continue;
+                    }
                     testFeatList.add(featN);
-
-                    ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, 15);
+                    int listNum = 5;
+                    if (servProd.equals(SsnsService.APP_PRODUCT) == true) {
+                        listNum = 2;
+                    }
+                    ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, listNum);
                     if (SsnsAcclist != null) {
                         for (int k = 0; k < SsnsAcclist.size(); k++) {
                             SsnsAcc accObj = SsnsAcclist.get(k);
@@ -174,7 +180,7 @@ public class SsnsRegression {
             String ESTdate = format.format(d);
             String StartTC = "TC:" + added + " start:" + ESTdate;
             logger.info("> startMonitor " + name + " " + StartTC);
-            testFeatList.add(StartTC);
+            testFeatList.add(0, StartTC);
 
             testData tObj = new testData();
             tObj.setAccid(0);
@@ -632,31 +638,38 @@ public class SsnsRegression {
 
                         reportObj.setType(reportReportObj.getId()); // reference to report test case
                         reportObj.setUid(REPORT_TESE_CASE);
-                        if (response.size() > 7001) {
-                            // data too big
-                            ArrayList responseTmp = new ArrayList();
-                            for (int i = 0; i < 7000; i++) {
-                                responseTmp.add(response.get(j));
-                            }
-                            response = responseTmp;
-                        }
-                        if (labResponse.size() > 7001) {
-                            // data too big
-                            ArrayList responseTmp = new ArrayList();
-                            for (int i = 0; i < 7000; i++) {
-                                responseTmp.add(labResponse.get(j));
-                            }
-                            labResponse = responseTmp;
-                        }
 
-//                        if (accObj.getName().indexOf("TTV:getProductList") != -1) {
-//                            ; // chop half of the size
-//                            logger.info("response " + response.size() + " labResponse" + labResponse.size());
-//
-//                        } else if (accObj.getName().indexOf("TTV:getProductList") != -1) {
-//                            ;// chop half of the size
-//                            logger.info("response " + response.size() + " labResponse" + labResponse.size());
-//                        }
+                        // data too big
+                        int charSize = 0;
+                        ArrayList responseTmp = new ArrayList();
+                        for (int i = 0; i < response.size(); i++) {
+                            String st = response.get(i);
+                            charSize += st.length();
+                            if (charSize > 6000) {
+                                responseTmp.add("Data truncation too long ");
+                                break;
+                            }
+                            responseTmp.add(st);
+                        }
+                        response = responseTmp;
+                        
+                        ///////////////////
+                        
+                        charSize = 0;
+                        responseTmp = new ArrayList();
+                        for (int i = 0; i < labResponse.size(); i++) {
+                            String st = labResponse.get(i);
+                            charSize += st.length();
+                            if (charSize > 6000) {
+                                responseTmp.add("Data truncation too long ");
+                                break;
+                            }
+                            responseTmp.add(st);
+                        }
+                        labResponse = responseTmp;
+                        ///////////////////
+                                
+                                
                         ProductData pDataNew = new ProductData();
                         pDataNew.setPostParam(pData.getPostParam());
                         pDataNew.setFlow(response);
@@ -665,6 +678,7 @@ public class SsnsRegression {
                         String nameSt = new ObjectMapper().writeValueAsString(pDataNew);
 
                         //////exception with not sure why so make sure not special #
+                        logger.info("nameSt size " + nameSt.length());
                         if (nameSt.indexOf("#") != -1) {
 //                            logger.info("# found");
                             nameSt = nameSt.replaceAll("#", "");
@@ -864,18 +878,24 @@ public class SsnsRegression {
                 String reportLine = app + "," + oper + ",size," + operList.get(j + 1);
                 testRList.add(reportLine);
 
-                ArrayList<SsReport> reportOperList = getSsnsDataImp().getSsReportByFeatureOperIdList(nameRepId, app, oper, 0);
-                if (reportOperList != null) {
-                    for (int k = 0; k < reportOperList.size(); k++) {
-                        SsReport rObj = reportOperList.get(k);
-                        reportLine = rObj.getId() + "," + rObj.getCusid() + "," + rObj.getBanid() + "," + rObj.getTiid() + "," + rObj.getRet() + "," + rObj.getExec();
-                        testRList.add(reportLine);
+                ArrayList<String> idReportList = getSsnsDataImp().getSsReportByFeatureOperIdListName(nameRepId, app, oper);
+                if (idReportList != null) {
+                    for (int k = 0; k < idReportList.size(); k++) {
+                        String idSt = idReportList.get(k);
+                        int id = Integer.parseInt(idSt);
+                        SsReport rObj = getSsnsDataImp().getSsReportByID(id);
+                        if (rObj != null) {
+                            reportLine = rObj.getId() + "," + rObj.getCusid() + "," + rObj.getBanid() + "," + rObj.getTiid() + "," + rObj.getRet() + "," + rObj.getExec();
+                            testRList.add(reportLine);
 
-                        if (rObj.getRet().indexOf(R_PASS) != -1) {
-                            Pass++;
-                            exec += rObj.getExec();
+                            if (rObj.getRet().indexOf(R_PASS) != -1) {
+                                Pass++;
+                                exec += rObj.getExec();
+                            } else {
+                                Fail++;
+                            }
                         } else {
-                            Fail++;
+                            logger.info("too large id " + id);
                         }
                     }
                 }
