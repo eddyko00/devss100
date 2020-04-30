@@ -129,11 +129,11 @@ public class SsnsService {
                         }
                     }
                 }
-                cmd.add("getcustomertvsubscription");
+                cmd.add("get customer ttv subscription");
                 cmd.add(TT_GetSub);
-                cmd.add("validatewithauth");
+                cmd.add("ttv validate");
                 cmd.add(TT_Vadulate);
-                cmd.add("quotation");
+                cmd.add("ttv quotation");
                 cmd.add(TT_Quote);
                 pData.setCmd(cmd);
 
@@ -149,7 +149,7 @@ public class SsnsService {
                     banid = operList[0];
                     prodid = operList[1];
                 }
-                cmd.add("getsub");
+                cmd.add("get customer ttv subscription");
                 cmd.add(TT_GetSub);
                 pData.setCmd(cmd);
 
@@ -648,9 +648,9 @@ public class SsnsService {
                         }
                     }
                 }
-                cmd.add("getdevice"); // cmd
-                cmd.add(WI_GetDevice);   // description
-                cmd.add("getdevicestatus");
+                cmd.add("get wifi device"); // description
+                cmd.add(WI_GetDevice);   // cmd
+                cmd.add("get wifi devicestatus");
                 cmd.add(WI_GetDeviceStatus);
                 pData.setCmd(cmd);
             } else if (oper.equals(WI_config)) {
@@ -686,9 +686,9 @@ public class SsnsService {
                         }
                     }
                 }
-                cmd.add("getdevice"); // cmd
-                cmd.add(WI_GetDevice);   // description
-                cmd.add("getdevicestatus");
+                cmd.add("get wifi device"); // description
+                cmd.add(WI_GetDevice);   // cmd
+                cmd.add("get wifi devicestatus");
                 cmd.add(WI_GetDeviceStatus);
                 pData.setCmd(cmd);
             } else if (oper.equals(WI_Callback)) {//"cancelAppointment")) {
@@ -1312,10 +1312,10 @@ public class SsnsService {
                 if ((banid.length() == 0) && (cust.length() == 0)) {
                     ;
                 } else {
-                    cmd.add("getappointment"); // cmd
+                    cmd.add("get appointment"); // cmd
                     cmd.add(APP_GET_APP);  // descriptoin
                 }
-                cmd.add("searchtimeslot");
+                cmd.add("search timeslot");
                 cmd.add(APP_GET_TIMES);
                 pData.setCmd(cmd);
 
@@ -1360,10 +1360,10 @@ public class SsnsService {
                     if ((banid.length() == 0) && (cust.length() == 0)) {
                         ;
                     } else {
-                        cmd.add("getappointment");
+                        cmd.add("get appointment");
                         cmd.add(APP_GET_APP);
                     }
-                    cmd.add("searchtimeslot");
+                    cmd.add("search timeslot");
                     cmd.add(APP_GET_TIMES);
                     pData.setCmd(cmd);
                 }
@@ -1379,7 +1379,7 @@ public class SsnsService {
                     banid = operList[0];
                     cust = operList[1];
                 }
-                cmd.add("getappointment");
+                cmd.add("get appointment");
                 cmd.add(APP_GET_APP);
                 pData.setCmd(cmd);
             } else if (oper.equals(APP_CAN_APP)) {//"cancelAppointment")) {
@@ -1981,8 +1981,8 @@ public class SsnsService {
 //    public static String APP_PRODUCT_TYPE_HSIC = "HSIC";
 //    public static String APP_PRODUCT_TYPE_SING = "SING";                
 
-                cmd.add("getproductbyid");
-                cmd.add(PIoper + " " + PROD_GET_BYID);
+                cmd.add("get " + PIoper + " productby id"); // description
+                cmd.add(PROD_GET_BYID); // cmd
                 pData.setCmd(cmd);
 
                 boolean stat = this.updateSsnsProdiuctInventoryByProdId(PIoper, banid, prodid, pData, dataObj, NAccObj);
@@ -2018,11 +2018,11 @@ public class SsnsService {
                 NAccObj.setRet(APP_FEATT_TYPE_SING);
                 NAccObj.setDown("splunkflow");
                 String PIoper = APP_FEATT_TYPE_SING;
-                
-                cmd.add("getproductbyid");
-                cmd.add(PIoper + " " + PROD_GET_BYID);
+
+                cmd.add("get " + PIoper + " productby id"); // description
+                cmd.add(PROD_GET_BYID); // cmd
                 pData.setCmd(cmd);
-                
+
                 boolean stat = this.updateSsnsProdiuctInventory(PIoper, banid, prodid, pData, dataObj, NAccObj);
                 if (stat == true) {
                     ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
@@ -2052,11 +2052,11 @@ public class SsnsService {
                 NAccObj.setRet(APP_FEAT_TYPE_HSIC);
                 NAccObj.setDown("splunkflow");
                 PIoper = APP_FEAT_TYPE_HSIC;
-                
-                cmd.add("getproductbyid");
-                cmd.add(PIoper + " " + PROD_GET_BYID);
+
+                cmd.add("get " + PIoper + " productby id"); // description
+                cmd.add(PROD_GET_BYID); // cmd
                 pData.setCmd(cmd);
-                
+
                 stat = this.updateSsnsProdiuctInventory(PIoper, banid, prodid, pData, dataObj, NAccObj);
                 if (stat == true) {
                     ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
@@ -2087,11 +2087,11 @@ public class SsnsService {
                 NAccObj.setRet(APP_FEAT_TYPE_TTV);
                 NAccObj.setDown("splunkflow");
                 PIoper = APP_FEAT_TYPE_TTV;
-                
-                cmd.add("getproductbyid");
-                cmd.add(PIoper + " " + PROD_GET_BYID);
+
+                cmd.add("get " + PIoper + " productby id"); // description
+                cmd.add(PROD_GET_BYID); // cmd
                 pData.setCmd(cmd);
-                
+
                 stat = this.updateSsnsProdiuctInventory(PIoper, banid, prodid, pData, dataObj, NAccObj);
                 if (stat == true) {
                     ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
