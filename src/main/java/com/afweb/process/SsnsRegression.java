@@ -19,6 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -133,16 +135,17 @@ public class SsnsRegression {
                         continue;
                     }
                     testFeatList.add(featN);
-                    int listNum = 5;
-                    if (servProd.equals(SsnsService.APP_PRODUCT) == true) {
-                        listNum = 2;
-                    }
-                    ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, listNum);
+                    Set<String> set = new HashSet<>();
+
+                    ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, 5);
                     if (SsnsAcclist != null) {
                         for (int k = 0; k < SsnsAcclist.size(); k++) {
                             SsnsAcc accObj = SsnsAcclist.get(k);
 
                             if (accObj.getType() > 10) {  // testfailed will increment this type
+                                continue;
+                            }
+                            if (!set.add(accObj.getBanid())) {
                                 continue;
                             }
                             testData tObj = new testData();
@@ -652,9 +655,8 @@ public class SsnsRegression {
                             responseTmp.add(st);
                         }
                         response = responseTmp;
-                        
+
                         ///////////////////
-                        
                         charSize = 0;
                         responseTmp = new ArrayList();
                         for (int i = 0; i < labResponse.size(); i++) {
@@ -668,8 +670,7 @@ public class SsnsRegression {
                         }
                         labResponse = responseTmp;
                         ///////////////////
-                                
-                                
+
                         ProductData pDataNew = new ProductData();
                         pDataNew.setPostParam(pData.getPostParam());
                         pDataNew.setFlow(response);
@@ -678,7 +679,7 @@ public class SsnsRegression {
                         String nameSt = new ObjectMapper().writeValueAsString(pDataNew);
 
                         //////exception with not sure why so make sure not special #
-                        logger.info("nameSt size " + nameSt.length());
+//                        logger.info("nameSt size " + nameSt.length());
                         if (nameSt.indexOf("#") != -1) {
 //                            logger.info("# found");
                             nameSt = nameSt.replaceAll("#", "");
