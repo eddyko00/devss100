@@ -70,17 +70,17 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/serv/prod?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/summary?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}");
-        arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}/rt/rt");
-        arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}/rttest/");
+        arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}/rt/getproductbyid");
+        arrayString.add("/cust/{username}/id/{id}/serv/prod/id/{pid}/rttest/getproductbyid");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/prod/feature?name=");
 
         arrayString.add("/cust/{username}/id/{id}/serv/app?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/app/summary?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}");
-        arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/getapp");
-        arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/gettimeslot");
-        arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rttest/");
+        arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/getappointment");
+        arrayString.add("/cust/{username}/id/{id}/serv/app/id/{pid}/rt/searchtimeslot");
+
 
         arrayString.add("/cust/{username}/id/{id}/serv/app/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/app/feature?name=");
@@ -91,7 +91,7 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevice");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevicestatus");
-        arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rttest/");
+        arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rttest/getdevicestatus");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/feature?name=");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/feature/summary?name=");
@@ -99,9 +99,9 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/serv/ttv?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/summary?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}");
-        arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/getsub");
-        arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/validate");
-        arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/quotation");
+        arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/getcustomertvsubscription");
+        arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/validatewithauth");
+        arrayString.add("/cust/{username}/id/{id}/serv/ttv/id/{pid}/rt/quotewithauth");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/featureall");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/feature?name=");
         arrayString.add("/cust/{username}/id/{id}/serv/ttv/feature/summary?name=");
