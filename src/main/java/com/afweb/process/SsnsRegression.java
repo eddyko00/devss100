@@ -803,8 +803,8 @@ public class SsnsRegression {
             if (dataSt.length() > 0) {
                 reportdata = new ObjectMapper().readValue(dataSt, ReportData.class);
             }
-            
-            String NumTC = name;
+
+            String NumTC = "";
             if (idList != null) {
 
                 String tzid = "America/New_York"; //EDT
@@ -824,8 +824,9 @@ public class SsnsRegression {
 
             dataSt = new ObjectMapper().writeValueAsString(reportdata);
             restulReportObj.setData(dataSt);
-
-            restulReportObj.setRet(NumTC);
+            if (NumTC.length() > 0) {
+                restulReportObj.setRet(NumTC);
+            }
             Calendar dateNow = TimeConvertion.getCurrentCalendar();
             long ctime = dateNow.getTimeInMillis();
             restulReportObj.setUpdatedatel(ctime);
@@ -854,7 +855,10 @@ public class SsnsRegression {
             reportdata.setReportList(overviewList);
             dataSt = new ObjectMapper().writeValueAsString(reportdata);
             userReportObj.setData(dataSt);
-            userReportObj.setRet(NumTC);
+            
+            if (NumTC.length() > 0) {
+                userReportObj.setRet(NumTC);
+            }            
             userReportObj.setUpdatedatel(ctime);
             userReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
             ret = getSsnsDataImp().updatSsReportDataStatusTypeRetById(userReportObj.getId(), userReportObj.getData(),
