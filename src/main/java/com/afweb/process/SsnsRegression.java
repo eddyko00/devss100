@@ -618,7 +618,7 @@ public class SsnsRegression {
                                     exec = Long.parseLong(execSt);
                                     labResponse = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
                                     boolean result = compareArraySame(response, labResponse);
-                                    if (result = true) {
+                                    if (result == true) {
                                         passSt = R_PASS;
                                     } else {
                                         passSt = R_FAIL;

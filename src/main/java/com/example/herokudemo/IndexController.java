@@ -62,7 +62,7 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/mon/stop");
         arrayString.add("/cust/{username}/id/{id}/mon/pid/{pid}");
 
-        arrayString.add("/cust/{username}/id/{id}/regression/start?url=");
+        arrayString.add("/cust/{username}/id/{id}/regression/start?app=&url=");
         arrayString.add("/cust/{username}/id/{id}/regression/stop");
 
         arrayString.add("/cust/{username}/id/{id}/serv");
