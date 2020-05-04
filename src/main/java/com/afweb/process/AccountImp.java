@@ -154,7 +154,10 @@ public class AccountImp {
         }
         String userN = newCustomer.getUsername();
         userN = userN.toUpperCase();
-        newCustomer.setUsername(userN);
+        NameObj nameObj = new NameObj(userN);
+        String UserName = nameObj.getNormalizeName();
+        
+        newCustomer.setUsername(UserName);
         logger.info("> addCustomer  " + newCustomer.getUsername());
         int result = 0;
         try {
