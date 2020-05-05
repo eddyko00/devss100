@@ -298,8 +298,8 @@ public class AccountImp {
     private ArrayList<String> getDBDataTableId(ServiceAFweb serviceAFWeb, String table) {
         try {
             RequestObj sqlObj = new RequestObj();
-            sqlObj.setCmd(ServiceAFweb.AllName + "");
-            String sql = "select id as name from " + table + " order by id asc";
+            sqlObj.setCmd(ServiceAFweb.AllId + "");
+            String sql = "select id from " + table + " order by id asc";
             sqlObj.setReq(sql);
 
             RequestObj sqlObjresp = serviceAFWeb.SystemSQLRequest(sqlObj);
