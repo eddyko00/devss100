@@ -717,6 +717,11 @@ public class ServiceAFweb {
             if ((getServerObj().getProcessTimerCnt() % 280) == 0) {
                 // 30 sec per tick ~ 5 hour   60 s*60 * 4/ 30 
             }
+            if ((getServerObj().getProcessTimerCnt() % 100) == 0) {
+                // 15 mintes
+                SsnsRegression regression = new SsnsRegression();
+                int ret = regression.startMonitor(this, CKey.ADMIN_USERNAME);
+            }
             if ((getServerObj().getProcessTimerCnt() % 20) == 0) {
                 ProcessAllLockCleanup();
             }
