@@ -572,9 +572,12 @@ public class SsnsRegression {
                                 if (response.size() > 3) {
                                     String feat = response.get(0);
                                     String execSt = response.get(2);
-                                    execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
-                                    exec = Long.parseLong(execSt);
-
+//                                    execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
+                                    int index = execSt.indexOf("elapsedTime:");
+                                    if (index != -1) {
+                                        execSt = execSt.substring(index + 12);
+                                        exec = Long.parseLong(execSt);
+                                    }
                                     if (feat.equals(accObj.getName())) {
                                         passSt = R_PASS;
                                     } else {
@@ -614,8 +617,12 @@ public class SsnsRegression {
                                 if (response.size() > 3) {
                                     String feat = response.get(0);
                                     String execSt = response.get(2);
-                                    execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
-                                    exec = Long.parseLong(execSt);
+//                                    execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
+                                    int index = execSt.indexOf("elapsedTime:");
+                                    if (index != -1) {
+                                        execSt = execSt.substring(index + 12);
+                                        exec = Long.parseLong(execSt);
+                                    }
                                     labResponse = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
                                     boolean result = compareArraySame(response, labResponse);
                                     if (result == true) {
@@ -855,10 +862,10 @@ public class SsnsRegression {
             reportdata.setReportList(overviewList);
             dataSt = new ObjectMapper().writeValueAsString(reportdata);
             userReportObj.setData(dataSt);
-            
+
             if (NumTC.length() > 0) {
                 userReportObj.setRet(NumTC);
-            }            
+            }
             userReportObj.setUpdatedatel(ctime);
             userReportObj.setUpdatedatedisplay(new java.sql.Date(ctime));
             ret = getSsnsDataImp().updatSsReportDataStatusTypeRetById(userReportObj.getId(), userReportObj.getData(),
