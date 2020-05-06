@@ -319,9 +319,9 @@ public class AccountImp {
 
     public boolean downloadDBData(ServiceAFweb serviceAFWeb) {
         saveDBcustomer(serviceAFWeb);
-        saveSsnsDataAcc(serviceAFWeb, "ssnsdata");
         saveSsnsDataAcc(serviceAFWeb, "ssnsacc");
         saveSsnsDataAcc(serviceAFWeb, "ssreport");
+        saveSsnsDataAcc(serviceAFWeb, "ssnsdata");        
         saveDBcomm(serviceAFWeb);
         return true;
     }
