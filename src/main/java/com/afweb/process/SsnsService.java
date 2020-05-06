@@ -780,11 +780,11 @@ public class SsnsService {
                         }
 
                     } else if (oper.equals(WI_config)) {
-                        outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, WI_GetDeviceStatus, banid, uniquid, prodClass, serialid, parm, null);
+                        outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, WI_GetDeviceStatus, banid, uniquid, prodClass, serialid, "", null);
                         if (outputSt == null) {
                             return false;
                         }
-                        String outputDeviceSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, WI_GetDevice, banid, uniquid, prodClass, serialid, parm, null);
+                        String outputDeviceSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, WI_GetDevice, banid, uniquid, prodClass, serialid, "", null);
                         if (outputDeviceSt.indexOf("Boost Device") != -1) {
                             boost = 1;
                         }

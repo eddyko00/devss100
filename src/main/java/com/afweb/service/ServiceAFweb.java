@@ -25,9 +25,12 @@ import java.util.Arrays;
 import java.util.Calendar;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.logging.Level;
 
 import java.util.logging.Logger;
 import javax.sql.DataSource;
@@ -66,7 +69,8 @@ public class ServiceAFweb {
     public static String URL_LOCALDB = "";
     public static String FileLocalPath = "";
 
-        public static String LOCALAB_URL = "http://L097105:8080"; //"http://localhost:8080";
+    public static String LOCALAB_URL = "http://L097105:8080"; //"http://localhost:8080";
+
     /**
      * @return the serverObj
      */
@@ -419,6 +423,130 @@ public class ServiceAFweb {
 //                    }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////   
+                    boolean tempflag = false;
+                    if (tempflag == true) {
+//                        String uid = "0e115d58-ff21-4508-b109-1cebd10e77db";
+//                        ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList(uid);
+//                        SsnsData data = dataList.get(0);
+//                        SsnsService ss = new SsnsService();
+//                        String feature = ss.getFeatureSsnsWifi(data);
+
+                        ArrayList<String> testIdList = new ArrayList();
+                        ArrayList<String> testFeatList = new ArrayList();
+                        int added = 0;
+                        ReportData reportdata = new ReportData();
+                        String app = SsnsService.APP_APP;
+                        ArrayList<String> servList = getSsnsprodAll(CKey.ADMIN_USERNAME, null, 0);
+                        for (int i = 0; i < servList.size(); i += 2) {
+                            String servProd = servList.get(i);
+                            int exitSrv = 100;
+                            if (app != null) {
+                                if (app.length() > 0) {
+                                    if (app.equals(servProd)) {
+                                        ;
+                                    } else {
+                                        continue;
+                                    }
+                                }
+                            }
+                            ArrayList<String> featallList = getSsnsprodByFeature(CKey.ADMIN_USERNAME, null, servProd);
+                            for (int j = 0; j < featallList.size(); j += 2) {
+                                String featN = featallList.get(j);
+                                if (featN.indexOf("failed") != -1) {
+                                    continue;
+                                }
+                                if (featN.indexOf("failed") != -1) {
+                                    continue;
+                                }
+                                testFeatList.add(featN);
+                                Set<String> set = new HashSet<>();
+
+                                ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, 5);
+                                if (SsnsAcclist != null) {
+                                    for (int k = 0; k < SsnsAcclist.size(); k++) {
+                                        try {
+                                            SsnsAcc accObj = SsnsAcclist.get(k);
+
+                                            if (accObj.getType() > 10) {  // testfailed will increment this type
+                                                continue;
+                                            }
+                                            if (accObj.getApp().equals(SsnsService.APP_PRODUCT)) {
+                                                if (accObj.getBanid().length() > 0) {
+                                                    if (!set.add(accObj.getBanid())) {
+                                                        continue;
+                                                    }
+                                                }
+                                            }
+                                            testData tObj = new testData();
+                                            tObj.setAccid(accObj.getId());
+                                            tObj.setUsername(CKey.ADMIN_USERNAME);
+                                            tObj.setTesturl("");
+                                            String st = new ObjectMapper().writeValueAsString(tObj);
+                                            st = st.replace('"', '^');
+                                            testIdList.add(st);
+                                            int id = tObj.getAccid();
+                                            String LABURL = tObj.getTesturl();  // " empty for monitor, not empay for regression
+
+                                            accObj = getSsnsDataImp().getSsnsAccObjByID(id);
+                                            String dataSt = accObj.getData();
+                                            ProductData pData = new ObjectMapper().readValue(dataSt, ProductData.class);
+                                            ArrayList<String> response = new ArrayList();
+                                            ArrayList<String> labResponse = new ArrayList();
+                                            String passSt;
+                                            int totalTC = 0;
+                                            float exec = 0;
+                                            String oper = SsnsService.APP_GET_TIMES;
+                                            if (LABURL.length() == 0) {
+                                                passSt = R_FAIL;
+
+                                                response = testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
+                                                totalTC++;
+                                                if (response != null) {
+                                                    if (response.size() > 3) {
+                                                        String feat = response.get(0);
+                                                        String execSt = response.get(2);
+                                                        execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
+                                                        exec = Long.parseLong(execSt);
+
+                                                        if (feat.equals(accObj.getName())) {
+                                                            passSt = R_PASS;
+                                                        } else {
+                                                            passSt = R_PASS;
+                                                            String[] featL = feat.split(":");
+                                                            String[] nameL = accObj.getName().split(":");
+                                                            if ((featL.length > 4) && (nameL.length > 4)) {
+                                                                if (!featL[2].equals(nameL[2])) {
+                                                                    passSt = R_FAIL;
+                                                                }
+                                                                if (!featL[3].equals(nameL[3])) {
+                                                                    passSt = R_FAIL;
+                                                                }
+                                                                if (!featL[4].equals(nameL[4])) {
+                                                                    passSt = R_FAIL;
+                                                                }
+                                                            } else if ((featL.length > 3) && (nameL.length > 3)) {
+                                                                if (!featL[2].equals(nameL[2])) {
+                                                                    passSt = R_FAIL;
+                                                                }
+                                                                if (!featL[3].equals(nameL[3])) {
+                                                                    passSt = R_FAIL;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                passSt = accObj.getName() + ":" + passSt;
+                                            }
+                                        } catch (Exception ex) {
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
                     boolean monflag = false;
                     if (monflag == true) {
 //                        this.getSsnsDataImp().deleteAllSsReport(0);
@@ -2198,7 +2326,7 @@ public class ServiceAFweb {
         }
         return 1;
     }
-    
+
     public String getSsReportMonExec(String EmailUserName, String IDSt) {
 
         if (getServerObj().isSysMaintenance() == true) {
@@ -2751,9 +2879,37 @@ public class ServiceAFweb {
                 ArrayList<String> outputList = new ArrayList();
                 SsnsService ss = new SsnsService();
                 String feat = "";
+                if (Oper.equals(SsnsService.APP_GET_APP)) {
 
-                if (Oper.equals(SsnsService.APP_GET_APP) || Oper.equals(SsnsService.APP_GET_TIMES)) {
-                    feat = ss.TestFeatureSsnsProdApp(ssnsAccObj, outputList, Oper, LABURL);
+                    feat = ss.TestFeatureSsnsProdApp(ssnsAccObj, outputList, SsnsService.APP_GET_APP, LABURL);
+                    //                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
+                    if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {
+                        // disabled this Acc Obj
+                        int type = ssnsAccObj.getType();
+                        String name = ssnsAccObj.getName();
+                        int status = ssnsAccObj.getStatus();
+                        type = type + 1; // increate error count
+
+                        this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
+                    } else {
+                        String name = ssnsAccObj.getName();
+                        int type = ssnsAccObj.getType();
+                        int status = ssnsAccObj.getStatus();
+                        if (type > 0) {
+                            type = 0; // clear error count
+                            this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
+                        }
+                    }
+                }
+                if (Oper.equals(SsnsService.APP_GET_TIMES)) {
+
+                    String featTimeSlot = ss.TestFeatureSsnsProdApp(ssnsAccObj, outputList, SsnsService.APP_GET_TIMES, LABURL);
+                    if ((ssnsAccObj.getBanid().length() != 0) && (ssnsAccObj.getCusid().length() != 0)) {
+                        outputList = new ArrayList();
+                        feat = ss.TestFeatureSsnsProdApp(ssnsAccObj, outputList, SsnsService.APP_GET_APP, LABURL);
+                    } else {
+                        feat = featTimeSlot;
+                    }
 //                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
                     if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {
                         // disabled this Acc Obj
@@ -2764,6 +2920,16 @@ public class ServiceAFweb {
 
                         this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
                     } else {
+                        if (((featTimeSlot == null) || (featTimeSlot.length() == 0)) || (featTimeSlot.indexOf(":testfailed") != -1)) {
+                            feat += ":testfailed";
+                        }
+                        if ((ssnsAccObj.getBanid().length() != 0) && (ssnsAccObj.getCusid().length() != 0)) {
+                            String feature = outputList.get(0);
+                            feature += ":startdate";
+                            outputList.remove(0);
+                            outputList.add(0, feature);
+                        }
+
                         String name = ssnsAccObj.getName();
                         int type = ssnsAccObj.getType();
                         int status = ssnsAccObj.getStatus();
