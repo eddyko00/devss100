@@ -1980,7 +1980,7 @@ public class SsnsService {
 //    public static String APP_PRODUCT_TYPE_TTV = "TTV";
 //    public static String APP_PRODUCT_TYPE_HSIC = "HSIC";
 //    public static String APP_PRODUCT_TYPE_SING = "SING";                
-
+                cmd = new ArrayList();
                 cmd.add("get " + PIoper + " productby id"); // description
                 cmd.add(PROD_GET_BYID); // cmd
                 pData.setCmd(cmd);
@@ -2018,7 +2018,7 @@ public class SsnsService {
                 NAccObj.setRet(APP_FEATT_TYPE_SING);
                 NAccObj.setDown("splunkflow");
                 String PIoper = APP_FEATT_TYPE_SING;
-
+                cmd = new ArrayList();
                 cmd.add("get " + PIoper + " productby id"); // description
                 cmd.add(PROD_GET_BYID); // cmd
                 pData.setCmd(cmd);
@@ -2052,7 +2052,7 @@ public class SsnsService {
                 NAccObj.setRet(APP_FEAT_TYPE_HSIC);
                 NAccObj.setDown("splunkflow");
                 PIoper = APP_FEAT_TYPE_HSIC;
-
+                cmd = new ArrayList();
                 cmd.add("get " + PIoper + " productby id"); // description
                 cmd.add(PROD_GET_BYID); // cmd
                 pData.setCmd(cmd);
@@ -2087,7 +2087,7 @@ public class SsnsService {
                 NAccObj.setRet(APP_FEAT_TYPE_TTV);
                 NAccObj.setDown("splunkflow");
                 PIoper = APP_FEAT_TYPE_TTV;
-
+                cmd = new ArrayList();
                 cmd.add("get " + PIoper + " productby id"); // description
                 cmd.add(PROD_GET_BYID); // cmd
                 pData.setCmd(cmd);
