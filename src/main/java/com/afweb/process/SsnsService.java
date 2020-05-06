@@ -24,10 +24,14 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import java.util.Map;
+import java.util.TimeZone;
 
 import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
@@ -438,7 +442,16 @@ public class SsnsService {
                 long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
                 if (inList != null) {
-                    inList.add("elapsedTime:" + elapsedTime);
+                String tzid = "America/New_York"; //EDT
+                TimeZone tz = TimeZone.getTimeZone(tzid);
+                Date d = new Date(startTime);
+                // timezone symbol (z) included in the format pattern 
+                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                // format date in target timezone
+                format.setTimeZone(tz);
+                String ESTdate = format.format(d);
+
+                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
                     inList.add("output:");
                 }
                 return output;
@@ -464,7 +477,16 @@ public class SsnsService {
                 long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
                 if (inList != null) {
-                    inList.add("elapsedTime:" + elapsedTime);
+                String tzid = "America/New_York"; //EDT
+                TimeZone tz = TimeZone.getTimeZone(tzid);
+                Date d = new Date(startTime);
+                // timezone symbol (z) included in the format pattern 
+                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                // format date in target timezone
+                format.setTimeZone(tz);
+                String ESTdate = format.format(d);
+
+                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
 
                     String bodyElement = new ObjectMapper().writeValueAsString(map);
                     inList.add("bodyElement:" + bodyElement);
@@ -495,7 +517,16 @@ public class SsnsService {
                 long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
                 if (inList != null) {
-                    inList.add("elapsedTime:" + elapsedTime);
+                String tzid = "America/New_York"; //EDT
+                TimeZone tz = TimeZone.getTimeZone(tzid);
+                Date d = new Date(startTime);
+                // timezone symbol (z) included in the format pattern 
+                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                // format date in target timezone
+                format.setTimeZone(tz);
+                String ESTdate = format.format(d);
+
+                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
 
                     String bodyElement = new ObjectMapper().writeValueAsString(map);
                     inList.add("bodyElement:" + bodyElement);
@@ -1103,7 +1134,16 @@ public class SsnsService {
             long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
-                inList.add("elapsedTime:" + elapsedTime);
+                String tzid = "America/New_York"; //EDT
+                TimeZone tz = TimeZone.getTimeZone(tzid);
+                Date d = new Date(startTime);
+                // timezone symbol (z) included in the format pattern 
+                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                // format date in target timezone
+                format.setTimeZone(tz);
+                String ESTdate = format.format(d);
+
+                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
                 inList.add("output:");
             }
 
@@ -1150,7 +1190,16 @@ public class SsnsService {
             long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
-                inList.add("elapsedTime:" + elapsedTime);
+                String tzid = "America/New_York"; //EDT
+                TimeZone tz = TimeZone.getTimeZone(tzid);
+                Date d = new Date(startTime);
+                // timezone symbol (z) included in the format pattern 
+                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                // format date in target timezone
+                format.setTimeZone(tz);
+                String ESTdate = format.format(d);
+
+                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
                 inList.add("output:");
             }
 
@@ -1756,7 +1805,16 @@ public class SsnsService {
             long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
-                inList.add("elapsedTime:" + elapsedTime);
+                String tzid = "America/New_York"; //EDT
+                TimeZone tz = TimeZone.getTimeZone(tzid);
+                Date d = new Date(startTime);
+                // timezone symbol (z) included in the format pattern 
+                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                // format date in target timezone
+                format.setTimeZone(tz);
+                String ESTdate = format.format(d);
+
+                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
                 inList.add("output:");
             }
 
@@ -1852,7 +1910,16 @@ public class SsnsService {
             long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
-                inList.add("elapsedTime:" + elapsedTime);
+                String tzid = "America/New_York"; //EDT
+                TimeZone tz = TimeZone.getTimeZone(tzid);
+                Date d = new Date(startTime);
+                // timezone symbol (z) included in the format pattern 
+                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                // format date in target timezone
+                format.setTimeZone(tz);
+                String ESTdate = format.format(d);
+
+                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
                 inList.add("output:");
             }
             return output;
@@ -2700,7 +2767,16 @@ public class SsnsService {
             long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
-                inList.add("elapsedTime:" + elapsedTime);
+                String tzid = "America/New_York"; //EDT
+                TimeZone tz = TimeZone.getTimeZone(tzid);
+                Date d = new Date(startTime);
+                // timezone symbol (z) included in the format pattern 
+                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                // format date in target timezone
+                format.setTimeZone(tz);
+                String ESTdate = format.format(d);
+
+                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
                 inList.add("output:");
             }
             return output;
@@ -2742,7 +2818,16 @@ public class SsnsService {
             long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
             if (inList != null) {
-                inList.add("elapsedTime:" + elapsedTime);
+                String tzid = "America/New_York"; //EDT
+                TimeZone tz = TimeZone.getTimeZone(tzid);
+                Date d = new Date(startTime);
+                // timezone symbol (z) included in the format pattern 
+                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                // format date in target timezone
+                format.setTimeZone(tz);
+                String ESTdate = format.format(d);
+
+                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
                 inList.add("output:");
             }
 
