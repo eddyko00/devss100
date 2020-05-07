@@ -29,8 +29,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 import java.util.logging.Logger;
@@ -46,6 +48,7 @@ import static org.apache.http.protocol.HTTP.USER_AGENT;
 public class SsnsService {
 
     protected static Logger logger = Logger.getLogger("SsnsService");
+    public static Set<String> set = new HashSet<>();
 
     public static String APP_WIFI = "wifi";
     public static String APP_APP = "app";
@@ -173,16 +176,23 @@ public class SsnsService {
             NAccObj.setDown("splunkflow");
             boolean stat = this.updateSsnsTTVC(oper, banid, prodid, postParm, pData, dataObj, NAccObj);
             if (stat == true) {
-                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                 boolean exist = false;
-                if (ssnsAccObjList != null) {
-                    if (ssnsAccObjList.size() != 0) {
-                        SsnsAcc ssnsObj = ssnsAccObjList.get(0);
-                        if (ssnsObj.getDown().equals("splunkflow")) {
-                            exist = true;
+                String key = NAccObj.getName()
+                        + NAccObj.getCusid()
+                        + NAccObj.getBanid()
+                        + NAccObj.getTiid();
+                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                if (set.add(key)) {
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() != 0) {
+                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                            if (ssnsObj.getDown().equals("splunkflow")) {
+                                exist = true;
+                            }
                         }
                     }
                 }
+
                 if (exist == false) {
                     ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByBan(NAccObj.getName(), NAccObj.getBanid());
                     if (ssnsAccObjList != null) {
@@ -442,16 +452,16 @@ public class SsnsService {
                 long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
                 if (inList != null) {
-                String tzid = "America/New_York"; //EDT
-                TimeZone tz = TimeZone.getTimeZone(tzid);
-                Date d = new Date(startTime);
-                // timezone symbol (z) included in the format pattern 
-                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
-                // format date in target timezone
-                format.setTimeZone(tz);
-                String ESTdate = format.format(d);
+                    String tzid = "America/New_York"; //EDT
+                    TimeZone tz = TimeZone.getTimeZone(tzid);
+                    Date d = new Date(startTime);
+                    // timezone symbol (z) included in the format pattern 
+                    DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                    // format date in target timezone
+                    format.setTimeZone(tz);
+                    String ESTdate = format.format(d);
 
-                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
+                    inList.add(ESTdate + " elapsedTime:" + elapsedTime);
                     inList.add("output:");
                 }
                 return output;
@@ -477,16 +487,16 @@ public class SsnsService {
                 long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
                 if (inList != null) {
-                String tzid = "America/New_York"; //EDT
-                TimeZone tz = TimeZone.getTimeZone(tzid);
-                Date d = new Date(startTime);
-                // timezone symbol (z) included in the format pattern 
-                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
-                // format date in target timezone
-                format.setTimeZone(tz);
-                String ESTdate = format.format(d);
+                    String tzid = "America/New_York"; //EDT
+                    TimeZone tz = TimeZone.getTimeZone(tzid);
+                    Date d = new Date(startTime);
+                    // timezone symbol (z) included in the format pattern 
+                    DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                    // format date in target timezone
+                    format.setTimeZone(tz);
+                    String ESTdate = format.format(d);
 
-                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
+                    inList.add(ESTdate + " elapsedTime:" + elapsedTime);
 
                     String bodyElement = new ObjectMapper().writeValueAsString(map);
                     inList.add("bodyElement:" + bodyElement);
@@ -517,16 +527,16 @@ public class SsnsService {
                 long elapsedTime = endTime - startTime;
 //            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
                 if (inList != null) {
-                String tzid = "America/New_York"; //EDT
-                TimeZone tz = TimeZone.getTimeZone(tzid);
-                Date d = new Date(startTime);
-                // timezone symbol (z) included in the format pattern 
-                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
-                // format date in target timezone
-                format.setTimeZone(tz);
-                String ESTdate = format.format(d);
+                    String tzid = "America/New_York"; //EDT
+                    TimeZone tz = TimeZone.getTimeZone(tzid);
+                    Date d = new Date(startTime);
+                    // timezone symbol (z) included in the format pattern 
+                    DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                    // format date in target timezone
+                    format.setTimeZone(tz);
+                    String ESTdate = format.format(d);
 
-                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
+                    inList.add(ESTdate + " elapsedTime:" + elapsedTime);
 
                     String bodyElement = new ObjectMapper().writeValueAsString(map);
                     inList.add("bodyElement:" + bodyElement);
@@ -755,17 +765,23 @@ public class SsnsService {
                     String feat = NAccObj.getName() + ":Async";
                     NAccObj.setName(feat);
                 }
-
-                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                 boolean exist = false;
-                if (ssnsAccObjList != null) {
-                    if (ssnsAccObjList.size() != 0) {
-                        SsnsAcc ssnsObj = ssnsAccObjList.get(0);
-                        if (ssnsObj.getDown().equals("splunkflow")) {
-                            exist = true;
+                String key = NAccObj.getName()
+                        + NAccObj.getCusid()
+                        + NAccObj.getBanid()
+                        + NAccObj.getTiid();
+                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                if (set.add(key)) {
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() != 0) {
+                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                            if (ssnsObj.getDown().equals("splunkflow")) {
+                                exist = true;
+                            }
                         }
                     }
                 }
+
                 if (exist == false) {
 
                     ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByTiid(NAccObj.getName(), NAccObj.getTiid());
@@ -1488,17 +1504,23 @@ public class SsnsService {
 //                    String feat = NAccObj.getName() + ":TicktoCust";
 //                    NAccObj.setName(feat);
 //                }
-
-                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
-                boolean exist = false;
-                if (ssnsAccObjList != null) {
-                    if (ssnsAccObjList.size() != 0) {
-                        SsnsAcc ssnsObj = ssnsAccObjList.get(0);
-                        if (ssnsObj.getDown().equals("splunkflow")) {
-                            exist = true;
+                    boolean exist = false;
+                    String key = NAccObj.getName()
+                            + NAccObj.getCusid()
+                            + NAccObj.getBanid()
+                            + NAccObj.getTiid();
+                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                    if (set.add(key)) {
+                        if (ssnsAccObjList != null) {
+                            if (ssnsAccObjList.size() != 0) {
+                                SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                                if (ssnsObj.getDown().equals("splunkflow")) {
+                                    exist = true;
+                                }
+                            }
                         }
                     }
-                }
+
                 if (exist == false) {
                     ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByTiid(NAccObj.getName(), NAccObj.getTiid());
                     if (ssnsAccObjList != null) {
@@ -2054,16 +2076,24 @@ public class SsnsService {
 
                 boolean stat = this.updateSsnsProdiuctInventoryByProdId(PIoper, banid, prodid, pData, dataObj, NAccObj);
                 if (stat == true) {
-                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                    
                     boolean exist = false;
-                    if (ssnsAccObjList != null) {
-                        if (ssnsAccObjList.size() != 0) {
-                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
-                            if (ssnsObj.getDown().equals("splunkflow")) {
-                                exist = true;
+                    String key = NAccObj.getName()
+                            + NAccObj.getCusid()
+                            + NAccObj.getBanid()
+                            + NAccObj.getTiid();
+                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                    if (set.add(key)) {
+                        if (ssnsAccObjList != null) {
+                            if (ssnsAccObjList.size() != 0) {
+                                SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                                if (ssnsObj.getDown().equals("splunkflow")) {
+                                    exist = true;
+                                }
                             }
                         }
-                    }
+                    }                    
+
                     if (exist == false) {
                         ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByBan(NAccObj.getName(), NAccObj.getBanid());
                         if (ssnsAccObjList != null) {
@@ -2092,13 +2122,19 @@ public class SsnsService {
 
                 boolean stat = this.updateSsnsProdiuctInventory(PIoper, banid, prodid, pData, dataObj, NAccObj);
                 if (stat == true) {
-                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                     boolean exist = false;
-                    if (ssnsAccObjList != null) {
-                        if (ssnsAccObjList.size() != 0) {
-                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
-                            if (ssnsObj.getDown().equals("splunkflow")) {
-                                exist = true;
+                    String key = NAccObj.getName()
+                            + NAccObj.getCusid()
+                            + NAccObj.getBanid()
+                            + NAccObj.getTiid();
+                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                    if (set.add(key)) {
+                        if (ssnsAccObjList != null) {
+                            if (ssnsAccObjList.size() != 0) {
+                                SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                                if (ssnsObj.getDown().equals("splunkflow")) {
+                                    exist = true;
+                                }
                             }
                         }
                     }
@@ -2126,13 +2162,19 @@ public class SsnsService {
 
                 stat = this.updateSsnsProdiuctInventory(PIoper, banid, prodid, pData, dataObj, NAccObj);
                 if (stat == true) {
-                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                     boolean exist = false;
-                    if (ssnsAccObjList != null) {
-                        if (ssnsAccObjList.size() != 0) {
-                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
-                            if (ssnsObj.getDown().equals("splunkflow")) {
-                                exist = true;
+                    String key = NAccObj.getName()
+                            + NAccObj.getCusid()
+                            + NAccObj.getBanid()
+                            + NAccObj.getTiid();
+                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                    if (set.add(key)) {
+                        if (ssnsAccObjList != null) {
+                            if (ssnsAccObjList.size() != 0) {
+                                SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                                if (ssnsObj.getDown().equals("splunkflow")) {
+                                    exist = true;
+                                }
                             }
                         }
                     }
@@ -2161,13 +2203,19 @@ public class SsnsService {
 
                 stat = this.updateSsnsProdiuctInventory(PIoper, banid, prodid, pData, dataObj, NAccObj);
                 if (stat == true) {
-                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                     boolean exist = false;
-                    if (ssnsAccObjList != null) {
-                        if (ssnsAccObjList.size() != 0) {
-                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
-                            if (ssnsObj.getDown().equals("splunkflow")) {
-                                exist = true;
+                    String key = NAccObj.getName()
+                            + NAccObj.getCusid()
+                            + NAccObj.getBanid()
+                            + NAccObj.getTiid();
+                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                    if (set.add(key)) {
+                        if (ssnsAccObjList != null) {
+                            if (ssnsAccObjList.size() != 0) {
+                                SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                                if (ssnsObj.getDown().equals("splunkflow")) {
+                                    exist = true;
+                                }
                             }
                         }
                     }
@@ -2197,7 +2245,7 @@ public class SsnsService {
         }
         try {
 
-            int quotaAmtInit = 0;
+            int callCInit = 0;
             int fifaInit = 0;
             int planInit = 0;
             int vmInit = 0;
@@ -2228,34 +2276,30 @@ public class SsnsService {
                     continue;
                 }
 
-                if (inLine.indexOf("hasVoicemail") != -1) {
-                    if (vmInit == 1) {
-                        continue;
-                    }
-                    vmInit = 1;
-                    String valueSt = outputList.get(outputList.size() - 1 - j + 1);
-                    if (valueSt.indexOf("false") != -1) {
-                        voicemail = 0;
-                    }
-                    if (valueSt.indexOf("true") != -1) {
-                        voicemail = 1;
-                    }
-                    continue;
-                }
-
                 if (inLine.indexOf("CallControl") != -1) {
 
-                    if (quotaAmtInit == 1) {
+                    if (callCInit == 1) {
                         continue;
                     }
-                    quotaAmtInit = 1;
+                    callCInit = 1;
                     String valueSt = checkProductNm(j, outputList);
                     if (valueSt.length() != 0) {
                         CallControl = valueSt;
                     }
                     continue;
                 }
+                if (inLine.indexOf("VoiceMail") != -1) {
 
+                    if (vmInit == 1) {
+                        continue;
+                    }
+                    vmInit = 1;
+                    String valueSt = checkProductNm(j, outputList);
+                    if (valueSt.length() != 0) {
+                        voicemail = 1;
+                    }
+                    continue;
+                }
                 if (inLine.indexOf("LocalLine") != -1) {
                     if (planInit == 1) {
                         continue;
@@ -2272,6 +2316,11 @@ public class SsnsService {
                     String valueSt = checkProductOfferingProductNm(j, outputList);
                     if (valueSt.length() != 0) {
                         PrimaryPricePlan = valueSt;
+                    } else {
+                        valueSt = checkProductNm(j, outputList);
+                        if (valueSt.length() != 0) {
+                            PrimaryPricePlan = valueSt;
+                        }
                     }
                     continue;
                 }
@@ -2310,10 +2359,10 @@ public class SsnsService {
     }
 
     public static String checkProductRelationshipProductNm(int j, ArrayList<String> outputList) {
-        for (int k = j; k <= outputList.size(); k++) {
+        for (int k = j; k < outputList.size(); k++) {
             String inL = outputList.get(outputList.size() - 1 - k);
             if (inL.indexOf("productRelationship") != -1) {
-                for (int m = k; m <= outputList.size(); m++) {
+                for (int m = k; m < outputList.size(); m++) {
                     String inLL = outputList.get(outputList.size() - 1 - m);
                     if (inLL.indexOf("productNm") != -1) {
                         String valueSt = outputList.get(outputList.size() - 1 - m + 1);
@@ -2329,7 +2378,7 @@ public class SsnsService {
     }
 
     public static String checkProductNm(int j, ArrayList<String> outputList) {
-        for (int k = j; k <= outputList.size(); k++) {
+        for (int k = j; k < outputList.size(); k++) {
             String inL = outputList.get(outputList.size() - 1 - k);
             if (inL.indexOf("productNm") != -1) {
                 String valueSt = outputList.get(outputList.size() - 1 - k + 1);
@@ -2343,20 +2392,24 @@ public class SsnsService {
     }
 
     public static String checkProductOfferingProductNm(int j, ArrayList<String> outputList) {
-        for (int k = j; k <= outputList.size(); k++) {
-            String inL = outputList.get(outputList.size() - 1 - k);
-            if (inL.indexOf("productOffering") != -1) {
-                for (int m = k; m <= outputList.size(); m++) {
-                    String inLL = outputList.get(outputList.size() - 1 - m);
-                    if (inLL.indexOf("productNm") != -1) {
-                        String valueSt = outputList.get(outputList.size() - 1 - m + 1);
-                        valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
-                        valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
-                        valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
-                        return valueSt;
+        try {
+            for (int k = j; k < outputList.size(); k++) {
+                String inL = outputList.get(outputList.size() - 1 - k);
+                if (inL.indexOf("productOffering") != -1) {
+                    for (int m = k; m < outputList.size(); m++) {
+                        String inLL = outputList.get(outputList.size() - 1 - m);
+                        if (inLL.indexOf("productNm") != -1) {
+                            String valueSt = outputList.get(outputList.size() - 1 - m + 1);
+                            valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                            valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
+                            valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
+                            return valueSt;
+                        }
                     }
                 }
             }
+        } catch (Exception ex) {
+            logger.info("> checkProductOfferingProductNm " + ex.getMessage());
         }
         return "";
     }
@@ -2793,8 +2846,8 @@ public class SsnsService {
                     + "&productType=" + productType;
             if (productType.equals(APP_FEAT_TYPE_TTV)) {
                 url += "&fields=product.characteristic.channelInfoList";
-            } else if (productType.equals(APP_FEATT_TYPE_SING)) {
-                url += "&fields=product.characteristic.voicemail";
+//            } else if (productType.equals(APP_FEATT_TYPE_SING)) {
+//                url += "&fields=product.characteristic.voicemail";
             }
         } else {
             url = ProductURL + "/v1/cmo/selfmgmt/productinventory/product/" + prodid + "?billingAccount.id=" + ban;

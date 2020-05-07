@@ -423,13 +423,13 @@ public class ServiceAFweb {
 //                    }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////   
-                    boolean tempflag = false;
+                    boolean tempflag = true;
                     if (tempflag == true) {
-//                        String uid = "0e115d58-ff21-4508-b109-1cebd10e77db";
-//                        ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList(uid);
-//                        SsnsData data = dataList.get(0);
-//                        SsnsService ss = new SsnsService();
-//                        String feature = ss.getFeatureSsnsWifi(data);
+                        String uid = "859d0f36-a3b7-4253-8ad9-8a46143f05c8";
+                        ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList(uid);
+                        SsnsData data = dataList.get(0);
+                        SsnsService ss = new SsnsService();
+                        String feature = ss.getFeatureSsnsProdiuctInventory(data);
 
                         ArrayList<String> testIdList = new ArrayList();
                         ArrayList<String> testFeatList = new ArrayList();
