@@ -423,7 +423,7 @@ public class ServiceAFweb {
 //                    }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////   
-                    boolean tempflag = true;
+                    boolean tempflag = false;
                     if (tempflag == true) {
                         String uid = "859d0f36-a3b7-4253-8ad9-8a46143f05c8";
                         ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList(uid);
