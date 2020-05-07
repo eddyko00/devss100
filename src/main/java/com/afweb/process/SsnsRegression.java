@@ -315,11 +315,16 @@ public class SsnsRegression {
         try {
             //Start process
             String uid = REPORT_REPORT;
+
+            Set<String> set = new HashSet<>();
             ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, uid);
             if (ssReportObjList != null) {
                 for (int i = 0; i < ssReportObjList.size(); i++) {
                     SsReport reportObj = ssReportObjList.get(i);
                     if (reportObj.getStatus() == ConstantKey.INITIAL) {
+                        if (!set.add(reportObj.getName())) {
+                            continue;
+                        }
                         reportNameL.add(reportObj.getName());
                     }
                 }
@@ -348,7 +353,7 @@ public class SsnsRegression {
     }
 
     ////////////////////////////////
-    ArrayList<String> moniterNameArray = new ArrayList();
+    public static ArrayList<String> moniterNameArray = new ArrayList();
 
     private ArrayList updateMonitorNameArray() {
         if (moniterNameArray != null && moniterNameArray.size() > 0) {
