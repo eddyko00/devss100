@@ -732,7 +732,9 @@ public class ServiceAFweb {
 
             } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
                 processFeatureApp();
-
+                //// process monitor
+                SsnsRegression regression = new SsnsRegression();
+                regression.processMonitorTesting(this);
             } else if ((getServerObj().getProcessTimerCnt() % 7) == 0) {
                 //////require to save memory
                 System.gc();
@@ -742,10 +744,6 @@ public class ServiceAFweb {
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
 
                 processFeatureTTVC();
-
-                //// process monitor
-                SsnsRegression regression = new SsnsRegression();
-                regression.processMonitorTesting(this);
 
             } else if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                 //10 Sec * 5 ~ 1 minutes
