@@ -2910,8 +2910,8 @@ public class ServiceAFweb {
 
                     String featTimeSlot = ss.TestFeatureSsnsProdApp(ssnsAccObj, outputList, SsnsService.APP_GET_TIMES, LABURL);
                     if ((ssnsAccObj.getBanid().length() != 0) && (ssnsAccObj.getCusid().length() != 0)) {
-                        outputList = new ArrayList();
-                        feat = ss.TestFeatureSsnsProdApp(ssnsAccObj, outputList, SsnsService.APP_GET_APP, LABURL);
+                        ArrayList<String> outputListTS = new ArrayList();  //ignore this output
+                        feat = ss.TestFeatureSsnsProdApp(ssnsAccObj, outputListTS, SsnsService.APP_GET_APP, LABURL);
                     } else {
                         feat = featTimeSlot;
                     }
