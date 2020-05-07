@@ -84,8 +84,8 @@ public class SsnsRegression {
         return 0;
     }
 
-    public int startMonitor(ServiceAFweb serviceAFweb, String name) { //CKey.ADMIN_USERNAME) {
-        return startMonitorRegression(serviceAFweb, name, "", "");
+    public int startMonitor(ServiceAFweb serviceAFweb, String name, String app) { //CKey.ADMIN_USERNAME) {
+        return startMonitorRegression(serviceAFweb, name, app, "");
     }
 
     public int startMonitorRegression(ServiceAFweb serviceAFweb, String name, String app, String labURL) { //CKey.ADMIN_USERNAME) {

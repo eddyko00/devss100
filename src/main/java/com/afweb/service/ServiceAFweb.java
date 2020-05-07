@@ -720,7 +720,7 @@ public class ServiceAFweb {
             if ((getServerObj().getProcessTimerCnt() % 100) == 0) {
                 // 15 mintes
                 SsnsRegression regression = new SsnsRegression();
-                int ret = regression.startMonitor(this, CKey.ADMIN_USERNAME);
+                int ret = regression.startMonitor(this, CKey.ADMIN_USERNAME, "");
             }
             if ((getServerObj().getProcessTimerCnt() % 20) == 0) {
                 ProcessAllLockCleanup();
@@ -2246,7 +2246,7 @@ public class ServiceAFweb {
         return 1;
     }
 
-    public int getSsReportMonStart(String EmailUserName, String IDSt) {
+    public int getSsReportMonStart(String EmailUserName, String IDSt, String app) {
 
         if (getServerObj().isSysMaintenance() == true) {
             return 0;
@@ -2276,7 +2276,7 @@ public class ServiceAFweb {
             if (lockReturn == 0) {
                 return 0;
             }
-            ret = regression.startMonitor(this, name);
+            ret = regression.startMonitor(this, name, app);
             // clear old report
             SsReportClearExceptLast3(name);
 
