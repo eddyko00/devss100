@@ -441,7 +441,7 @@ public class SsnsService {
                         + "/subscription";
 
                 if (inList != null) {
-                    inList.add(url + " post:" + postParm);
+                    inList.add(url);
                 }
                 // calculate elapsed time in milli seconds
                 long startTime = TimeConvertion.currentTimeMillis();
@@ -471,7 +471,7 @@ public class SsnsService {
                         + "/quotation";
 
                 if (inList != null) {
-                    inList.add(url + " post:" + postParm);
+                    inList.add(url);
                 }
                 // calculate elapsed time in milli seconds
                 long startTime = TimeConvertion.currentTimeMillis();
@@ -511,7 +511,7 @@ public class SsnsService {
                         + "/validation";
 
                 if (inList != null) {
-                    inList.add(url + " post:" + postParm);
+                    inList.add(url);
                 }
                 // calculate elapsed time in milli seconds
                 long startTime = TimeConvertion.currentTimeMillis();
@@ -1816,8 +1816,7 @@ public class SsnsService {
         newbodymap.put("hostSystemCd", host);
         try {
             if (inList != null) {
-                String postElement = new ObjectMapper().writeValueAsString(newbodymap);
-                inList.add(url + " post:" + postElement);
+                inList.add(url);
             }
             // calculate elapsed time in milli seconds
             long startTime = TimeConvertion.currentTimeMillis();
@@ -1838,6 +1837,8 @@ public class SsnsService {
                 String ESTdate = format.format(d);
 
                 inList.add(ESTdate + " elapsedTime:" + elapsedTime);
+                String bodyElement = new ObjectMapper().writeValueAsString(newbodymap);
+                inList.add("bodyElement:" + bodyElement);
                 inList.add("output:");
             }
 
