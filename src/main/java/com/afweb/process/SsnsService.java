@@ -441,7 +441,7 @@ public class SsnsService {
                         + "/subscription";
 
                 if (inList != null) {
-                    inList.add(url);
+                    inList.add(url + " post:" + postParm);
                 }
                 // calculate elapsed time in milli seconds
                 long startTime = TimeConvertion.currentTimeMillis();
@@ -471,7 +471,7 @@ public class SsnsService {
                         + "/quotation";
 
                 if (inList != null) {
-                    inList.add(url);
+                    inList.add(url + " post:" + postParm);
                 }
                 // calculate elapsed time in milli seconds
                 long startTime = TimeConvertion.currentTimeMillis();
@@ -508,10 +508,10 @@ public class SsnsService {
             } else if (oper.equals(TT_Vadulate)) {
                 url = ProductURL + "/v1/cmo/selfmgmt/tv/requisition/account/" + banid
                         + "/productinstance/" + prodid
-                        + "/quotation";
+                        + "/validation";
 
                 if (inList != null) {
-                    inList.add(url);
+                    inList.add(url + " post:" + postParm);
                 }
                 // calculate elapsed time in milli seconds
                 long startTime = TimeConvertion.currentTimeMillis();
@@ -1504,22 +1504,22 @@ public class SsnsService {
 //                    String feat = NAccObj.getName() + ":TicktoCust";
 //                    NAccObj.setName(feat);
 //                }
-                    boolean exist = false;
-                    String key = NAccObj.getName()
-                            + NAccObj.getCusid()
-                            + NAccObj.getBanid()
-                            + NAccObj.getTiid();
-                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
-                    if (set.add(key)) {
-                        if (ssnsAccObjList != null) {
-                            if (ssnsAccObjList.size() != 0) {
-                                SsnsAcc ssnsObj = ssnsAccObjList.get(0);
-                                if (ssnsObj.getDown().equals("splunkflow")) {
-                                    exist = true;
-                                }
+                boolean exist = false;
+                String key = NAccObj.getName()
+                        + NAccObj.getCusid()
+                        + NAccObj.getBanid()
+                        + NAccObj.getTiid();
+                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                if (set.add(key)) {
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() != 0) {
+                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                            if (ssnsObj.getDown().equals("splunkflow")) {
+                                exist = true;
                             }
                         }
                     }
+                }
 
                 if (exist == false) {
                     ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByTiid(NAccObj.getName(), NAccObj.getTiid());
@@ -1816,7 +1816,8 @@ public class SsnsService {
         newbodymap.put("hostSystemCd", host);
         try {
             if (inList != null) {
-                inList.add(url);
+                String postElement = new ObjectMapper().writeValueAsString(newbodymap);
+                inList.add(url + " post:" + postElement);
             }
             // calculate elapsed time in milli seconds
             long startTime = TimeConvertion.currentTimeMillis();
@@ -2076,7 +2077,7 @@ public class SsnsService {
 
                 boolean stat = this.updateSsnsProdiuctInventoryByProdId(PIoper, banid, prodid, pData, dataObj, NAccObj);
                 if (stat == true) {
-                    
+
                     boolean exist = false;
                     String key = NAccObj.getName()
                             + NAccObj.getCusid()
@@ -2092,7 +2093,7 @@ public class SsnsService {
                                 }
                             }
                         }
-                    }                    
+                    }
 
                     if (exist == false) {
                         ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByBan(NAccObj.getName(), NAccObj.getBanid());
