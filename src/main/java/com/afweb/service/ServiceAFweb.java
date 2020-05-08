@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.logging.Level;
 
 import java.util.logging.Logger;
 import javax.sql.DataSource;
@@ -410,11 +409,9 @@ public class ServiceAFweb {
 
                     boolean restoreSsnsAccFlag = false; // work for remote d
                     if (restoreSsnsAccFlag == true) {
-                        logger.info("restoreSsnsAccDB start");
-                        this.getSsnsDataImp().deleteAllSsnsAcc(0);
-                        boolean retSatus = getAccountImp().restoreSsnsAccDB(this);
-                        logger.info("restoreSsnsAccDB end");
+                        systemRestoresSsnsAcc();
                     }
+
                     boolean restoreSsRepotFlag = false; // work for remote d
                     if (restoreSsRepotFlag == true) {
                         logger.info("restoreSsReportDB start");
@@ -3294,7 +3291,7 @@ public class ServiceAFweb {
         return 0;
     }
 
-    public int restoresSsnsAcc() {
+    public int systemRestoresSsnsAcc() {
         logger.info("restoreSsnsAccDB start");
         this.getSsnsDataImp().deleteAllSsnsAcc(0);
         boolean retSatus = getAccountImp().restoreSsnsAccDB(this);
