@@ -568,7 +568,7 @@ public class SsnsService {
         String outputSt = null;
         ArrayList<String> inList = new ArrayList();
         if (oper.equals(TT_SaveOrder) || oper.equals(TT_Vadulate) || oper.equals(TT_Quote) || oper.equals(TT_SaveOrder)) {
-            outputSt = SendSsnsTTVC(LABURL, oper, banid, appTId, null, inList);
+            outputSt = SendSsnsTTVC(LABURL, TT_GetSub, banid, appTId, null, inList);
             if (outputSt == null) {
                 return "";
             }
@@ -597,6 +597,7 @@ public class SsnsService {
 
             String postParamSt = ProductDataHelper.getPostParamRestore(pData.getPostParam());
             outputSt = SendSsnsTTVC(LABURL, oper, banid, appTId, postParamSt, inList);
+            outList = ServiceAFweb.prettyPrintJSON(outputSt);
             outputList.addAll(inList);
             outputList.addAll(outList);
 
