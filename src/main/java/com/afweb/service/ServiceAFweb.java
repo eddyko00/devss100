@@ -746,12 +746,12 @@ public class ServiceAFweb {
                 //////require to save memory
                 System.gc();
                 //////require to save memory
+
+                processFeatureWifi();
+            } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
                 //// process monitor
                 SsnsRegression regression = new SsnsRegression();
                 regression.processMonitorTesting(this);
-                processFeatureWifi();
-            } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
-
                 processFeatureTTVC();
             } else if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                 //10 Sec * 5 ~ 1 minutes
