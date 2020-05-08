@@ -390,20 +390,21 @@ public class ServiceAFweb {
                         if (clearsplunkflag == true) {
                             this.getSsnsDataImp().deleteAllSsnsData(0);
                         }
-
                         for (int i = 0; i < 10; i++) {
                             processETL();
                         }
                     }
 /////////
 /////////                    
-                    boolean procallflag = false;
+                    boolean procallflag = true;
                     if (procallflag == true) {
                         for (int i = 0; i < 10; i++) {
-                            processFeatureApp();
-                            processFeatureProd();
-                            processFeatureWifi();
-                            processFeatureTTVC();
+                            processFeatureWLNPro();
+
+//                            processFeatureApp();
+//                            processFeatureProd();
+//                            processFeatureWifi();
+//                            processFeatureTTVC();
                         }
                     }
 
@@ -869,6 +870,80 @@ public class ServiceAFweb {
     }
 ////////////////////////////////
 
+    ArrayList<String> getAllOpenWLNProArray() {
+        String app = SsnsService.APP_WLNPRO;
+        String ret = "parameter";
+        int status = ConstantKey.OPEN;
+        return getSsnsDataImp().getSsnsDataIDList(app, ret, status, 15);
+    }
+
+    ArrayList<String> wlnproNameArray = new ArrayList();
+
+    private ArrayList updateWLNProNameArray() {
+        if (wlnproNameArray != null && wlnproNameArray.size() > 0) {
+            return wlnproNameArray;
+        }
+        ArrayList ttvNameArrayTemp = getAllOpenWLNProArray();
+        if (ttvNameArrayTemp != null) {
+            wlnproNameArray = ttvNameArrayTemp;
+        }
+        return wlnproNameArray;
+    }
+
+    public int processFeatureWLNPro() {
+
+        updateWLNProNameArray();
+        if ((wlnproNameArray == null) || (wlnproNameArray.size() == 0)) {
+            return 0;
+        }
+        int result = 0;
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        long lockDateValue = dateNow.getTimeInMillis();
+        String LockName = "ETL_" + SsnsService.APP_WLNPRO;
+
+        try {
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processFeatureWifi");
+            if (CKey.NN_DEBUG == true) {
+                lockReturn = 1;
+            }
+            if (lockReturn == 0) {
+                return 0;
+            }
+
+            logger.info("processFeatureApp for 2 minutes size " + wlnproNameArray.size());
+
+            long currentTime = System.currentTimeMillis();
+            long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
+
+            for (int i = 0; i < 5; i++) {
+                currentTime = System.currentTimeMillis();
+//                if (CKey.NN_DEBUG != true) {
+                if (lockDate1Min < currentTime) {
+                    break;
+                }
+//                }
+                if (wlnproNameArray.size() == 0) {
+                    break;
+                }
+
+                String idSt = (String) wlnproNameArray.get(0);
+                wlnproNameArray.remove(0);
+                SsnsService ss = new SsnsService();
+                int id = Integer.parseInt(idSt);
+                SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
+                String feature = ss.getFeatureSsnsWLNPro(data);
+//                logger.info("> feature " + i + " " + feature);
+
+                AFSleep();
+            }
+        } catch (Exception ex) {
+        }
+        removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
+        return result;
+
+    }
+/////////////////////////////////
+
     ArrayList<String> getAllOpenWifiArray() {
         String app = SsnsService.APP_WIFI;
         String ret = "parameter";
@@ -1194,7 +1269,17 @@ public class ServiceAFweb {
             return;
         }
 
-        String app = SsnsService.APP_WIFI; //"wifi";
+        String app = SsnsService.APP_WLNPRO; //;
+        file = FileLocalPath + app + "data.csv";
+        if (FileUtil.FileTest(file) == true) {
+            boolean ret = processETLsplunkWLNPro(app, 0);
+            if (ret == true) {
+                FileUtil.FileDelete(file);
+            }
+            return;
+        }
+
+        app = SsnsService.APP_WIFI; //"wifi";
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             boolean ret = processETLsplunk(app, 10000);
@@ -1505,6 +1590,209 @@ public class ServiceAFweb {
             logger.info("> ETLsplunkProcess exception " + e.getMessage() + " " + spSt);
         }
 
+    }
+
+    public boolean processETLsplunkWLNPro(String app, int length) {
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        long lockDateValue = dateNow.getTimeInMillis();
+        String LockName = "ETL_" + app;
+        int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processETLsplunk " + app);
+        if (CKey.NN_DEBUG == true) {
+            lockReturn = 1;
+        }
+        if (lockReturn == 0) {
+            return false;
+        }
+
+        String file = FileLocalPath + app + "data.csv";
+        if (FileUtil.FileTest(file) == false) {
+            logger.info("> No File exist " + file);
+            return false;
+        }
+
+        int numAdd = 0;
+        int numFail = 0;
+        int numDup = 0;
+        ArrayList<String> writeArray = new ArrayList();
+        FileUtil.FileReadTextArray(file, writeArray);
+
+        ArrayList<String> writeSQLArray = new ArrayList();
+        logger.info("> ETLsplunkProcess " + app + " " + writeArray.size());
+        String spSt = "";
+        int size = writeArray.size();
+        if (length == 0) {
+            size = writeArray.size();
+        } else {
+            if (size > length) {
+                size = length;
+            }
+        }
+        String SeqTran = "";
+        String TimeTran = "";
+        for (int i = 0; i < size; i++) {
+            try {
+                String daSt = "";
+                String timeSt = "";
+                String oper = SsnsService.APP_GET_DOWNURL;
+                String down = "";
+                String execSt = "";
+                long exec = 0;
+                String tran = "";
+                String status = "";
+                String ret = "";
+                long datel = 0;
+                String thread = "";
+                spSt = writeArray.get(i);
+                boolean processFlag = true;
+                String[] spList = spSt.split(" ");
+                for (int j = 0; j < spList.length; j++) {
+                    if (spList.length < 3) {
+                        processFlag = false;
+                        break;
+                    }
+//                    logger.info("splunk " + j + " " + spList[j]);
+
+                    String inLine = spList[j];
+                    if (j == 0) {
+                        daSt = spList[j];
+                        daSt = daSt.replaceAll("\"", "");
+                        timeSt = spList[j + 1];
+                        Calendar c = parseDateTime(daSt, timeSt);
+
+                        if (c == null) {
+                            processFlag = false;
+                            break;
+                        }
+                        datel = c.getTimeInMillis();
+                        continue;
+                    }
+                    if (inLine.indexOf("nio-8080-exec-") != -1) {
+                        thread = inLine.replace("nio-8080-exec-", "");
+                        if (SeqTran.equals(thread)) {
+                            tran = TimeTran + SeqTran;
+                        } else {
+                            tran = datel + thread;
+                        }
+                        continue;
+                    }
+
+                    if (inLine.indexOf("CustomerInfo=") != -1) {
+
+                        String parmSt = spSt;
+                        int beg = parmSt.indexOf("CustomerInfo=");
+                        status = parmSt.substring(beg + 13, parmSt.length());
+                        ret = "parameter";
+                        continue;
+
+                    }
+                    if (inLine.indexOf("prodsubsInfo=") != -1) {
+
+                        SeqTran = thread;
+                        TimeTran = datel + "";
+                        tran = TimeTran + SeqTran;
+                        String parmSt = spSt;
+                        int beg = parmSt.indexOf("prodsubsInfo=");
+                        status = parmSt.substring(beg + 13, parmSt.length());
+                        ret = "parameter";
+                        continue;
+
+                    }
+                    if (inLine.indexOf("operation=") != -1) {
+                        oper = inLine.replace("operation=", "");
+                        continue;
+                    }
+                    if (inLine.indexOf("clientOperation=") != -1) {
+                        down = inLine.replace("clientOperation=", "");
+                        continue;
+                    }
+                    if (inLine.indexOf("executionTime=") != -1) {
+                        execSt = inLine.replace("executionTime=", "");
+                        if (execSt.length() > 0) {
+                            exec = Long.parseLong(execSt);
+                        }
+                        continue;
+                    }
+
+                    if (inLine.indexOf("httpCd=") != -1) {
+//                        ret = inLine.replace("httpCd=", "");
+                        ret = inLine;
+                        continue;
+                    }
+                    if (inLine.indexOf("stacktrace=") != -1) {
+                        status = inLine;
+                        continue;
+                    }
+                    if (inLine.indexOf("transactionId=") != -1) {
+                        tran = inLine.replace("transactionId=", "");
+                        continue;
+                    }
+                    if (inLine.indexOf("status=") != -1) {
+                        status = inLine.replace("status=", "");
+                        int beg = spSt.indexOf("status=");
+                        String temSt = spSt.substring(beg + 7, spSt.length());
+                        int end = temSt.indexOf("}");
+                        if (end != -1) {
+                            status = temSt.substring(0, end + 1);
+                        }
+                        continue;
+                    }
+
+                }
+                if (processFlag == false) {
+                    continue;
+                }
+                if (datel == 0) {
+                    continue;
+                }
+                if (tran.length() == 0) {
+//                    logger.info("splunk " + i + " " + spSt);
+                    continue;
+                }
+
+                SsnsData item = new SsnsData();
+                item.setUid(tran);
+                item.setApp(app);
+                item.setOper(oper);
+                item.setDown(down);
+                item.setRet(ret);
+                item.setExec(exec);
+                item.setData(status);
+                item.setUpdatedatel(datel);
+                item.setUpdatedatedisplay(new java.sql.Date(datel));
+
+                String key = item.getUid() + item.getUpdatedatel();
+                item.setName(key);
+                String sql = SsnsDataDB.insertSsnsDataObjectSQL(item);
+//                logger.info("SsnsdDataDB " + i + " " + sql);
+                SsnsData ssnsObj = getSsnsDataImp().getSsnsDataObj(key);
+                if (ssnsObj == null) {
+                    writeSQLArray.add(sql);
+                    if (writeSQLArray.size() > 100) {
+                        proceSssendRequestObj(writeSQLArray);
+                        ServiceAFweb.AFSleep();
+                        writeSQLArray.clear();
+                    }
+                    if ((numAdd % 500) == 0) {
+                        logger.info("> ETLsplunkProcess  " + numAdd);
+                    }
+                    numAdd++;
+                    ////////just for testing
+//                    if (numAdd > 3000) {
+//                        break;
+//                    }
+                    ////////just for testing
+                } else {
+                    numDup++;
+                }
+            } catch (Exception e) {
+                logger.info("> ETLsplunkProcess exception " + e.getMessage() + " " + spSt);
+                numFail++;
+            }
+        }
+        int st = proceSssendRequestObj(writeSQLArray);
+        logger.info("> ETLsplunkProcess done add:" + numAdd + " fail:" + numFail + " dup:" + numDup + " file:" + file);
+        removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
+        return true;
     }
 
     public boolean processETLsplunk(String app, int length) {
