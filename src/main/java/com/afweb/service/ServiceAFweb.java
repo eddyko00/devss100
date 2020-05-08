@@ -747,8 +747,10 @@ public class ServiceAFweb {
                 processFeatureWifi();
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
                 //// process monitor
-                SsnsRegression regression = new SsnsRegression();
-                regression.processMonitorTesting(this);
+                if (CKey.SQL_RemoveServerDB == true) {
+                    SsnsRegression regression = new SsnsRegression();
+                    regression.processMonitorTesting(this);
+                }
                 processFeatureTTVC();
             } else if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                 //10 Sec * 5 ~ 1 minutes
