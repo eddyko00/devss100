@@ -181,6 +181,7 @@ public class SsnsService {
                         + NAccObj.getCusid()
                         + NAccObj.getBanid()
                         + NAccObj.getTiid();
+                key = key.replaceAll(NAccObj.getUid(), "");
                 ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                 if (set.add(key)) {
                     if (ssnsAccObjList != null) {
@@ -771,6 +772,7 @@ public class SsnsService {
                         + NAccObj.getCusid()
                         + NAccObj.getBanid()
                         + NAccObj.getTiid();
+                key = key.replaceAll(NAccObj.getUid(), "");
                 ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                 if (set.add(key)) {
                     if (ssnsAccObjList != null) {
@@ -1510,6 +1512,7 @@ public class SsnsService {
                         + NAccObj.getCusid()
                         + NAccObj.getBanid()
                         + NAccObj.getTiid();
+                key = key.replaceAll(NAccObj.getUid(), "");
                 ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                 if (set.add(key)) {
                     if (ssnsAccObjList != null) {
@@ -2085,7 +2088,8 @@ public class SsnsService {
                             + NAccObj.getCusid()
                             + NAccObj.getBanid()
                             + NAccObj.getTiid();
-                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                 key = key.replaceAll(NAccObj.getUid(), "");
+                   ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                     if (set.add(key)) {
                         if (ssnsAccObjList != null) {
                             if (ssnsAccObjList.size() != 0) {
@@ -2130,6 +2134,7 @@ public class SsnsService {
                             + NAccObj.getCusid()
                             + NAccObj.getBanid()
                             + NAccObj.getTiid();
+                key = key.replaceAll(NAccObj.getUid(), "");
                     ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                     if (set.add(key)) {
                         if (ssnsAccObjList != null) {
@@ -2170,6 +2175,7 @@ public class SsnsService {
                             + NAccObj.getCusid()
                             + NAccObj.getBanid()
                             + NAccObj.getTiid();
+                key = key.replaceAll(NAccObj.getUid(), "");
                     ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                     if (set.add(key)) {
                         if (ssnsAccObjList != null) {
@@ -2211,7 +2217,8 @@ public class SsnsService {
                             + NAccObj.getCusid()
                             + NAccObj.getBanid()
                             + NAccObj.getTiid();
-                    ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                 key = key.replaceAll(NAccObj.getUid(), "");
+                   ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
                     if (set.add(key)) {
                         if (ssnsAccObjList != null) {
                             if (ssnsAccObjList.size() != 0) {
