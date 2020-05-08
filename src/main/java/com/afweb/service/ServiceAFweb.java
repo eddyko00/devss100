@@ -2310,7 +2310,7 @@ public class ServiceAFweb {
 
     public int SsReportClearExceptLast3(String name) {
 
-        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT);
+        ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT, 0);
         if (ssReportObjList != null) {
             for (int i = 0; i < ssReportObjList.size(); i++) {
                 if (i < 3) {
@@ -2323,7 +2323,7 @@ public class ServiceAFweb {
                 getSsnsDataImp().DeleteSsReportObjByID(repObj.getId());  // delete report
             }
 
-            ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT);
+            ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT, 0);
             if (ssReportObjList != null) {
                 for (int i = 0; i < ssReportObjList.size(); i++) {
                     if (i < 3) {
@@ -2382,13 +2382,13 @@ public class ServiceAFweb {
         }
         String name = EmailUserName;
         ArrayList<SsReport> ssReportList = new ArrayList();
-        ArrayList<SsReport> ssUserReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_USER);
+        ArrayList<SsReport> ssUserReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_USER, 0);
         if (ssUserReportObjList == null) {
             return ssReportList;
         }
         ssReportList.addAll(ssUserReportObjList);
 
-        ArrayList<SsReport> ssResultReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT);
+        ArrayList<SsReport> ssResultReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT, 0);
         if (ssResultReportObjList != null) {
             ssReportList.addAll(ssResultReportObjList);
         }
@@ -2412,13 +2412,13 @@ public class ServiceAFweb {
         }
         String name = CKey.ADMIN_USERNAME;
         ArrayList<SsReport> ssReportList = new ArrayList();
-        ArrayList<SsReport> ssUserReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_USER);
+        ArrayList<SsReport> ssUserReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_USER, 0);
         if (ssUserReportObjList == null) {
             return ssReportList;
         }
         ssReportList.addAll(ssUserReportObjList);
 
-        ArrayList<SsReport> ssResultReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT);
+        ArrayList<SsReport> ssResultReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT, 0);
         if (ssResultReportObjList != null) {
             ssReportList.addAll(ssResultReportObjList);
         }
