@@ -415,6 +415,13 @@ public class ServiceAFweb {
                         boolean retSatus = getAccountImp().restoreSsnsAccDB(this);
                         logger.info("restoreSsnsAccDB end");
                     }
+                    boolean restoreSsRepotFlag = false; // work for remote d
+                    if (restoreSsRepotFlag == true) {
+                        logger.info("restoreSsReportDB start");
+                        this.getSsnsDataImp().deleteAllSsReport(0);
+                        boolean retSatus = getAccountImp().restoreSsReportDB(this);
+                        logger.info("restoreSsReportDB end");
+                    }
 
 //                    boolean restoreSsnsDataFlag = false; // work for remote d
 //                    if (restoreSsnsDataFlag == true) {
@@ -425,11 +432,11 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////   
                     boolean tempflag = false;
                     if (tempflag == true) {
-                        String uid = "859d0f36-a3b7-4253-8ad9-8a46143f05c8";
-                        ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList(uid);
-                        SsnsData data = dataList.get(0);
-                        SsnsService ss = new SsnsService();
-                        String feature = ss.getFeatureSsnsProdiuctInventory(data);
+//                        String uid = "97c69ce5-bd22-4c7f-b215-3fcc8e358535";
+//                        ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList(uid);
+//                        SsnsData data = dataList.get(0);
+//                        SsnsService ss = new SsnsService();
+//                        String feature = ss.getFeatureSsnsProdiuctInventory(data);
 
                         ArrayList<String> testIdList = new ArrayList();
                         ArrayList<String> testFeatList = new ArrayList();
@@ -505,8 +512,11 @@ public class ServiceAFweb {
                                                     if (response.size() > 3) {
                                                         String feat = response.get(0);
                                                         String execSt = response.get(2);
-                                                        execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
-                                                        exec = Long.parseLong(execSt);
+                                                        int index = execSt.indexOf("elapsedTime:");
+                                                        if (index != -1) {
+                                                            execSt = execSt.substring(index + 12);
+                                                            exec = Long.parseLong(execSt);
+                                                        }
 
                                                         if (feat.equals(accObj.getName())) {
                                                             passSt = R_PASS;
@@ -697,8 +707,7 @@ public class ServiceAFweb {
                 if (CKey.NN_DEBUG == true) {
                     if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                         //10 Sec * 5 ~ 1 minutes
-//                        processETL();
-//                        return;
+
                     }
                 }
             }
@@ -732,19 +741,18 @@ public class ServiceAFweb {
 
             } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
                 processFeatureApp();
-                //// process monitor
-                SsnsRegression regression = new SsnsRegression();
-                regression.processMonitorTesting(this);
+
             } else if ((getServerObj().getProcessTimerCnt() % 7) == 0) {
                 //////require to save memory
                 System.gc();
                 //////require to save memory
-
+                //// process monitor
+                SsnsRegression regression = new SsnsRegression();
+                regression.processMonitorTesting(this);
                 processFeatureWifi();
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
 
                 processFeatureTTVC();
-
             } else if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                 //10 Sec * 5 ~ 1 minutes
                 processETL();
@@ -2929,7 +2937,7 @@ public class ServiceAFweb {
                             feat += ":testfailed";
                         }
                         if ((ssnsAccObj.getBanid().length() != 0) && (ssnsAccObj.getCusid().length() != 0)) {
-                            String feature = outputList.get(0);
+                            String feature = feat;
                             feature += ":startdate";
                             outputList.remove(0);
                             outputList.add(0, feature);
