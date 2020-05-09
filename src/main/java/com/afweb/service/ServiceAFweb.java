@@ -398,7 +398,9 @@ public class ServiceAFweb {
 /////////                    
                     boolean procallflag = true;
                     if (procallflag == true) {
+                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
                         for (int i = 0; i < 10; i++) {
+
                             processFeatureWLNPro();
 
 //                            processFeatureApp();

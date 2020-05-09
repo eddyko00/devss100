@@ -129,7 +129,7 @@ public class SsnsService {
                     String custSt = operList[0];
                     if (custSt.indexOf("[customerId=") != -1) {
                         custSt = custSt.replace("[customerId=", "");
-                        custid = custSt;
+                        custid = custSt.trim();
                     }
 
                     ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjListByUid(dataObj.getApp(), dataObj.getUid());
@@ -144,19 +144,21 @@ public class SsnsService {
                                 String lineSt = operList[k];
                                 if (lineSt.indexOf("[catalogId=") != -1) {
                                     lineSt = lineSt.replace("[catalogId=", "");
-                                    catalogId = lineSt;
+                                    catalogId = lineSt.trim();
                                 }
                                 if (lineSt.indexOf("bundleName=") != -1) {
                                     lineSt = lineSt.replace("bundleName=", "");
-                                    bundleName = lineSt;
+                                    bundleName = lineSt.trim();
+                                    bundleName = ServiceAFweb.replaceAll(" ", "_", bundleName);
                                 }
                                 if (lineSt.indexOf("serviceType=") != -1) {
                                     lineSt = lineSt.replace("serviceType=", "");
-                                    serviceType = lineSt;
+                                    serviceType = lineSt.replace("]", "");
+                                    serviceType = serviceType.trim();
                                 }
                                 if (lineSt.indexOf("skuP=") != -1) {
                                     lineSt = lineSt.replace("skuP=", "");
-                                    skuP = lineSt;
+                                    skuP = lineSt.trim();
                                 }
                             }
                         }
@@ -231,6 +233,7 @@ public class SsnsService {
             String outputSt = null;
 
             outputSt = SendSsnsWLNPro(ServiceAFweb.URL_PRODUCT, APP_GET_DOWNURL, custid, serviceType, skuP, null);
+//            outputSt = SendSsnsWLNPro(ServiceAFweb.LOCALAB_URL, APP_GET_DOWNURL, custid, serviceType, skuP, null);
             if (outputSt == null) {
                 return false;
             }
@@ -244,7 +247,7 @@ public class SsnsService {
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 return false;
             }
-            featTTV = parseWLNProFeature(outputSt, oper);
+            featTTV = parseWLNProFeature(outputSt, oper, bundleName);
 
             int failure = 0;
             if (NAccObj.getDown().equals("splunkflow")) {
@@ -267,7 +270,7 @@ public class SsnsService {
             NAccObj.setName(featTTV);
             NAccObj.setBanid("");
             NAccObj.setCusid(custid);
-            String tid = catalogId + ":" + bundleName + ":" + serviceType + ":" + skuP;
+            String tid = catalogId + ":" + serviceType + ":" + skuP + ":" + bundleName;
             NAccObj.setTiid(tid);
 
             NAccObj.setUid(dataObj.getUid());
@@ -291,7 +294,7 @@ public class SsnsService {
         return false;
     }
 
-    public static String parseWLNProFeature(String outputSt, String oper) {
+    public static String parseWLNProFeature(String outputSt, String oper, String bundleName) {
 
         if (outputSt == null) {
             return "";
@@ -331,6 +334,7 @@ public class SsnsService {
 
         String featTTV = APP_FEAT_TYPE_WLNP;
         featTTV += ":" + oper;
+        featTTV += ":" + bundleName;
         featTTV += ":" + serviceTypeCd + ":" + skuTxt + ":licenceCount_" + licenceCount;
         return featTTV;
     }
@@ -345,7 +349,7 @@ public class SsnsService {
                     + "  \"customerId\": \"xxcustid\","
                     + "  \"languageCd\": \"EN\","
                     + "  \"emailAddressList\": [],"
-                    + "  \"auditInfo\": {\n"
+                    + "  \"auditInfo\": {"
                     + "    \"originatorApplicationId\": \"APP_SELFSERVEUSGBIZSVC\""
                     + "  },"
                     + "  \"componentDetailList\": ["
@@ -367,7 +371,7 @@ public class SsnsService {
             // calculate elapsed time in milli seconds
             long startTime = TimeConvertion.currentTimeMillis();
 
-            String output = this.sendRequest_Ssns(METHOD_GET, url, null, newbodymap);
+            String output = this.sendRequest_Ssns(METHOD_POST, url, null, newbodymap, postParm);
 
             long endTime = TimeConvertion.currentTimeMillis();
             long elapsedTime = endTime - startTime;
@@ -832,7 +836,7 @@ public class SsnsService {
                 // calculate elapsed time in milli seconds
                 long startTime = TimeConvertion.currentTimeMillis();
 
-                String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);
+                String output = this.sendRequest_Ssns(METHOD_GET, url, null, null, null);
 
                 long endTime = TimeConvertion.currentTimeMillis();
                 long elapsedTime = endTime - startTime;
@@ -867,7 +871,7 @@ public class SsnsService {
                 Map<String, String> map = new ObjectMapper().readValue(st, Map.class);
                 map.remove("customerEmail");
 
-                String output = this.sendRequest_Ssns(METHOD_POST, url, null, map);
+                String output = this.sendRequest_Ssns(METHOD_POST, url, null, map, null);
 
                 long endTime = TimeConvertion.currentTimeMillis();
                 long elapsedTime = endTime - startTime;
@@ -907,7 +911,7 @@ public class SsnsService {
                 Map<String, String> map = new ObjectMapper().readValue(st, Map.class);
                 map.remove("customerEmail");
 
-                String output = this.sendRequest_Ssns(METHOD_POST, url, null, map);
+                String output = this.sendRequest_Ssns(METHOD_POST, url, null, map, null);
 
                 long endTime = TimeConvertion.currentTimeMillis();
                 long elapsedTime = endTime - startTime;
@@ -1532,7 +1536,7 @@ public class SsnsService {
             // calculate elapsed time in milli seconds
             long startTime = TimeConvertion.currentTimeMillis();
 
-            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);
+            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null, null);
 
             long endTime = TimeConvertion.currentTimeMillis();
             long elapsedTime = endTime - startTime;
@@ -1588,7 +1592,7 @@ public class SsnsService {
             // calculate elapsed time in milli seconds
             long startTime = TimeConvertion.currentTimeMillis();
 
-            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);
+            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null, null);
 
             long endTime = TimeConvertion.currentTimeMillis();
             long elapsedTime = endTime - startTime;
@@ -2159,7 +2163,7 @@ public class SsnsService {
         newbodymap.put("hostSystemCd", host);
         try {
             String custid = "";
-            String output = this.sendRequest_Ssns(METHOD_POST, url, null, newbodymap);
+            String output = this.sendRequest_Ssns(METHOD_POST, url, null, newbodymap, null);
 
             if (output == null) {
                 return "";
@@ -2210,7 +2214,7 @@ public class SsnsService {
             // calculate elapsed time in milli seconds
             long startTime = TimeConvertion.currentTimeMillis();
 
-            String output = this.sendRequest_Ssns(METHOD_POST, url, null, newbodymap);
+            String output = this.sendRequest_Ssns(METHOD_POST, url, null, newbodymap, null);
 
             long endTime = TimeConvertion.currentTimeMillis();
             long elapsedTime = endTime - startTime;
@@ -2317,7 +2321,7 @@ public class SsnsService {
             // calculate elapsed time in milli seconds
             long startTime = TimeConvertion.currentTimeMillis();
 
-            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);
+            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null, null);
 
             long endTime = TimeConvertion.currentTimeMillis();
             long elapsedTime = endTime - startTime;
@@ -3209,7 +3213,7 @@ public class SsnsService {
             // calculate elapsed time in milli seconds
             long startTime = TimeConvertion.currentTimeMillis();
 
-            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);
+            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null, null);
 
             long endTime = TimeConvertion.currentTimeMillis();
             long elapsedTime = endTime - startTime;
@@ -3260,7 +3264,7 @@ public class SsnsService {
             // calculate elapsed time in milli seconds
             long startTime = TimeConvertion.currentTimeMillis();
 
-            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null);
+            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null, null);
 
             long endTime = TimeConvertion.currentTimeMillis();
             long elapsedTime = endTime - startTime;
@@ -3297,6 +3301,10 @@ public class SsnsService {
 //            logger.info("> ssnsList " + ssnsList.size());
             for (int i = 0; i < ssnsList.size(); i++) {
                 SsnsData data = ssnsList.get(i);
+                String down = data.getDown();
+                if (down.length() ==0) {
+                    continue;
+                }
                 String flowSt = data.getDown();
                 if (flowSt.length() == 0) {
                     flowSt = data.getOper();
@@ -3327,13 +3335,13 @@ public class SsnsService {
     private static final String METHOD_GET = "get";
 
     private String sendRequest_Ssns(String method, String subResourcePath, Map<String, String> queryParams,
-            Map<String, String> bodyParams) throws Exception {
+            Map<String, String> bodyParams, String postParmSt) throws Exception {
         String response = null;
         for (int i = 0; i < 4; i++) {
 
             try {
 
-                response = sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams);
+                response = sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams, postParmSt);
                 if (response != null) {
                     return response;
                 }
@@ -3343,11 +3351,12 @@ public class SsnsService {
             }
         }
 
-        response = sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams);
+        response = sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams, postParmSt);
         return response;
     }
 
-    private String sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, Map<String, String> bodyParams) {
+    private String sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, Map<String, 
+            String> bodyParams, String postParmSt) {
 
         try {
 //            if (CKey.SQL_Devop == true) {
@@ -3358,9 +3367,9 @@ public class SsnsService {
 //                }
 //            }
             if (subResourcePath.indexOf("https") != -1) {
-                return this.https_sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams);
+                return this.https_sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams, postParmSt);
             }
-            return this.http_sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams);
+            return this.http_sendRequest_Process_Ssns(method, subResourcePath, queryParams, bodyParams, postParmSt);
         } catch (Exception ex) {
 //            Logger.getLogger(SsnsService.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -3402,7 +3411,8 @@ public class SsnsService {
 //            throw e;
 //        }
 //    }
-    private String https_sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, Map<String, String> bodyParams)
+    private String https_sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, 
+            Map<String, String> bodyParams, String postParmSt)
             throws Exception {
         try {
 
@@ -3420,7 +3430,9 @@ public class SsnsService {
             if (bodyParams != null) {
                 bodyElement = new ObjectMapper().writeValueAsString(bodyParams);
             }
-
+            if (postParmSt != null) {
+                bodyElement = postParmSt;
+            }
             URLPath += webResourceString;
             URL request = new URL(URLPath);
 
@@ -3525,7 +3537,8 @@ public class SsnsService {
         return null;
     }
 
-    private String http_sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, Map<String, String> bodyParams)
+    private String http_sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams,
+            Map<String, String> bodyParams, String postParmSt)
             throws Exception {
         try {
 
@@ -3543,7 +3556,9 @@ public class SsnsService {
             if (bodyParams != null) {
                 bodyElement = new ObjectMapper().writeValueAsString(bodyParams);
             }
-
+            if (postParmSt != null) {
+                bodyElement = postParmSt;
+            }
             URLPath += webResourceString;
             URL request = new URL(URLPath);
 
