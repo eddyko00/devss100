@@ -1257,7 +1257,9 @@ public class ServiceAFweb {
         if (lockReturn == 0) {
             return;
         }
-        processETL_process();
+        if (CKey.SQL_RemoveServerDB == false) {
+            processETL_process();
+        }
         removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
 
     }
@@ -1273,7 +1275,7 @@ public class ServiceAFweb {
         String app = SsnsService.APP_WLNPRO; //;
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunkWLNPro(app, 1000);
+            boolean ret = processETLsplunkWLNPro(app, 0);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
@@ -1283,7 +1285,7 @@ public class ServiceAFweb {
         app = SsnsService.APP_WIFI; //"wifi";
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunk(app, 1000);
+            boolean ret = processETLsplunk(app, 0);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
@@ -1293,7 +1295,7 @@ public class ServiceAFweb {
         app = SsnsService.APP_PRODUCT;  //"product"
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunk(app, 1000);
+            boolean ret = processETLsplunk(app, 0);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
@@ -1303,7 +1305,7 @@ public class ServiceAFweb {
         app = SsnsService.APP_APP;  //"appointment"
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunk(app, 1000);
+            boolean ret = processETLsplunk(app, 0);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
