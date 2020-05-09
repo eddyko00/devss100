@@ -1265,6 +1265,7 @@ public class ServiceAFweb {
     }
 
     void processETL_process() {
+        int sizeTemp=4000;
         String file = FileLocalPath + "clear.txt";
         if (FileUtil.FileTest(file) == true) {
             this.getSsnsDataImp().deleteAllSsnsData(0);
@@ -1275,7 +1276,7 @@ public class ServiceAFweb {
         String app = SsnsService.APP_WLNPRO; //;
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunkWLNPro(app, 0);
+            boolean ret = processETLsplunkWLNPro(app, sizeTemp);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
@@ -1285,7 +1286,7 @@ public class ServiceAFweb {
         app = SsnsService.APP_WIFI; //"wifi";
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunk(app, 0);
+            boolean ret = processETLsplunk(app, sizeTemp);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
@@ -1295,7 +1296,7 @@ public class ServiceAFweb {
         app = SsnsService.APP_PRODUCT;  //"product"
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunk(app, 0);
+            boolean ret = processETLsplunk(app, sizeTemp);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
@@ -1305,7 +1306,7 @@ public class ServiceAFweb {
         app = SsnsService.APP_APP;  //"appointment"
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunk(app, 0);
+            boolean ret = processETLsplunk(app, sizeTemp);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
@@ -1315,7 +1316,7 @@ public class ServiceAFweb {
         String appTTV = SsnsService.APP_TTVSUB;  //ttvsub"
         file = FileLocalPath + appTTV + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunkTTV(appTTV, 0);
+            boolean ret = processETLsplunkTTV(appTTV, sizeTemp);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
@@ -1325,7 +1326,7 @@ public class ServiceAFweb {
         appTTV = SsnsService.APP_TTVREQ; //"ttvreq";
         file = FileLocalPath + appTTV + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunkTTV(appTTV, 0);
+            boolean ret = processETLsplunkTTV(appTTV, sizeTemp);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
