@@ -107,7 +107,6 @@ public class SsnsService {
         if (dataObj == null) {
             return "";
         }
-
         String custid = "";
         String bundleName = "";
         String serviceType = "";
@@ -232,8 +231,7 @@ public class SsnsService {
 
             String outputSt = null;
 
-            outputSt = SendSsnsWLNPro(ServiceAFweb.URL_PRODUCT, APP_GET_DOWNURL, custid, serviceType, skuP, null);
-//            outputSt = SendSsnsWLNPro(ServiceAFweb.LOCALAB_URL, APP_GET_DOWNURL, custid, serviceType, skuP, null);
+            outputSt = SendSsnsWLNPro(ServiceAFweb.URL_PRODUCT_PR, APP_GET_DOWNURL, custid, serviceType, skuP, null);
             if (outputSt == null) {
                 return false;
             }
@@ -363,15 +361,14 @@ public class SsnsService {
             postParm = postParm.replace("xxserv", serviceType);
             postParm = postParm.replace("xxsku", skuP);
 
-            HashMap newbodymap = new ObjectMapper().readValue(postParm, HashMap.class);
-
+//            HashMap newbodymap = new ObjectMapper().readValue(postParm, HashMap.class);
             if (inList != null) {
                 inList.add(url);
             }
             // calculate elapsed time in milli seconds
             long startTime = TimeConvertion.currentTimeMillis();
 
-            String output = this.sendRequest_Ssns(METHOD_POST, url, null, newbodymap, postParm);
+            String output = this.sendRequest_Ssns(METHOD_POST, url, null, null, postParm);
 
             long endTime = TimeConvertion.currentTimeMillis();
             long elapsedTime = endTime - startTime;
@@ -401,21 +398,25 @@ public class SsnsService {
         if (dataObj == null) {
             return "";
         }
-
         dataObj.getData();
-        String banid = dataObj.getBanid();
+        String custid = dataObj.getCusid();
         String appTId = dataObj.getTiid();
         if (appTId.length() == 0) {
             return "";
         }
+        String WifiparL[] = appTId.split(":");
+        String serviceType = WifiparL[1];
+        String skuP = WifiparL[2];
+
         if (LABURL.length() == 0) {
-            LABURL = ServiceAFweb.URL_PRODUCT;
+            LABURL = ServiceAFweb.URL_PRODUCT_PR;
         }
 
         String outputSt = null;
         ArrayList<String> inList = new ArrayList();
-        if (oper.equals(TT_SaveOrder) || oper.equals(TT_Vadulate) || oper.equals(TT_Quote) || oper.equals(TT_SaveOrder)) {
-            outputSt = SendSsnsTTVC(LABURL, TT_GetSub, banid, appTId, null, inList);
+        if (oper.equals(APP_GET_DOWNURL)) {
+            outputSt = SendSsnsWLNPro(ServiceAFweb.URL_PRODUCT_PR, APP_GET_DOWNURL, custid, serviceType, skuP, inList);
+
             if (outputSt == null) {
                 return "";
             }
@@ -425,43 +426,8 @@ public class SsnsService {
             outputSt = outputSt.replaceAll("^", "");
 
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            String feat = parseTTVCFeature(outputSt, oper, null);
-            if (outputSt.indexOf("responseCode:400500") != -1) {
-                feat += ":testfailed";
-            }
-            outputList.add(feat);
+            String feat = parseWLNProFeature(outputSt, oper, null);
 
-            ProductData pData = null;
-            String output = dataObj.getData();
-            try {
-                pData = new ObjectMapper().readValue(output, ProductData.class);
-            } catch (IOException ex) {
-            }
-            if (pData == null) {
-                return "";
-            }
-            inList.clear();
-
-            String postParamSt = ProductDataHelper.getPostParamRestore(pData.getPostParam());
-            outputSt = SendSsnsTTVC(LABURL, oper, banid, appTId, postParamSt, inList);
-            outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            outputList.addAll(inList);
-            outputList.addAll(outList);
-
-            return feat;
-        } else if (oper.equals(TT_GetSub)) {
-
-            outputSt = SendSsnsTTVC(LABURL, oper, banid, appTId, null, inList);;
-            if (outputSt == null) {
-                return "";
-            }
-            ////special char #, need to ignore for this system
-            outputSt = outputSt.replaceAll("#", "");
-            outputSt = outputSt.replaceAll("~", "");
-            outputSt = outputSt.replaceAll("^", "");
-
-            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            String feat = parseTTVCFeature(outputSt, oper, null);
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 feat += ":testfailed";
             }
@@ -612,7 +578,7 @@ public class SsnsService {
                     return false;
                 } else {
                     String outputSt = null;
-                    outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT, TT_GetSub, banid, prodid, postParm, null);
+                    outputSt = SendSsnsTTVC(ServiceAFweb.URL_PRODUCT_PR, TT_GetSub, banid, prodid, postParm, null);
                     if (outputSt == null) {
                         return false;
                     }
@@ -952,7 +918,7 @@ public class SsnsService {
             return "";
         }
         if (LABURL.length() == 0) {
-            LABURL = ServiceAFweb.URL_PRODUCT;
+            LABURL = ServiceAFweb.URL_PRODUCT_PR;
         }
 
         String outputSt = null;
@@ -1206,12 +1172,12 @@ public class SsnsService {
                 } else {
                     String outputSt = null;
                     if (oper.equals(WI_GetDeviceStatus)) {
-                        outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, oper, banid, uniquid, prodClass, serialid, "", null);
+                        outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT_PR, oper, banid, uniquid, prodClass, serialid, "", null);
                         if (outputSt == null) {
                             return false;
                         }
                         if (parm.length() > 0) {
-                            String outputStConnect = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, oper, banid, uniquid, prodClass, serialid, parm, null);
+                            String outputStConnect = SendSsnsWifi(ServiceAFweb.URL_PRODUCT_PR, oper, banid, uniquid, prodClass, serialid, parm, null);
                             if (outputStConnect.indexOf("macAddressTxt") != -1) {
                                 connectDevice = 1;
                             }
@@ -1219,11 +1185,11 @@ public class SsnsService {
                         }
 
                     } else if (oper.equals(WI_config)) {
-                        outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, WI_GetDeviceStatus, banid, uniquid, prodClass, serialid, "", null);
+                        outputSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT_PR, WI_GetDeviceStatus, banid, uniquid, prodClass, serialid, "", null);
                         if (outputSt == null) {
                             return false;
                         }
-                        String outputDeviceSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT, WI_GetDevice, banid, uniquid, prodClass, serialid, "", null);
+                        String outputDeviceSt = SendSsnsWifi(ServiceAFweb.URL_PRODUCT_PR, WI_GetDevice, banid, uniquid, prodClass, serialid, "", null);
                         if (outputDeviceSt.indexOf("Boost Device") != -1) {
                             boost = 1;
                         }
@@ -1623,7 +1589,7 @@ public class SsnsService {
             return "";
         }
         if (LABURL.length() == 0) {
-            LABURL = ServiceAFweb.URL_PRODUCT;
+            LABURL = ServiceAFweb.URL_PRODUCT_PR;
         }
         dataObj.getData();
         String banid = dataObj.getBanid();
@@ -1877,7 +1843,7 @@ public class SsnsService {
             if ((banid.length() == 0) && (cust.length() == 0)) {
                 if (CKey.DEVOP == true) {
                     if (host.equals("FIFA") || host.equals("LYNX")) {
-                        String custid = getCustIdAppointmentDevop(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host);
+                        String custid = getCustIdAppointmentDevop(ServiceAFweb.URL_PRODUCT_PR, appTId, banid, cust, host);
                         if (custid.length() != 0) {
                             cust = custid;
                             dataObj.setCusid(custid);
@@ -1941,7 +1907,7 @@ public class SsnsService {
             if (oper.equals(APP_UPDATE) || oper.equals(APP_GET_TIMES) || oper.equals(APP_GET_APP)) {
                 if ((banid.length() == 0) && (cust.length() == 0)) {
 
-                    outputSt = SendSsnsAppointmentGetTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
+                    outputSt = SendSsnsAppointmentGetTimeslot(ServiceAFweb.URL_PRODUCT_PR, appTId, banid, cust, host, null);
                     if (outputSt == null) {
                         return false;
                     }
@@ -1956,7 +1922,7 @@ public class SsnsService {
 
                 } else {
                     if (oper.equals(APP_GET_TIMES)) {
-                        outputSt = SendSsnsAppointmentGetTimeslot(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
+                        outputSt = SendSsnsAppointmentGetTimeslot(ServiceAFweb.URL_PRODUCT_PR, appTId, banid, cust, host, null);
                         if (outputSt == null) {
                             return false;
                         }
@@ -1969,7 +1935,7 @@ public class SsnsService {
                         }
                         featTTV = parseAppointmentTimeSlotFeature(outputSt, oper, host);
                     } else {
-                        outputSt = SendSsnsAppointmentGetApp(ServiceAFweb.URL_PRODUCT, appTId, banid, cust, host, null);
+                        outputSt = SendSsnsAppointmentGetApp(ServiceAFweb.URL_PRODUCT_PR, appTId, banid, cust, host, null);
                         if (outputSt == null) {
                             return false;
                         }
@@ -2247,7 +2213,7 @@ public class SsnsService {
             return "";
         }
         if (LABURL.length() == 0) {
-            LABURL = ServiceAFweb.URL_PRODUCT;
+            LABURL = ServiceAFweb.URL_PRODUCT_PR;
         }
         dataObj.getData();
         String banid = dataObj.getBanid();
@@ -2351,7 +2317,7 @@ public class SsnsService {
             return "";
         }
         if (LABURL.length() == 0) {
-            LABURL = ServiceAFweb.URL_PRODUCT;
+            LABURL = ServiceAFweb.URL_PRODUCT_PR;
         }
         String banid = dataObj.getBanid();
         String prodid = dataObj.getTiid();
@@ -2436,7 +2402,7 @@ public class SsnsService {
 /////////////
             if (oper.equals(PROD_GET_BYID)) {
 
-                String outputSt = SendSsnsProdiuctInventoryByProdId(ServiceAFweb.URL_PRODUCT, banid, prodid, null);
+                String outputSt = SendSsnsProdiuctInventoryByProdId(ServiceAFweb.URL_PRODUCT_PR, banid, prodid, null);
                 if (outputSt == null) {
                     return "";
                 }
@@ -2644,7 +2610,7 @@ public class SsnsService {
             String featTTV = "";
             String outputSt = null;
 
-            outputSt = SendSsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, prodid, oper, null);
+            outputSt = SendSsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT_PR, banid, prodid, oper, null);
             if (outputSt == null) {
                 return false;
             }
@@ -2709,7 +2675,7 @@ public class SsnsService {
 
             String outputSt = null;
 
-            outputSt = SendSsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT, banid, prodid, oper, null);
+            outputSt = SendSsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT_PR, banid, prodid, oper, null);
             if (outputSt == null) {
                 return false;
             }
@@ -3302,7 +3268,7 @@ public class SsnsService {
             for (int i = 0; i < ssnsList.size(); i++) {
                 SsnsData data = ssnsList.get(i);
                 String down = data.getDown();
-                if (down.length() ==0) {
+                if (down.length() == 0) {
                     continue;
                 }
                 String flowSt = data.getDown();
@@ -3355,8 +3321,7 @@ public class SsnsService {
         return response;
     }
 
-    private String sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, Map<String, 
-            String> bodyParams, String postParmSt) {
+    private String sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, Map<String, String> bodyParams, String postParmSt) {
 
         try {
 //            if (CKey.SQL_Devop == true) {
@@ -3411,7 +3376,7 @@ public class SsnsService {
 //            throw e;
 //        }
 //    }
-    private String https_sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams, 
+    private String https_sendRequest_Process_Ssns(String method, String subResourcePath, Map<String, String> queryParams,
             Map<String, String> bodyParams, String postParmSt)
             throws Exception {
         try {
