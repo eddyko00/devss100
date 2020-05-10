@@ -373,7 +373,8 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////
                     boolean clearssnsflag = false;
                     if (clearssnsflag == true) {
-//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
+                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
+                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
 
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
@@ -401,10 +402,10 @@ public class ServiceAFweb {
                         getSsnsDataImp().updateSsnsDataAllOpenStatus();
                         for (int i = 0; i < 10; i++) {
 
-                            processFeatureWLNPro();
-                            processFeatureApp();
-                            processFeatureProd();
-                            processFeatureWifi();
+//                            processFeatureWLNPro();
+//                            processFeatureApp();
+//                            processFeatureProd();
+//                            processFeatureWifi();
                             processFeatureTTVC();
                         }
                     }
@@ -1265,7 +1266,7 @@ public class ServiceAFweb {
     }
 
     void processETL_process() {
-        int sizeTemp=4000;
+        int sizeTemp = 4000;
         String file = FileLocalPath + "clear.txt";
         if (FileUtil.FileTest(file) == true) {
             this.getSsnsDataImp().deleteAllSsnsData(0);
@@ -3095,7 +3096,7 @@ public class ServiceAFweb {
         } else if (prod.equals(SsnsService.APP_PRODUCT)) {
             return testSsnsprodByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         } else if (prod.equals(SsnsService.APP_WLNPRO)) {
-            return testSsnsprodWLNPROByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);            
+            return testSsnsprodWLNPROByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         }
         return null;
     }
