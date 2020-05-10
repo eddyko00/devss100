@@ -586,10 +586,15 @@ public class SsnsRegression {
                                         execSt = execSt.substring(index + 12);
                                         exec = Long.parseLong(execSt);
                                     }
+
                                     if (feat.equals(accObj.getName())) {
                                         passSt = R_PASS;
+                                        
                                     } else {
                                         passSt = R_PASS;
+                                        if (feat.indexOf("testfailed") != -1) {
+                                            passSt = R_FAIL;
+                                        }                                        
                                         String[] featL = feat.split(":");
                                         String[] nameL = accObj.getName().split(":");
                                         if ((featL.length > 4) && (nameL.length > 4)) {
@@ -800,7 +805,7 @@ public class SsnsRegression {
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WIFI, testRList, overviewList);
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_APP, testRList, overviewList);
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_TTVC, testRList, overviewList);
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WLNPRO, testRList, overviewList);            
+            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WLNPRO, testRList, overviewList);
             logger.info("> reportList  " + testRList.size());
 
             uid = REPORT_RESULT;
