@@ -407,7 +407,8 @@ public class SsnsService {
         String WifiparL[] = appTId.split(":");
         String serviceType = WifiparL[1];
         String skuP = WifiparL[2];
-
+        String bundleName = WifiparL[3];
+        
         if (LABURL.length() == 0) {
             LABURL = ServiceAFweb.URL_PRODUCT_PR;
         }
@@ -426,7 +427,7 @@ public class SsnsService {
             outputSt = outputSt.replaceAll("^", "");
 
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            String feat = parseWLNProFeature(outputSt, oper, null);
+            String feat = parseWLNProFeature(outputSt, oper, bundleName);
 
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 feat += ":testfailed";
