@@ -408,7 +408,7 @@ public class SsnsService {
         String serviceType = WifiparL[1];
         String skuP = WifiparL[2];
         String bundleName = WifiparL[3];
-        
+
         if (LABURL.length() == 0) {
             LABURL = ServiceAFweb.URL_PRODUCT_PR;
         }
@@ -939,8 +939,8 @@ public class SsnsService {
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 feat += ":testfailed";
             }
-            outputList.add(feat);
 
+            outputList.add(feat);
             ProductData pData = null;
             String output = dataObj.getData();
             try {
@@ -954,7 +954,13 @@ public class SsnsService {
 
             String postParamSt = ProductDataHelper.getPostParamRestore(pData.getPostParam());
             outputSt = SendSsnsTTVC(LABURL, oper, banid, appTId, postParamSt, inList);
+            if (outputSt.indexOf("responseCode:400500") != -1) {
+                feat += ":testfailed";
+                outputList.remove(0);
+                outputList.add(0, feat);
+            }
             outList = ServiceAFweb.prettyPrintJSON(outputSt);
+
             outputList.addAll(inList);
             outputList.addAll(outList);
 
