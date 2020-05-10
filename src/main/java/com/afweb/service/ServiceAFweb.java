@@ -3094,6 +3094,8 @@ public class ServiceAFweb {
             return this.testSsnsprodWifiByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         } else if (prod.equals(SsnsService.APP_PRODUCT)) {
             return testSsnsprodByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+        } else if (prod.equals(SsnsService.APP_WLNPRO)) {
+            return testSsnsprodWLNPROByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);            
         }
         return null;
     }
