@@ -800,6 +800,7 @@ public class SsnsRegression {
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WIFI, testRList, overviewList);
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_APP, testRList, overviewList);
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_TTVC, testRList, overviewList);
+            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WLNPRO, testRList, overviewList);            
             logger.info("> reportList  " + testRList.size());
 
             uid = REPORT_RESULT;
