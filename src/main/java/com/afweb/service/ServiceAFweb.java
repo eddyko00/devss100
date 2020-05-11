@@ -3636,6 +3636,13 @@ public class ServiceAFweb {
         return 0;
     }
 
+    public int systemBackupSsnsAcc() {
+        logger.info("systemBackupSsnsAcc start");
+        backupSystem();
+        logger.info("systemBackupSsnsAcc end");
+        return 1;
+    }
+
     public int systemRestoresSsnsAcc() {
         logger.info("restoreSsnsAccDB start");
         this.getSsnsDataImp().deleteAllSsnsAcc(0);
