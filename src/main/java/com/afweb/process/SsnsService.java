@@ -251,7 +251,7 @@ public class SsnsService {
             if (NAccObj.getDown().equals("splunkflow")) {
 
                 ArrayList<String> flow = new ArrayList();
-                failure = getSsnsWLNProFlowTrace(dataObj, flow);
+                failure = getSsnsFlowTrace(dataObj, flow);
                 if (flow == null) {
                     logger.info("> updateSsnsWLNPro skip no flow");
                     return false;
@@ -442,49 +442,6 @@ public class SsnsService {
         return "";
     }
 
-    // 1 faulure, 0 = success
-    public int getSsnsWLNProFlowTrace(SsnsData dataObj, ArrayList<String> flow) {
-
-        String uid = dataObj.getUid();
-        int failure = 0;
-
-        ArrayList<SsnsData> ssnsList = getSsnsDataImp().getSsnsDataObjListByUid(dataObj.getApp(), uid);
-        if (ssnsList != null) {
-//            logger.info("> ssnsList " + ssnsList.size());
-            for (int i = 0; i < ssnsList.size(); i++) {
-                SsnsData data = ssnsList.get(i);
-                String down = data.getDown();
-                if (down.length() == 0) {
-                    continue;
-                }
-                String flowSt = data.getDown();
-                if (flowSt.length() == 0) {
-                    flowSt = data.getOper();
-                }
-                flowSt += ":" + data.getExec();
-                String dataTxt = data.getData();
-                if (dataTxt.indexOf("stacktrace") != -1) {
-                    failure = 1;
-                } else {
-                    dataTxt = data.getRet();
-                    if (dataTxt.indexOf("httpCd=500") != -1) {
-                        failure = 1;
-                    }
-                }
-//                logger.info("> flow " + flowSt);
-                if (failure == 1) {
-                    flowSt += ":failed:" + data.getData();
-                }
-
-                flow.add(flowSt);
-                
-                if (down.indexOf("getCustomerInfoByCustomerIdList") != -1) {
-                    break;
-                }
-            }
-        }
-        return failure;
-    }
 
 ////////////////////////////////////////////    
     public String getFeatureSsnsTTVC(SsnsData dataObj) {

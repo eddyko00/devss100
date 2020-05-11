@@ -1277,7 +1277,7 @@ public class ServiceAFweb {
         String app = SsnsService.APP_WLNPRO; //;
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunkWLNPro(app, sizeTemp);
+            boolean ret = processETLsplunkWLNPro(app, sizeTemp*2);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }

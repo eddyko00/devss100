@@ -153,6 +153,14 @@ public class SsnsRegression {
                                     }
                                 }
                             }
+                            if (accObj.getApp().equals(SsnsService.APP_TTVC)) {
+                                String oper = accObj.getOper();
+                                if (oper.equals(SsnsService.TT_SaveOrder)) {
+                                    ;
+                                } else {
+                                    continue;
+                                }
+                            }
                             testData tObj = new testData();
                             tObj.setAccid(accObj.getId());
                             tObj.setUsername(name);
@@ -578,8 +586,9 @@ public class SsnsRegression {
                             totalTC++;
                             if (response != null) {
                                 if (response.size() > 3) {
-                                    String feat = response.get(0);
-                                    String execSt = response.get(2);
+                                    response.add(0, accObj.getName());
+                                    String feat = response.get(1);
+                                    String execSt = response.get(3);
 //                                    execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
                                     int index = execSt.indexOf("elapsedTime:");
                                     if (index != -1) {
@@ -589,12 +598,12 @@ public class SsnsRegression {
 
                                     if (feat.equals(accObj.getName())) {
                                         passSt = R_PASS;
-                                        
+
                                     } else {
                                         passSt = R_PASS;
                                         if (feat.indexOf("testfailed") != -1) {
                                             passSt = R_FAIL;
-                                        }                                        
+                                        }
                                         String[] featL = feat.split(":");
                                         String[] nameL = accObj.getName().split(":");
                                         if ((featL.length > 4) && (nameL.length > 4)) {
