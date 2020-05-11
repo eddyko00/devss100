@@ -399,14 +399,17 @@ public class ServiceAFweb {
 /////////                    
                     boolean procallflag = false;
                     if (procallflag == true) {
-                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
-                        for (int i = 0; i < 10; i++) {
+//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
+//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WLNPRO);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WLNPRO);
 
-//                            processFeatureWLNPro();
+                        for (int i = 0; i < 100; i++) {
+
+                            processFeatureWLNPro();
 //                            processFeatureApp();
 //                            processFeatureProd();
 //                            processFeatureWifi();
-                            processFeatureTTVC();
+//                            processFeatureTTVC();
                         }
                     }
 
