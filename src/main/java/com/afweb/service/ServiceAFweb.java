@@ -302,28 +302,28 @@ public class ServiceAFweb {
         if (CKey.LocalPCflag == true) {
             getServerObj().setSysMaintenance(true);
             serverObj.setTimerInit(true);
-            if (CKey.NN_DEBUG == true) {
-                // LocalPCflag = true; 
-                // SQL_DATABASE = REMOTE_MYSQL;
-                if (CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) {
-                    logger.info(">>>>> SystemDownloadDBData form Openshift");
+//            if (CKey.NN_DEBUG == true) {
+            // LocalPCflag = true; 
+            // SQL_DATABASE = REMOTE_MYSQL;
+            if (CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) {
+                logger.info(">>>>> SystemDownloadDBData form Openshift");
 
-                } else if (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL) {
-                    logger.info(">>>>> SystemDownloadDBData form local My SQL");
-                }
-
-                serverObj.setSysMaintenance(true);
-                boolean retSatus = getAccountImp().downloadDBData(this);
-                if (retSatus == true) {
-                    serverObj.setSysMaintenance(true);
-                    serverObj.setTimerInit(false);
-                    serverObj.setTimerQueueCnt(0);
-                    serverObj.setTimerCnt(0);
-                }
-                getServerObj().setSysMaintenance(true);
-                logger.info(">>>>> SystemDownloadDBData done");
+            } else if (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL) {
+                logger.info(">>>>> SystemDownloadDBData form local My SQL");
             }
+
+            serverObj.setSysMaintenance(true);
+            boolean retSatus = getAccountImp().downloadDBData(this);
+            if (retSatus == true) {
+                serverObj.setSysMaintenance(true);
+                serverObj.setTimerInit(false);
+                serverObj.setTimerQueueCnt(0);
+                serverObj.setTimerCnt(0);
+            }
+            getServerObj().setSysMaintenance(true);
+            logger.info(">>>>> SystemDownloadDBData done");
         }
+//        }
     }
 
     private void restoreSystem() {

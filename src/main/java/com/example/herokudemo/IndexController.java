@@ -1264,11 +1264,6 @@ public class IndexController {
     WebStatus SystemBackupacc(@PathVariable("username") String username) {
         WebStatus msg = new WebStatus();
         // remote is stopped
-        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
-            if (username.toLowerCase().equals(CKey.ADMIN_USERNAME.toLowerCase())) {
-                return null;
-            }
-        }
         CustomerObj cust = afWebService.getCustomerIgnoreMaintenance(username, null);
         if (cust != null) {
             if (cust.getType() == CustomerObj.INT_ADMIN_USER) {
