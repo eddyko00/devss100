@@ -721,6 +721,7 @@ public class SsnsService {
                 String ESTdate = format.format(d);
 
                 inList.add(ESTdate + " elapsedTime:" + elapsedTime);
+                inList.add("bodyElement:" + postParm);                
                 inList.add("output:");
             }
             return output;
