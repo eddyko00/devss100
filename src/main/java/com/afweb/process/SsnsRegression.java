@@ -191,7 +191,7 @@ public class SsnsRegression {
                             if (accObj.getApp().equals(SsnsService.APP_QUAL)) {
                                 testIdList.add(st);
                                 added++;
-                                wlnProCnt += 2;
+                                qualCnt += 2;
 
                             }
 ////////////////////////////////////////////////
