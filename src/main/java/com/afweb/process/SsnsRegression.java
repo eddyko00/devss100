@@ -164,7 +164,7 @@ public class SsnsRegression {
 
                             if (accObj.getApp().equals(SsnsService.APP_WIFI)) {
                                 String nameFeat = accObj.getName();
-                                if (nameFeat.indexOf("NotaBan") == -1) {
+                                if (nameFeat.indexOf("NotaBan") != -1) {
                                     continue;
                                 }
                             }

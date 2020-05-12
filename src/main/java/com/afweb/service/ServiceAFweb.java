@@ -397,15 +397,15 @@ public class ServiceAFweb {
                     }
 /////////
 /////////                    
-                    boolean procallflag = false;
+                    boolean procallflag = true;
                     if (procallflag == true) {
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
 //                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WLNPRO);
 //                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WLNPRO);
 
                         for (int i = 0; i < 100; i++) {
-
-                            processFeatureWLNPro();
+                            processFeatureQual();
+//                            processFeatureWLNPro();
 //                            processFeatureApp();
 //                            processFeatureProd();
 //                            processFeatureWifi();
@@ -874,8 +874,82 @@ public class ServiceAFweb {
 //            output.add("  ");
         }
     }
-////////////////////////////////
 
+/////////////////////////////////
+    ArrayList<String> getAllOpenQualArray() {
+        String app = SsnsService.APP_QUAL;
+        String ret = "parameter";
+        int status = ConstantKey.OPEN;
+        return getSsnsDataImp().getSsnsDataIDList(app, ret, status, 15);
+    }
+
+    ArrayList<String> qualNameArray = new ArrayList();
+
+    private ArrayList updateQualNameArray() {
+        if (qualNameArray != null && qualNameArray.size() > 0) {
+            return qualNameArray;
+        }
+        ArrayList ttvNameArrayTemp = getAllOpenQualArray();
+        if (ttvNameArrayTemp != null) {
+            qualNameArray = ttvNameArrayTemp;
+        }
+        return qualNameArray;
+    }
+
+    public int processFeatureQual() {
+
+        updateQualNameArray();
+        if ((qualNameArray == null) || (qualNameArray.size() == 0)) {
+            return 0;
+        }
+        int result = 0;
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        long lockDateValue = dateNow.getTimeInMillis();
+        String LockName = "ETL_" + SsnsService.APP_QUAL;
+
+        try {
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processFeatureWifi");
+            if (CKey.NN_DEBUG == true) {
+                lockReturn = 1;
+            }
+            if (lockReturn == 0) {
+                return 0;
+            }
+
+            logger.info("processFeatureApp for 2 minutes size " + qualNameArray.size());
+
+            long currentTime = System.currentTimeMillis();
+            long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
+
+            for (int i = 0; i < 5; i++) {
+                currentTime = System.currentTimeMillis();
+//                if (CKey.NN_DEBUG != true) {
+                if (lockDate1Min < currentTime) {
+                    break;
+                }
+//                }
+                if (qualNameArray.size() == 0) {
+                    break;
+                }
+
+                String idSt = (String) qualNameArray.get(0);
+                qualNameArray.remove(0);
+                SsnsService ss = new SsnsService();
+                int id = Integer.parseInt(idSt);
+                SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
+                String feature = ss.getFeatureSsnsQual(data);
+//                logger.info("> feature " + i + " " + feature);
+
+                AFSleep();
+            }
+        } catch (Exception ex) {
+        }
+        removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
+        return result;
+
+    }
+
+////////////////////////////////
     ArrayList<String> getAllOpenWLNProArray() {
         String app = SsnsService.APP_WLNPRO;
         String ret = "parameter";
@@ -1277,8 +1351,17 @@ public class ServiceAFweb {
             FileUtil.FileDelete(file);
             return;
         }
+        String app = SsnsService.APP_QUAL; //;
+        file = FileLocalPath + app + "data.csv";
+        if (FileUtil.FileTest(file) == true) {
+            boolean ret = processETLsplunk(app, sizeTemp);
+            if (ret == true) {
+                FileUtil.FileDelete(file);
+            }
+            return;
+        }
 
-        String app = SsnsService.APP_WLNPRO; //;
+        app = SsnsService.APP_WLNPRO; //;
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             boolean ret = processETLsplunkWLNPro(app, sizeTemp * 2);
@@ -2001,6 +2084,12 @@ public class ServiceAFweb {
                         return true;
                     }
                     app = SsnsService.APP_WIFI;
+                } else if (oper.equals(SsnsService.QUAL_AVAL) || oper.equals(SsnsService.QUAL_MATCH)) {
+                    if (app.equals(SsnsService.APP_QUAL) == false) {
+                        logger.info("Wrong data file " + app + " detected:" + SsnsService.APP_QUAL);
+                        return true;
+                    }
+                    app = SsnsService.APP_QUAL;
                 } else {
                     continue;
                 }
@@ -2748,7 +2837,9 @@ public class ServiceAFweb {
         ssnsList.add(SsnsService.APP_TTVC);
         ssnsList.add("SSNS TTV Service");
         ssnsList.add(SsnsService.APP_WLNPRO);
-        ssnsList.add("SSNS TTV WLN Protection");
+        ssnsList.add("SSNS WLN Protection");
+        ssnsList.add(SsnsService.APP_QUAL);
+        ssnsList.add("SSNS Qualfiication");
         return ssnsList;
 
     }

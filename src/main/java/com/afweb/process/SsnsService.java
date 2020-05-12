@@ -55,33 +55,38 @@ public class SsnsService {
     public static String APP_PRODUCT = "prod";
     public static String APP_TTVC = "ttv";
     public static String APP_WLNPRO = "wlnpro";
+    public static String APP_QUAL = "qual";
 
     public static String APP_TTVSUB = "ttvsub";  // ETL name
     public static String APP_TTVREQ = "ttvreq";  // ETL name
     //
-    public static String APP_GET_DOWNURL = "downloadurl";
     public static String APP_FEAT_TYPE_WLNP = "WLNP";
+    public static String APP_GET_DOWNURL = "downloadurl";
 
     public static String APP_FEAT_TYPE_TTV = "TTV";
     public static String APP_FEAT_TYPE_HSIC = "HSIC";
     public static String APP_FEATT_TYPE_SING = "SING";
-    public static String APP_FEAT_TYPE_APP = "APP";
-    public static String APP_FEAT_TYPE_WIFI = "WIFI";
-    public static String APP_FEAT_TYPE_TTVCL = "TTVCL";
+    public static String PROD_GET_PROD = "getProductList";
+    public static String PROD_GET_BYID = "getProductById";
 
+    public static String APP_FEAT_TYPE_APP = "APP";
     public static String APP_GET_APP = "getAppointment";
     public static String APP_CAN_APP = "cancelAppointment";
     public static String APP_GET_TIMES = "searchTimeSlot";
     public static String APP_UPDATE = "updateAppointment";
 
-    public static String PROD_GET_PROD = "getProductList";
-    public static String PROD_GET_BYID = "getProductById";
-
+    public static String APP_FEAT_TYPE_WIFI = "WIFI";
     public static String WI_GetDeviceStatus = "getDeviceStatus";
     public static String WI_Callback = "callbackNotification";
     public static String WI_GetDevice = "getDevices";
     public static String WI_config = "configureDeviceStatus";
 
+    public static String APP_FEAT_TYPE_QUAL = "QUAL";
+    public static String QUAL_AVAL = "availability";
+    public static String QUAL_MATCH = "address_matches";
+//
+
+    public static String APP_FEAT_TYPE_TTVCL = "TTVCL";
     public static String TT_GetSub = "getCustomerTvSubscription";
     public static String TT_Vadulate = "validateWithAuth";
     public static String TT_Quote = "quotewithauth";
@@ -89,7 +94,396 @@ public class SsnsService {
 
     private SsnsDataImp ssnsDataImp = new SsnsDataImp();
 
+////////////////////////////////////////////
+    public String getFeatureSsnsQual(SsnsData dataObj) {
+        String feat = "";
+        try {
+            feat = getFeatureSsnsQualProcess(dataObj);
+        } catch (Exception ex) {
+            logger.info("> getFeatureSsnsQual Exception " + ex.getMessage());
+        }
+        getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+        return feat;
+    }
+
+    public String getFeatureSsnsQualProcess(SsnsData dataObj) {
+        ProductData pData = new ProductData();
+        ArrayList<String> cmd = new ArrayList();
+        if (dataObj == null) {
+            return "";
+        }
+
+        String banid = "";
+        String uniquid = "";
+        String prodClass = "";
+        String serialid = "";
+        String parm = "";
+        String postParm = "";
+        String address = "";
+        int vpopReq = 0;
+        int async = 0;
+        String dataSt = "";
+        try {
+            String oper = dataObj.getOper();
+            if (oper.equals(QUAL_AVAL)) { //"updateAppointment")) {
+
+                dataSt = dataObj.getData();
+                dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+                String[] operList = dataSt.split(",");
+                if (operList.length > 3) {
+                    address = operList[1];
+                    if (address.length() == 0) {
+                        address = operList[2];
+                    }
+                    if (dataSt.indexOf("1509") != -1) {
+                        vpopReq = 0;
+                    } else {
+                        vpopReq = 1;
+                    }
+                }
+                cmd.add("get availability"); // description
+                cmd.add(QUAL_AVAL);   // cmd
+                pData.setCmd(cmd);
+            } else if (oper.equals(QUAL_MATCH)) {
+                // cannot support this address format
+                return "";
+            } else {
+                logger.info("> getFeatureSsnsQualProcess Other oper " + oper);
+                return "";
+            }
+
+            if (address.equals("")) {
+                return "";
+            } else if (address.equals("null")) {
+                return "";
+            }
+
+//            logger.info(dataSt);
+/////////////
+            //call devop to get customer id
+            SsnsAcc NAccObj = new SsnsAcc();
+            NAccObj.setDown("splunkflow");
+            boolean stat = this.updateSsnsQual(oper, address, pData, dataObj, NAccObj);
+            if (stat == true) {
+                boolean exist = false;
+                String key = NAccObj.getName()
+                        + NAccObj.getCusid()
+                        + NAccObj.getBanid()
+                        + NAccObj.getTiid();
+                key = key.replaceAll(NAccObj.getUid(), "");
+                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                if (set.add(key)) {
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() != 0) {
+                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                            if (ssnsObj.getDown().equals("splunkflow")) {
+                                exist = true;
+                            }
+                        }
+                    }
+                }
+
+                if (exist == false) {
+
+                    ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByTiid(NAccObj.getName(), NAccObj.getTiid());
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() > 3) {
+                            exist = true;
+                        }
+                    }
+                }
+                if (exist == false) {
+                    int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
+                }
+            }
+            return NAccObj.getName();
+        } catch (Exception ex) {
+            logger.info("> getFeatureSsnsQualProcess Exception " + ex.getMessage());
+        }
+
+        return "";
+    }
+
+    public boolean updateSsnsQual(String oper, String address, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
+        try {
+            String featTTV = "";
+
+            if (oper.equals(QUAL_AVAL) || oper.equals(QUAL_MATCH)) {
+
+                String outputSt = null;
+                if (oper.equals(QUAL_AVAL)) {
+                    outputSt = SendSsnsQual(ServiceAFweb.URL_PRODUCT_PR, oper, address, null);
+                    if (outputSt == null) {
+                        return false;
+                    }
+
+                }
+                if (outputSt == null) {
+                    return false;
+                }
+                if (outputSt.length() == 0) {
+                    return false;
+                }
+//                    if (outputSt.length() < 80) {  // or test 
+//                        return false;
+//                    }
+                if (outputSt.indexOf("responseCode:400500") != -1) {
+                    return false;
+                }
+                featTTV = parseQualFeature(outputSt, oper);
+
+            } else {
+                return false;
+            }
+
+//            logger.info("> updateSsnsWifi feat " + featTTV);
+/////////////TTV   
+            if (NAccObj.getDown().equals("splunkflow")) {
+                ArrayList<String> flow = new ArrayList();
+                int faulure = getSsnsFlowTrace(dataObj, flow);
+                if (flow == null) {
+                    logger.info("> updateSsnsQual skip no flow");
+                    return false;
+                }
+                pData.setFlow(flow);
+
+                if (faulure == 1) {
+                    featTTV += ":splunkfailed";
+                }
+            }
+            logger.info("> updateSsnsQual feat " + featTTV);
+
+            NAccObj.setName(featTTV);
+
+            NAccObj.setTiid(address);
+
+            NAccObj.setUid(dataObj.getUid());
+            NAccObj.setApp(dataObj.getApp());
+            NAccObj.setOper(oper);
+
+//          NAccObj.setDown(""); // set by NAccObj
+            NAccObj.setRet(dataObj.getRet());
+            NAccObj.setExec(dataObj.getExec());
+
+            String nameSt = new ObjectMapper().writeValueAsString(pData);
+            NAccObj.setData(nameSt);
+
+            NAccObj.setUpdatedatel(dataObj.getUpdatedatel());
+            NAccObj.setUpdatedatedisplay(new java.sql.Date(dataObj.getUpdatedatel()));
+
+            return true;
+        } catch (Exception ex) {
+            logger.info("> updateSsnsQual Exception " + ex.getMessage());
+        }
+        return false;
+    }
+
+    public static String parseQualFeature(String outputSt, String oper) {
+
+        if (outputSt == null) {
+            return null;
+        }
+
+        int serviceCategoryCd = 0;
+        int qualStatusCdQUA = 0;
+        int qualStatusCdDQN = 0;
+        String FSAStatusCd = "";
+        String dropPlacedInd = "";
+
+        ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
+        for (int j = 0; j < outputList.size(); j++) {
+            String inLine = outputList.get(j);
+//            logger.info("" + inLine);
+
+            if (inLine.indexOf("serviceCategoryCd") != -1) {
+                serviceCategoryCd++;
+                continue;
+            }
+            if (inLine.indexOf("qualStatusCd") != -1) {
+                if (inLine.indexOf("QUA") != -1) {
+                    qualStatusCdQUA++;
+                }
+                if (inLine.indexOf("DQN") != -1) {
+                    qualStatusCdDQN++;
+                }
+                continue;
+            }
+            if (inLine.indexOf("FSAStatusCd") != -1) {
+
+                String valueSt = inLine;
+                valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                valueSt = ServiceAFweb.replaceAll("FSAStatusCd:", "", valueSt);
+                valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
+                FSAStatusCd = valueSt;
+                continue;
+            }
+            if (inLine.indexOf("dropPlacedInd") != -1) {
+                String valueSt = inLine;
+                valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                valueSt = ServiceAFweb.replaceAll("dropPlacedInd:", "", valueSt);
+                valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
+                dropPlacedInd = valueSt;
+                continue;
+            }
+        }
+
+        String featTTV = APP_FEAT_TYPE_QUAL;
+        featTTV += ":" + oper;
+        featTTV += ":serviceCat_" + serviceCategoryCd;
+        featTTV += ":QUA_" + qualStatusCdQUA;
+        featTTV += ":DQN_" + qualStatusCdDQN;
+        featTTV += ":FSASt_" + FSAStatusCd;
+        featTTV += ":drop_" + dropPlacedInd;
+        return featTTV;
+    }
+
+    public String SendSsnsQual(String ProductURL, String oper, String address, ArrayList<String> inList) {
+        String url = "";
+
+        if (oper.equals(QUAL_AVAL)) {
+            address = ServiceAFweb.replaceAll(" ", "%20", address);
+            url = ProductURL + "/v1/cmo/selfmgmt/service-qualification/availability?address=" + address;
+
+        } else {
+            return "";
+        }
+        try {
+            if (inList != null) {
+                inList.add(url);
+            }
+            // calculate elapsed time in milli seconds
+            long startTime = TimeConvertion.currentTimeMillis();
+
+            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null, null);
+
+            long endTime = TimeConvertion.currentTimeMillis();
+            long elapsedTime = endTime - startTime;
+//            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
+            if (inList != null) {
+                String tzid = "America/New_York"; //EDT
+                TimeZone tz = TimeZone.getTimeZone(tzid);
+                Date d = new Date(startTime);
+                // timezone symbol (z) included in the format pattern 
+                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                // format date in target timezone
+                format.setTimeZone(tz);
+                String ESTdate = format.format(d);
+
+                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
+                inList.add("output:");
+            }
+
+            return output;
+        } catch (Exception ex) {
+            logger.info("> SsnsAppointment exception " + ex.getMessage());
+        }
+        return null;
+    }
+
+    public String TestFeatureSsnsProdQual(SsnsAcc dataObj, ArrayList<String> outputList, String Oper, String LABURL) {
+        if (dataObj == null) {
+            return "";
+        }
+        if (LABURL.length() == 0) {
+            LABURL = ServiceAFweb.URL_PRODUCT_PR;
+        }
+        dataObj.getData();
+        String banid = dataObj.getBanid();
+        String appTId = dataObj.getTiid();
+        if (appTId.length() == 0) {
+            return "";
+        }
+        String WifiparL[] = appTId.split(":");
+
+        String uniquid = WifiparL[0];
+        String prodClass = WifiparL[1];
+        String serialid = WifiparL[2];
+        String parm = "";
+
+        if (WifiparL.length > 3) {
+            parm = WifiparL[3];
+        }
+
+        String outputSt = null;
+        int connectDevice = 0;
+        ArrayList<String> inList = new ArrayList();
+        if (Oper.equals(WI_GetDeviceStatus)) {
+            outputSt = SendSsnsWifi(LABURL, Oper, banid, uniquid, prodClass, serialid, "", inList);
+            if (parm.length() > 0) {
+                String outputStConnect = SendSsnsWifi(LABURL, Oper, banid, uniquid, prodClass, serialid, parm, null);
+                if (outputStConnect.indexOf("macAddressTxt") != -1) {
+                    connectDevice = 1;
+                }
+
+            }
+            if (outputSt == null) {
+
+                return "";
+            }
+            ////special char #, need to ignore for this system
+            outputSt = outputSt.replaceAll("#", "");
+            outputSt = outputSt.replaceAll("~", "");
+            outputSt = outputSt.replaceAll("^", "");
+
+            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+            String feat = parseWifiFeature(outputSt, Oper, prodClass);
+            if (outputSt.indexOf("responseCode:400500") != -1) {
+                feat += ":testfailed";
+            }
+            if (connectDevice == 1) {
+                feat += ":" + parm;
+            }
+            outputList.add(feat);
+            outputList.addAll(inList);
+            outputList.addAll(outList);
+
+            return feat;
+        } else if (Oper.equals(WI_GetDevice)) {
+
+            outputSt = SendSsnsWifi(LABURL, Oper, banid, uniquid, prodClass, serialid, Oper, inList);
+            if (outputSt == null) {
+                return "";
+            }
+            ////special char #, need to ignore for this system
+            outputSt = outputSt.replaceAll("#", "");
+            outputSt = outputSt.replaceAll("~", "");
+            outputSt = outputSt.replaceAll("^", "");
+
+            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+
+            String feat = dataObj.getName();
+            for (int i = 0; i < outList.size(); i++) {
+                String inLine = outList.get(i);
+                inLine = ServiceAFweb.replaceAll("\"", "", inLine);
+                inLine = ServiceAFweb.replaceAll(",", "", inLine);
+
+                if (inLine.indexOf("deviceTypeCd") != -1) {
+                    String dCd = ServiceAFweb.replaceAll("deviceTypeCd:", "", inLine);
+                    feat += ":" + dCd;
+                }
+                if (inLine.indexOf("productClassId") != -1) {
+                    String dCd = ServiceAFweb.replaceAll("productClassId:", "", inLine);
+                    feat += ":" + dCd;
+                }
+            }
+            if (outputSt.indexOf("responseCode:400500") != -1) {
+                feat += ":testfailed";
+            }
+            outputList.add(feat);
+            outputList.addAll(inList);
+            outputList.addAll(outList);
+            return feat;
+        }
+
+        return "";
+    }
+
 ////////////////////////////////////////////    
+///////////////////////////////////////////    
     public String getFeatureSsnsWLNPro(SsnsData dataObj) {
         String feat = "";
         try {
@@ -441,7 +835,6 @@ public class SsnsService {
 
         return "";
     }
-
 
 ////////////////////////////////////////////    
     public String getFeatureSsnsTTVC(SsnsData dataObj) {
@@ -836,7 +1229,8 @@ public class SsnsService {
                 String st = ServiceAFweb.replaceAll("\":\",", "\":\"\",", postParm);
                 st = st.substring(0, st.length() - 2);
 
-                Map<String, String> map = new ObjectMapper().readValue(st, Map.class);
+                Map<String, String> map = new ObjectMapper().readValue(st, Map.class
+                );
                 map.remove("customerEmail");
 
                 String output = this.sendRequest_Ssns(METHOD_POST, url, null, map, null);
@@ -876,7 +1270,8 @@ public class SsnsService {
                 String st = ServiceAFweb.replaceAll("\":\",", "\":\"\",", postParm);
                 st = st.substring(0, st.length() - 2);
 
-                Map<String, String> map = new ObjectMapper().readValue(st, Map.class);
+                Map<String, String> map = new ObjectMapper().readValue(st, Map.class
+                );
                 map.remove("customerEmail");
 
                 String output = this.sendRequest_Ssns(METHOD_POST, url, null, map, null);
@@ -944,8 +1339,10 @@ public class SsnsService {
             outputList.add(feat);
             ProductData pData = null;
             String output = dataObj.getData();
+
             try {
-                pData = new ObjectMapper().readValue(output, ProductData.class);
+                pData = new ObjectMapper().readValue(output, ProductData.class
+                );
             } catch (IOException ex) {
             }
             if (pData == null) {
@@ -2144,8 +2541,10 @@ public class SsnsService {
             }
             if (output.indexOf("responseCode:400500") != -1) {
                 return "";
+
             }
-            ArrayList arrayItem = new ObjectMapper().readValue(output, ArrayList.class);
+            ArrayList arrayItem = new ObjectMapper().readValue(output, ArrayList.class
+            );
             if (arrayItem.size() < 1) {
                 return "";
             }
