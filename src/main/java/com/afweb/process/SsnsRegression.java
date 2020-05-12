@@ -111,6 +111,9 @@ public class SsnsRegression {
             }
             int exitTest = 800;  // 1000000;
 
+            int qualCnt = 0;
+            int wlnProCnt = 0;
+
             int added = 0;
             ReportData reportdata = new ReportData();
             ArrayList<String> servList = serviceAFweb.getSsnsprodAll(name, null, 0);
@@ -182,6 +185,14 @@ public class SsnsRegression {
                                 // add double test becuase the TC is too low
                                 testIdList.add(st);
                                 added++;
+                                wlnProCnt += 2;
+
+                            }
+                            if (accObj.getApp().equals(SsnsService.APP_QUAL)) {
+                                testIdList.add(st);
+                                added++;
+                                wlnProCnt += 2;
+
                             }
 ////////////////////////////////////////////////
                             if (added > exitTest) {
@@ -199,6 +210,7 @@ public class SsnsRegression {
                     }
                 }
             }
+            logger.info("> startMonitor " + name + " wlnProCnt:" + wlnProCnt + " qualCnt:" + qualCnt);
             // make random list on testIdList 
             Collections.shuffle(testIdList);
 
@@ -829,7 +841,7 @@ public class SsnsRegression {
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_APP, testRList, overviewList);
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_TTVC, testRList, overviewList);
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WLNPRO, testRList, overviewList);
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_QUAL, testRList, overviewList);            
+            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_QUAL, testRList, overviewList);
             logger.info("> reportList  " + testRList.size());
 
             uid = REPORT_RESULT;
