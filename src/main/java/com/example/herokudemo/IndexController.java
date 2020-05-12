@@ -587,7 +587,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.QUAL_AVAL;
-        ArrayList<String> ret = afWebService.testSsnsprodWLNPROByIdRT(username, idSt, pidSt, SsnsService.APP_QUAL, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodQualByIdRT(username, idSt, pidSt, SsnsService.APP_QUAL, oper, "");
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
