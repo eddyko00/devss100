@@ -749,14 +749,15 @@ public class ServiceAFweb {
                 //////require to save memory
                 System.gc();
                 //////require to save memory
-                processFeatureWLNPro();
                 processFeatureWifi();
-            } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
+            } else if ((getServerObj().getProcessTimerCnt() % 6) == 0) {
                 //// process monitor
                 if (CKey.SQL_RemoveServerDB == true) {
                     SsnsRegression regression = new SsnsRegression();
                     regression.processMonitorTesting(this);
                 }
+                processFeatureWLNPro();
+            } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
                 processFeatureTTVC();
             } else if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                 //10 Sec * 5 ~ 1 minutes
@@ -1280,7 +1281,7 @@ public class ServiceAFweb {
         String app = SsnsService.APP_WLNPRO; //;
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunkWLNPro(app, sizeTemp*2);
+            boolean ret = processETLsplunkWLNPro(app, sizeTemp * 2);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }

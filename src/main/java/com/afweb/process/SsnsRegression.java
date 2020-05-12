@@ -169,6 +169,12 @@ public class SsnsRegression {
                             st = st.replace('"', '^');
                             testIdList.add(st);
                             added++;
+
+                            if (accObj.getApp().equals(SsnsService.APP_WLNPRO)) {
+                                // add double test becuase the TC is too low
+                                testIdList.add(st);
+                                added++;
+                            }
 ////////////////////////////////////////////////
                             if (added > exitTest) {
                                 break;
