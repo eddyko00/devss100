@@ -161,6 +161,14 @@ public class SsnsRegression {
                                     continue;
                                 }
                             }
+
+                            if (accObj.getApp().equals(SsnsService.APP_WIFI)) {
+                                String nameFeat = accObj.getName();
+                                if (nameFeat.indexOf("NotaBan") == -1) {
+                                    continue;
+                                }
+                            }
+
                             testData tObj = new testData();
                             tObj.setAccid(accObj.getId());
                             tObj.setUsername(name);

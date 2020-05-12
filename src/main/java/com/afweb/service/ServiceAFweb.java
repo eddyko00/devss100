@@ -750,12 +750,12 @@ public class ServiceAFweb {
                 System.gc();
                 //////require to save memory
                 processFeatureWifi();
-            } else if ((getServerObj().getProcessTimerCnt() % 6) == 0) {
-                //// process monitor
+                // monitor
                 if (CKey.SQL_RemoveServerDB == true) {
                     SsnsRegression regression = new SsnsRegression();
                     regression.processMonitorTesting(this);
                 }
+            } else if ((getServerObj().getProcessTimerCnt() % 6) == 0) {
                 processFeatureWLNPro();
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
                 processFeatureTTVC();
