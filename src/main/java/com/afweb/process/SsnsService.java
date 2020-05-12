@@ -113,15 +113,9 @@ public class SsnsService {
             return "";
         }
 
-        String banid = "";
-        String uniquid = "";
-        String prodClass = "";
-        String serialid = "";
-        String parm = "";
-        String postParm = "";
         String address = "";
         int vpopReq = 0;
-        int async = 0;
+
         String dataSt = "";
         try {
             String oper = dataObj.getOper();
@@ -220,7 +214,6 @@ public class SsnsService {
                     if (outputSt == null) {
                         return false;
                     }
-
                 }
                 if (outputSt == null) {
                     return false;
@@ -235,7 +228,9 @@ public class SsnsService {
                     return false;
                 }
                 featTTV = parseQualFeature(outputSt, oper);
-
+                if (featTTV == null) {
+                    return false;
+                }
             } else {
                 return false;
             }
@@ -330,7 +325,10 @@ public class SsnsService {
                 continue;
             }
         }
-
+        if (serviceCategoryCd == 0) {
+            logger.info("> serviceCategoryCd=0 for multiple address found");
+            return  null;
+        }
         String featTTV = APP_FEAT_TYPE_QUAL;
         featTTV += ":" + oper;
         featTTV += ":serviceCat_" + serviceCategoryCd;
@@ -379,7 +377,7 @@ public class SsnsService {
 
             return output;
         } catch (Exception ex) {
-            logger.info("> SsnsAppointment exception " + ex.getMessage());
+            logger.info("> SendSsnsQual exception " + ex.getMessage());
         }
         return null;
     }
@@ -392,59 +390,17 @@ public class SsnsService {
             LABURL = ServiceAFweb.URL_PRODUCT_PR;
         }
         dataObj.getData();
-        String banid = dataObj.getBanid();
-        String appTId = dataObj.getTiid();
-        if (appTId.length() == 0) {
+
+        String address = dataObj.getTiid();
+        if (address.length() == 0) {
             return "";
-        }
-        String WifiparL[] = appTId.split(":");
-
-        String uniquid = WifiparL[0];
-        String prodClass = WifiparL[1];
-        String serialid = WifiparL[2];
-        String parm = "";
-
-        if (WifiparL.length > 3) {
-            parm = WifiparL[3];
         }
 
         String outputSt = null;
-        int connectDevice = 0;
+
         ArrayList<String> inList = new ArrayList();
-        if (Oper.equals(WI_GetDeviceStatus)) {
-            outputSt = SendSsnsWifi(LABURL, Oper, banid, uniquid, prodClass, serialid, "", inList);
-            if (parm.length() > 0) {
-                String outputStConnect = SendSsnsWifi(LABURL, Oper, banid, uniquid, prodClass, serialid, parm, null);
-                if (outputStConnect.indexOf("macAddressTxt") != -1) {
-                    connectDevice = 1;
-                }
-
-            }
-            if (outputSt == null) {
-
-                return "";
-            }
-            ////special char #, need to ignore for this system
-            outputSt = outputSt.replaceAll("#", "");
-            outputSt = outputSt.replaceAll("~", "");
-            outputSt = outputSt.replaceAll("^", "");
-
-            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            String feat = parseWifiFeature(outputSt, Oper, prodClass);
-            if (outputSt.indexOf("responseCode:400500") != -1) {
-                feat += ":testfailed";
-            }
-            if (connectDevice == 1) {
-                feat += ":" + parm;
-            }
-            outputList.add(feat);
-            outputList.addAll(inList);
-            outputList.addAll(outList);
-
-            return feat;
-        } else if (Oper.equals(WI_GetDevice)) {
-
-            outputSt = SendSsnsWifi(LABURL, Oper, banid, uniquid, prodClass, serialid, Oper, inList);
+        if (Oper.equals(QUAL_AVAL)) {
+            outputSt = SendSsnsQual(LABURL, Oper, address, inList);
             if (outputSt == null) {
                 return "";
             }
@@ -454,28 +410,15 @@ public class SsnsService {
             outputSt = outputSt.replaceAll("^", "");
 
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-
-            String feat = dataObj.getName();
-            for (int i = 0; i < outList.size(); i++) {
-                String inLine = outList.get(i);
-                inLine = ServiceAFweb.replaceAll("\"", "", inLine);
-                inLine = ServiceAFweb.replaceAll(",", "", inLine);
-
-                if (inLine.indexOf("deviceTypeCd") != -1) {
-                    String dCd = ServiceAFweb.replaceAll("deviceTypeCd:", "", inLine);
-                    feat += ":" + dCd;
-                }
-                if (inLine.indexOf("productClassId") != -1) {
-                    String dCd = ServiceAFweb.replaceAll("productClassId:", "", inLine);
-                    feat += ":" + dCd;
-                }
-            }
+            String feat = parseQualFeature(outputSt, Oper);
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 feat += ":testfailed";
             }
+
             outputList.add(feat);
             outputList.addAll(inList);
             outputList.addAll(outList);
+
             return feat;
         }
 
@@ -1615,7 +1558,9 @@ public class SsnsService {
                         return false;
                     }
                     featTTV = parseWifiFeature(outputSt, oper, prodClass);
-
+                    if (featTTV == null) {
+                        return false;
+                    }
                     if (connectDevice == 1) {
                         featTTV += ":" + parm;
                     }

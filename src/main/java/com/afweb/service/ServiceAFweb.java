@@ -397,11 +397,11 @@ public class ServiceAFweb {
                     }
 /////////
 /////////                    
-                    boolean procallflag = true;
+                    boolean procallflag = false;
                     if (procallflag == true) {
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
-//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WLNPRO);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WLNPRO);
+                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_QUAL);
+                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_QUAL);
 
                         for (int i = 0; i < 100; i++) {
                             processFeatureQual();
