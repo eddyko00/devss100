@@ -610,9 +610,13 @@ public class SsnsRegression {
 
                             response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
                             totalTC++;
+                            String featName=  accObj.getName();
                             if (response != null) {
+                                if (oper.equals(SsnsService.PROD_GET_CC)) {
+                                    featName = accObj.getRet();
+                                }
                                 if (response.size() > 3) {
-                                    response.add(0, accObj.getName());
+                                    response.add(0, featName);
                                     String feat = response.get(1);
                                     String execSt = response.get(3);
 //                                    execSt = ServiceAFweb.replaceAll("elapsedTime:", "", execSt);
@@ -622,7 +626,7 @@ public class SsnsRegression {
                                         exec = Long.parseLong(execSt);
                                     }
 
-                                    if (feat.equals(accObj.getName())) {
+                                    if (feat.equals(featName)) {
                                         passSt = R_PASS;
 
                                     } else {
@@ -631,7 +635,7 @@ public class SsnsRegression {
                                             passSt = R_FAIL;
                                         }
                                         String[] featL = feat.split(":");
-                                        String[] nameL = accObj.getName().split(":");
+                                        String[] nameL = featName.split(":");
                                         if ((featL.length > 4) && (nameL.length > 4)) {
                                             if (!featL[2].equals(nameL[2])) {
                                                 passSt = R_FAIL;
@@ -653,7 +657,7 @@ public class SsnsRegression {
                                     }
                                 }
                             }
-                            passSt = accObj.getName() + ":" + passSt;
+                            passSt = featName + ":" + passSt;
                         } else {
                             //regression testing///
                             //regression testing///
