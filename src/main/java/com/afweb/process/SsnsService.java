@@ -3006,7 +3006,7 @@ public class SsnsService {
     public boolean updateSsnsProdiuctInventoryByProdId(String oper, String banid, String prodid, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
             String custId = dataObj.getCusid();
-            String ret = NAccObj.getRet();
+            String down = NAccObj.getDown();
             String feat = "";
             String outputSt = null;
 
@@ -3057,7 +3057,7 @@ public class SsnsService {
                         String sys = CCparL[1];
                         String outputCCSt = SendSsnsCallControl(ServiceAFweb.URL_PRODUCT_PR, banid, phone, sys, null);
                         String featCC = parseCallControlFeature(outputCCSt, dataObj.getOper());
-                        ret = featCC;                        
+                        down = featCC;                        
                     }
                     ///////////  
                 }
@@ -3086,8 +3086,8 @@ public class SsnsService {
             NAccObj.setTiid(dataObj.getTiid());
             NAccObj.setOper(dataObj.getOper());
 
-            NAccObj.setDown(NAccObj.getDown());
-            NAccObj.setRet(ret);
+            NAccObj.setDown(down);
+            NAccObj.setRet(NAccObj.getRet());
 
             NAccObj.setExec(dataObj.getExec());
 
@@ -3107,7 +3107,7 @@ public class SsnsService {
     public boolean updateSsnsProdiuctInventory(String oper, String banid, String prodid, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
             String custId = dataObj.getCusid();
-            String ret = NAccObj.getRet();
+            String down = NAccObj.getDown();
             String outputSt = null;
 
             outputSt = SendSsnsProdiuctInventory(ServiceAFweb.URL_PRODUCT_PR, banid, prodid, oper, null);
@@ -3156,7 +3156,7 @@ public class SsnsService {
                         String sys = CCparL[1];
                         String outputCCSt = SendSsnsCallControl(ServiceAFweb.URL_PRODUCT_PR, banid, phone, sys, null);
                         String featCC = parseCallControlFeature(outputCCSt, dataObj.getOper());
-                        ret = featCC;                        
+                        down = featCC;                        
                     }
                     ///////////  
                 }
@@ -3189,8 +3189,8 @@ public class SsnsService {
             NAccObj.setTiid(dataObj.getTiid());
             NAccObj.setOper(dataObj.getOper());
 
-            NAccObj.setDown(NAccObj.getDown());
-            NAccObj.setRet(ret);
+            NAccObj.setDown(down);
+            NAccObj.setRet(NAccObj.getRet());
 
             NAccObj.setExec(dataObj.getExec());
 
