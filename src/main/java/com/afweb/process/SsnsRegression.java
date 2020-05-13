@@ -602,7 +602,7 @@ public class SsnsRegression {
                         }
                         long exec = 0;
                         int totalTC = 0;
-
+                        String featName = accObj.getName();
                         ArrayList<String> response = new ArrayList();
                         ArrayList<String> labResponse = new ArrayList();
                         if (LABURL.length() == 0) {
@@ -610,10 +610,10 @@ public class SsnsRegression {
 
                             response = serviceAFweb.testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
                             totalTC++;
-                            String featName=  accObj.getName();
+
                             if (response != null) {
                                 if (oper.equals(SsnsService.PROD_GET_CC)) {
-                                    featName = accObj.getRet();
+                                    featName = accObj.getDown();
                                 }
                                 if (response.size() > 3) {
                                     response.add(0, featName);
@@ -684,7 +684,7 @@ public class SsnsRegression {
                                     }
                                 }
                             }
-                            passSt = accObj.getName() + ":" + passSt;
+                            passSt = featName + ":" + passSt;
                         }
 
                         SsReport reportObj = new SsReport();
