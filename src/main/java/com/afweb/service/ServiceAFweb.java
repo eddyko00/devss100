@@ -400,14 +400,14 @@ public class ServiceAFweb {
                     boolean procallflag = false;
                     if (procallflag == true) {
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
-                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_QUAL);
-                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_QUAL);
+                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
+                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_PRODUCT);
 
                         for (int i = 0; i < 100; i++) {
-                            processFeatureQual();
+//                            processFeatureQual();
 //                            processFeatureWLNPro();
 //                            processFeatureApp();
-//                            processFeatureProd();
+                            processFeatureProd();
 //                            processFeatureWifi();
 //                            processFeatureTTVC();
                         }
@@ -3133,7 +3133,7 @@ public class ServiceAFweb {
         }
         return null;
     }
-        
+
     public ArrayList<String> testSsnsprodWLNPROByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
@@ -3444,7 +3444,8 @@ public class ServiceAFweb {
         return null;
     }
 
-    public String testSsnsprodByIdRTtest(String EmailUserName, String IDSt, String PIDSt, String prod, String ProdOper, String LABURL) {
+    public String testSsnsprodByIdRTtest(String EmailUserName, String IDSt, String PIDSt, String prod,
+            String ProdOper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -3465,7 +3466,13 @@ public class ServiceAFweb {
                 ArrayList<String> response = new ArrayList();
                 SsnsService ss = new SsnsService();
 
+                if (ProdOper.equals(SsnsService.PROD_GET_CC)) {
+                    String featRet = ss.TestFeatureSsnsCallControl(accObj, response, ProdOper, LABURL);
+
+                    return "";
+                }
                 if (prod.equals(SsnsService.APP_PRODUCT)) {
+
                     String oper = accObj.getRet();
 
                     String featRet = ss.TestFeatureSsnsProductInventory(accObj, response, oper, LABURL);
