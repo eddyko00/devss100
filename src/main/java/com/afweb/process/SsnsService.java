@@ -2715,7 +2715,7 @@ public class SsnsService {
         }
         String banid = dataObj.getBanid();
 
-        String appTId = dataObj.getTiid();
+        String appTId = dataObj.getCusid();
         if (appTId.length() == 0) {
             return "";
         }
@@ -3005,7 +3005,7 @@ public class SsnsService {
 
     public boolean updateSsnsProdiuctInventoryByProdId(String oper, String banid, String prodid, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
-            String tid = dataObj.getTiid();
+            String custId = dataObj.getCusid();
             String ret = NAccObj.getRet();
             String feat = "";
             String outputSt = null;
@@ -3029,21 +3029,21 @@ public class SsnsService {
                 feat = parseProductPhoneFeature(outputSt, dataObj.getOper(), returnParm);
 
                 if (returnParm.size() > 0) {
-                    tid = (String) returnParm.get(0);
+                    custId = (String) returnParm.get(0);
                     //////////
                     if (feat.indexOf("noCallControl") == -1) {
                         if (feat.indexOf("fifa") != -1) {
-                            tid += ":FIFA";
-                            tid += ":VoiceMail";
+                            custId += ":FIFA";
+                            custId += ":VoiceMail";
                             ArrayList cmd = new ArrayList();
                             cmd = pData.getCmd();
                             cmd.add("get Call control"); // description
                             cmd.add(PROD_GET_CC); // cmd
                             pData.setCmd(cmd);
                         } else {
-                            tid += ":COMPASS";
+                            custId += ":COMPASS";
                             if (feat.indexOf("VoiceMail") != -1) {
-                                tid += ":VoiceMail";
+                                custId += ":VoiceMail";
                             }
                             ArrayList cmd = new ArrayList();
                             cmd = pData.getCmd();
@@ -3051,13 +3051,13 @@ public class SsnsService {
                             cmd.add(PROD_GET_CC); // cmd
                             pData.setCmd(cmd);
                         }
-                        String CCparL[] = tid.split(":");
+                        String CCparL[] = custId.split(":");
 
                         String phone = CCparL[0];
                         String sys = CCparL[1];
                         String outputCCSt = SendSsnsCallControl(ServiceAFweb.URL_PRODUCT_PR, banid, phone, sys, null);
                         String featCC = parseCallControlFeature(outputCCSt, dataObj.getOper());
-                        ret = featCC;
+                        ret = featCC;                        
                     }
                     ///////////  
                 }
@@ -3074,17 +3074,16 @@ public class SsnsService {
             }
 
             pData.setFlow(flow);
-            pData.setFlow(flow);
             if (faulure == 1) {
                 feat += ":failed";
             }
             logger.info("> updateSsnsProdiuctInventory feat " + feat);
             NAccObj.setName(feat);
+            NAccObj.setCusid(custId);            
             NAccObj.setBanid(banid);
-            NAccObj.setCusid(dataObj.getCusid());
             NAccObj.setUid(dataObj.getUid());
             NAccObj.setApp(dataObj.getApp());
-            NAccObj.setTiid(tid);
+            NAccObj.setTiid(dataObj.getTiid());
             NAccObj.setOper(dataObj.getOper());
 
             NAccObj.setDown(NAccObj.getDown());
@@ -3107,7 +3106,7 @@ public class SsnsService {
 
     public boolean updateSsnsProdiuctInventory(String oper, String banid, String prodid, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
-            String tid = dataObj.getTiid();
+            String custId = dataObj.getCusid();
             String ret = NAccObj.getRet();
             String outputSt = null;
 
@@ -3129,21 +3128,21 @@ public class SsnsService {
                 ArrayList returnParm = new ArrayList();
                 feat = parseProductPhoneFeature(outputSt, dataObj.getOper(), returnParm);
                 if (returnParm.size() > 0) {
-                    tid = (String) returnParm.get(0);
+                    custId = (String) returnParm.get(0);
                     //////////
                     if (feat.indexOf("noCallControl") == -1) {
                         if (feat.indexOf("fifa") != -1) {
-                            tid += ":FIFA";
-                            tid += ":VoiceMail";
+                            custId += ":FIFA";
+                            custId += ":VoiceMail";
                             ArrayList cmd = new ArrayList();
                             cmd = pData.getCmd();
                             cmd.add("get Call control"); // description
                             cmd.add(PROD_GET_CC); // cmd
                             pData.setCmd(cmd);
                         } else {
-                            tid += ":COMPASS";
+                            custId += ":COMPASS";
                             if (feat.indexOf("VoiceMail") != -1) {
-                                tid += ":VoiceMail";
+                                custId += ":VoiceMail";
                             }
                             ArrayList cmd = new ArrayList();
                             cmd = pData.getCmd();
@@ -3151,7 +3150,7 @@ public class SsnsService {
                             cmd.add(PROD_GET_CC); // cmd
                             pData.setCmd(cmd);
                         }
-                        String CCparL[] = tid.split(":");
+                        String CCparL[] = custId.split(":");
 
                         String phone = CCparL[0];
                         String sys = CCparL[1];
@@ -3183,11 +3182,11 @@ public class SsnsService {
             }
             logger.info("> updateSsnsProdiuctInventory feat " + feat);
             NAccObj.setName(feat);
+            NAccObj.setCusid(custId);
             NAccObj.setBanid(banid);
-            NAccObj.setCusid(dataObj.getCusid());
             NAccObj.setUid(dataObj.getUid());
             NAccObj.setApp(dataObj.getApp());
-            NAccObj.setTiid(tid);
+            NAccObj.setTiid(dataObj.getTiid());
             NAccObj.setOper(dataObj.getOper());
 
             NAccObj.setDown(NAccObj.getDown());
