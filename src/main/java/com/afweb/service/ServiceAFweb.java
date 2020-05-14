@@ -734,6 +734,8 @@ public class ServiceAFweb {
                 if (CKey.SQL_RemoveServerDB == true) {
                     SsnsRegression regression = new SsnsRegression();
                     int ret = regression.startMonitor(this, CKey.ADMIN_USERNAME, "");
+                    // clear old report
+                    SsReportClearExceptLast3(CKey.ADMIN_USERNAME);
                 }
             }
             if ((getServerObj().getProcessTimerCnt() % 20) == 0) {
