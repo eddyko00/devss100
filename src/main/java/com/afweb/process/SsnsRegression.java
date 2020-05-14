@@ -636,6 +636,7 @@ public class SsnsRegression {
                                         }
                                         String[] featL = feat.split(":");
                                         String[] nameL = featName.split(":");
+                                       
                                         if ((featL.length > 4) && (nameL.length > 4)) {
                                             if (!featL[2].equals(nameL[2])) {
                                                 passSt = R_FAIL;
@@ -653,6 +654,8 @@ public class SsnsRegression {
                                             if (!featL[3].equals(nameL[3])) {
                                                 passSt = R_FAIL;
                                             }
+                                        } else {
+                                            passSt = R_FAIL;
                                         }
                                     }
                                 }
