@@ -3381,7 +3381,7 @@ public class ServiceAFweb {
                 SsnsAcc ssnsAccObj = (SsnsAcc) ssnsAccObjList.get(0);
                 ArrayList<String> outputList = new ArrayList();
                 SsnsService ss = new SsnsService();
-                String feat = "";             
+                String feat = "";
                 if (Oper.equals(SsnsService.APP_GET_APP)) {
 
                     feat = ss.TestFeatureSsnsProdApp(ssnsAccObj, outputList, SsnsService.APP_GET_APP, LABURL);
@@ -3585,6 +3585,7 @@ public class ServiceAFweb {
                 String feat = "";
 
                 if (ProdOper.equals(SsnsService.PROD_GET_CC)) {
+                    String oper = SsnsService.APP_FEATT_TYPE_CC;
                     feat = ss.TestFeatureSsnsCallControl(ssnsAccObj, outputList, ProdOper, LABURL);
 
                     return outputList;

@@ -48,7 +48,8 @@ public class IndexController {
         arrayString.add("/server/url0/set?url=stop");
         arrayString.add("/server/filepath");
         arrayString.add("/server/filepath/set?path=");
-        //
+        arrayString.add("/server/restoressnsacc");
+//
         arrayString.add("/cust/add?email={email}&pass={pass}&firstName={firstName}&lastName={lastName}");
         arrayString.add("/cust/login?email={email}&pass={pass}");
         arrayString.add("/cust/{username}/login&pass={pass}");
@@ -119,7 +120,6 @@ public class IndexController {
         arrayString.add("/cust/{username}/sys/start");
         arrayString.add("/cust/{username}/sys/lock");
         arrayString.add("/cust/{username}/sys/reopenssnsdata");
-        arrayString.add("/cust/{username}/sys/restoressnsacc");
         arrayString.add("/cust/{username}/sys/custlist");
         arrayString.add("/cust/{username}/sys/cust/{customername}/status/{status}/substatus/{substatus}");
 
@@ -1451,28 +1451,28 @@ public class IndexController {
         return null;
     }
 
-    @RequestMapping(value = "/cust/{username}/sys/restoressnsacc", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    WebStatus SystemRestoreacc(@PathVariable("username") String username) {
-        WebStatus msg = new WebStatus();
-        // remote is stopped
-        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
-            if (username.toLowerCase().equals(CKey.ADMIN_USERNAME.toLowerCase())) {
-                return null;
-            }
-        }
-        CustomerObj cust = afWebService.getCustomerIgnoreMaintenance(username, null);
-        if (cust != null) {
-            if (cust.getType() == CustomerObj.INT_ADMIN_USER) {
-                msg.setResponse(afWebService.systemRestoresSsnsAcc() + "");
-                msg.setResult(true);
-                return msg;
-            }
-        }
-
-        return null;
-    }
-
+    // using server/restoressnsacc
+//    @RequestMapping(value = "/cust/{username}/sys/restoressnsacc", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+//    public @ResponseBody
+//    WebStatus SystemRestoreacc(@PathVariable("username") String username) {
+//        WebStatus msg = new WebStatus();
+//        // remote is stopped
+//        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+//            if (username.toLowerCase().equals(CKey.ADMIN_USERNAME.toLowerCase())) {
+//                return null;
+//            }
+//        }
+//        CustomerObj cust = afWebService.getCustomerIgnoreMaintenance(username, null);
+//        if (cust != null) {
+//            if (cust.getType() == CustomerObj.INT_ADMIN_USER) {
+//                msg.setResponse(afWebService.systemRestoresSsnsAcc() + "");
+//                msg.setResult(true);
+//                return msg;
+//            }
+//        }
+//
+//        return null;
+//    }
     @RequestMapping(value = "/cust/{username}/sys/reopenssnsdata", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     WebStatus SystemReopen(@PathVariable("username") String username) {

@@ -69,6 +69,7 @@ public class SsnsService {
     public static String PROD_GET_PROD = "getProductList";
     public static String PROD_GET_BYID = "getProductById";
     public static String PROD_GET_CC = "CallControl";
+    public static String APP_FEATT_TYPE_CC = "CC";    
 
     public static String APP_FEAT_TYPE_APP = "APP";
     public static String APP_GET_APP = "getAppointment";
@@ -2736,7 +2737,7 @@ public class SsnsService {
         outputSt = outputSt.replaceAll("^", "");
         ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
 
-        featTTV = parseCallControlFeature(outputSt, dataObj.getOper());
+        featTTV = parseCallControlFeature(outputSt, oper);
 
         if (outputSt.indexOf("responseCode:400500") != -1) {
             featTTV += ":testfailed";
@@ -3084,7 +3085,7 @@ public class SsnsService {
             NAccObj.setUid(dataObj.getUid());
             NAccObj.setApp(dataObj.getApp());
             NAccObj.setTiid(dataObj.getTiid());
-            NAccObj.setOper(dataObj.getOper());
+            NAccObj.setOper(oper);
 
             NAccObj.setDown(down);
             NAccObj.setRet(NAccObj.getRet());
@@ -3187,7 +3188,7 @@ public class SsnsService {
             NAccObj.setUid(dataObj.getUid());
             NAccObj.setApp(dataObj.getApp());
             NAccObj.setTiid(dataObj.getTiid());
-            NAccObj.setOper(dataObj.getOper());
+            NAccObj.setOper(oper);
 
             NAccObj.setDown(down);
             NAccObj.setRet(NAccObj.getRet());
@@ -3443,7 +3444,7 @@ public class SsnsService {
                 }
             }
 
-            String featTTV = APP_FEAT_TYPE_HSIC;
+            String featTTV = APP_FEATT_TYPE_CC;
             featTTV += ":" + oper;
             featTTV += ":" + whiteList;
             featTTV += ":" + blackList;
