@@ -2003,7 +2003,7 @@ public class SsnsService {
             outputList.addAll(outList);
 
             return feat;
-        } else if (Oper.equals(WI_GetDevice)) {
+        } else if (Oper.equals(WI_GetDevice) || Oper.equals(WI_GetDeviceHDML)) {
 
             outputSt = SendSsnsWifi(LABURL, Oper, banid, uniquid, prodClass, serialid, Oper, inList);
             if (outputSt == null) {
