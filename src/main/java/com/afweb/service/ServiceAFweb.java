@@ -746,17 +746,17 @@ public class ServiceAFweb {
 
             } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
                 processFeatureApp();
-
-            } else if ((getServerObj().getProcessTimerCnt() % 7) == 0) {
-                //////require to save memory
-                System.gc();
-                //////require to save memory
-                processFeatureWifi();
                 // monitor
                 if (CKey.SQL_RemoveServerDB == true) {
                     SsnsRegression regression = new SsnsRegression();
                     regression.processMonitorTesting(this);
                 }
+            } else if ((getServerObj().getProcessTimerCnt() % 7) == 0) {
+                //////require to save memory
+                System.gc();
+                //////require to save memory
+                processFeatureWifi();
+
             } else if ((getServerObj().getProcessTimerCnt() % 6) == 0) {
                 processFeatureWLNPro();
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
@@ -3337,7 +3337,7 @@ public class ServiceAFweb {
                 SsnsService ss = new SsnsService();
                 String feat = "";
 
-                if (Oper.equals(SsnsService.WI_GetDevice) || Oper.equals(SsnsService.WI_GetDeviceStatus) 
+                if (Oper.equals(SsnsService.WI_GetDevice) || Oper.equals(SsnsService.WI_GetDeviceStatus)
                         || Oper.equals(SsnsService.WI_GetDeviceHDML)) {
                     feat = ss.TestFeatureSsnsProdWifi(ssnsAccObj, outputList, Oper, LABURL);
 //                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
