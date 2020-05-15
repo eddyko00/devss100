@@ -400,15 +400,15 @@ public class ServiceAFweb {
                     boolean procallflag = false;
                     if (procallflag == true) {
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
-                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
-                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_PRODUCT);
+                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
+                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
 
                         for (int i = 0; i < 100; i++) {
 //                            processFeatureQual();
 //                            processFeatureWLNPro();
 //                            processFeatureApp();
-                            processFeatureProd();
-//                            processFeatureWifi();
+//                            processFeatureProd();
+                            processFeatureWifi();
 //                            processFeatureTTVC();
                         }
                     }
@@ -3337,7 +3337,8 @@ public class ServiceAFweb {
                 SsnsService ss = new SsnsService();
                 String feat = "";
 
-                if (Oper.equals(SsnsService.WI_GetDevice) || Oper.equals(SsnsService.WI_GetDeviceStatus)) {
+                if (Oper.equals(SsnsService.WI_GetDevice) || Oper.equals(SsnsService.WI_GetDeviceStatus) 
+                        || Oper.equals(SsnsService.WI_GetDeviceHDML)) {
                     feat = ss.TestFeatureSsnsProdWifi(ssnsAccObj, outputList, Oper, LABURL);
 //                    logger.info("> getSsnsprodAppByIdRT " + Oper + " feat " + feat);
                     if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {

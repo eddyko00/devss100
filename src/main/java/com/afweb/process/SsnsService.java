@@ -69,7 +69,7 @@ public class SsnsService {
     public static String PROD_GET_PROD = "getProductList";
     public static String PROD_GET_BYID = "getProductById";
     public static String PROD_GET_CC = "CallControl";
-    public static String APP_FEATT_TYPE_CC = "CC";    
+    public static String APP_FEATT_TYPE_CC = "CC";
 
     public static String APP_FEAT_TYPE_APP = "APP";
     public static String APP_GET_APP = "getAppointment";
@@ -81,6 +81,7 @@ public class SsnsService {
     public static String WI_GetDeviceStatus = "getDeviceStatus";
     public static String WI_Callback = "callbackNotification";
     public static String WI_GetDevice = "getDevices";
+    public static String WI_GetDeviceHDML = "getDeviceshdml";
     public static String WI_config = "configureDeviceStatus";
 
     public static String APP_FEAT_TYPE_QUAL = "QUAL";
@@ -1401,6 +1402,8 @@ public class SsnsService {
                 cmd.add(WI_GetDevice);   // cmd
                 cmd.add("get wifi devicestatus");
                 cmd.add(WI_GetDeviceStatus);
+                cmd.add("get device (hdml) "); // description
+                cmd.add(WI_GetDeviceHDML);   // cmd                               
                 pData.setCmd(cmd);
             } else if (oper.equals(WI_config)) {
                 dataSt = dataObj.getData();
@@ -1439,6 +1442,8 @@ public class SsnsService {
                 cmd.add(WI_GetDevice);   // cmd
                 cmd.add("get wifi devicestatus");
                 cmd.add(WI_GetDeviceStatus);
+                cmd.add("get device (hdml) "); // description
+                cmd.add(WI_GetDeviceHDML);   // cmd                     
                 pData.setCmd(cmd);
             } else if (oper.equals(WI_Callback)) {//"cancelAppointment")) {
                 dataSt = dataObj.getData();
@@ -1889,6 +1894,9 @@ public class SsnsService {
         if (oper.equals(WI_GetDevice)) {
             url = ProductURL + "/v1/cmo/selfmgmt/wifimanagement/account/" + banid
                     + "/device";
+        } else if (oper.equals(WI_GetDeviceHDML)) {
+            url = ProductURL + "/v1/cmo/selfmgmt/wifimanagement/account/" + banid
+                    + "/device?source=hdml";
         } else if (oper.equals(WI_GetDeviceStatus)) {
 
             url = ProductURL + "/v1/cmo/selfmgmt/wifimanagement/account/" + banid
@@ -3058,7 +3066,7 @@ public class SsnsService {
                         String sys = CCparL[1];
                         String outputCCSt = SendSsnsCallControl(ServiceAFweb.URL_PRODUCT_PR, banid, phone, sys, null);
                         String featCC = parseCallControlFeature(outputCCSt, dataObj.getOper());
-                        down = featCC;                        
+                        down = featCC;
                     }
                     ///////////  
                 }
@@ -3080,7 +3088,7 @@ public class SsnsService {
             }
             logger.info("> updateSsnsProdiuctInventory feat " + feat);
             NAccObj.setName(feat);
-            NAccObj.setCusid(custId);            
+            NAccObj.setCusid(custId);
             NAccObj.setBanid(banid);
             NAccObj.setUid(dataObj.getUid());
             NAccObj.setApp(dataObj.getApp());
@@ -3157,7 +3165,7 @@ public class SsnsService {
                         String sys = CCparL[1];
                         String outputCCSt = SendSsnsCallControl(ServiceAFweb.URL_PRODUCT_PR, banid, phone, sys, null);
                         String featCC = parseCallControlFeature(outputCCSt, dataObj.getOper());
-                        down = featCC;                        
+                        down = featCC;
                     }
                     ///////////  
                 }
