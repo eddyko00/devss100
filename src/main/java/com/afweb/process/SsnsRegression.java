@@ -980,10 +980,11 @@ public class SsnsRegression {
             float execAvg = 0;
             int execSec = 0;
             if (Pass > 0) {
-                execAvg = exec / Pass / 1000;
+                execAvg = exec / Pass / 100;
                 execSec = (int) execAvg;
+                execAvg = execSec / 10;
             }
-            String reportLine = app + ",result," + "pass," + Pass + ",fail," + Fail + ",exec," + execSec + "(s)";
+            String reportLine = app + ",result," + "pass," + Pass + ",fail," + Fail + ",exec," + execAvg;
             overviewList.add(reportLine);
             testRList.add(reportLine);
             logger.info("getReportStat " + nameRepId + " " + reportLine);
