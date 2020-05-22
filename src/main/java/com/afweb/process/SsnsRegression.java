@@ -636,7 +636,7 @@ public class SsnsRegression {
                                         }
                                         String[] featL = feat.split(":");
                                         String[] nameL = featName.split(":");
-                                       
+
                                         if ((featL.length > 4) && (nameL.length > 4)) {
                                             if (!featL[2].equals(nameL[2])) {
                                                 passSt = R_FAIL;
@@ -978,10 +978,12 @@ public class SsnsRegression {
                 }
             }
             float execAvg = 0;
+            int execSec = 0;
             if (Pass > 0) {
-                execAvg = exec / Pass;
+                execAvg = exec / Pass / 1000;
+                execSec = (int) execAvg;
             }
-            String reportLine = app + ",result," + "pass," + Pass + ",fail," + Fail + ",exec," + execAvg;
+            String reportLine = app + ",result," + "pass," + Pass + ",fail," + Fail + ",exec," + execSec + "(s)";
             overviewList.add(reportLine);
             testRList.add(reportLine);
             logger.info("getReportStat " + nameRepId + " " + reportLine);
