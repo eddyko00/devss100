@@ -747,10 +747,8 @@ public class ServiceAFweb {
             } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
                 processFeatureApp();
                 // monitor
-                if (CKey.SQL_RemoveServerDB == true) {
-                    SsnsRegression regression = new SsnsRegression();
-                    regression.processMonitorTesting(this);
-                }
+                SsnsRegression regression = new SsnsRegression();
+                regression.processMonitorTesting(this);
             } else if ((getServerObj().getProcessTimerCnt() % 7) == 0) {
                 //////require to save memory
                 System.gc();
