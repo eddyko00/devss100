@@ -397,7 +397,7 @@ public class ServiceAFweb {
                     }
 /////////
 /////////                    
-                    boolean procallflag = true;
+                    boolean procallflag = false;
                     if (procallflag == true) {
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
@@ -710,7 +710,6 @@ public class ServiceAFweb {
                 if (CKey.NN_DEBUG == true) {
                     if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                         //10 Sec * 5 ~ 1 minutes
-
                     }
                 }
             }
@@ -762,7 +761,7 @@ public class ServiceAFweb {
                 processETL();
 
             } else if ((getServerObj().getProcessTimerCnt() % 2) == 0) {
-
+                processETL();
             } else {
 
             }
@@ -1349,9 +1348,9 @@ public class ServiceAFweb {
             FileUtil.FileDelete(file);
             return;
         }
-        
+
         String app = SsnsService.APP_QUAL; //;
-        file = FileLocalPath + app + "data.csv";        
+        file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             boolean ret = processETLsplunk(file, app, sizeTemp);
             if (ret == true) {
@@ -1388,7 +1387,7 @@ public class ServiceAFweb {
             }
             return;
         }
-        
+
         app = SsnsService.APP_PRODUCT;  //"product"
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
@@ -1417,7 +1416,7 @@ public class ServiceAFweb {
             }
             return;
         }
-        
+
         String appTTV = SsnsService.APP_TTVSUB;  //ttvsub"
         file = FileLocalPath + appTTV + "data.csv";
         if (FileUtil.FileTest(file) == true) {
