@@ -1526,6 +1526,10 @@ public class ServiceAFweb {
                     String inLine = spList[j];
                     if (j == 0) {
                         daSt = spList[j];
+                        if (inLine.equals("")) {
+                            daSt = spList[j+1];
+                        }
+          
                         daSt = replaceAll("\"[", "", daSt);
                         Calendar c = parseDateTimeTTV(daSt);
 
