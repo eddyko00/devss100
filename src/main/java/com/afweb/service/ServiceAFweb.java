@@ -397,18 +397,18 @@ public class ServiceAFweb {
                     }
 /////////
 /////////                    
-                    boolean procallflag = false;
+                    boolean procallflag = true;
                     if (procallflag == true) {
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
-                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
-                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
 
                         for (int i = 0; i < 100; i++) {
 //                            processFeatureQual();
 //                            processFeatureWLNPro();
-//                            processFeatureApp();
+                            processFeatureApp();
 //                            processFeatureProd();
-                            processFeatureWifi();
+//                            processFeatureWifi();
 //                            processFeatureTTVC();
                         }
                     }
@@ -1349,10 +1349,11 @@ public class ServiceAFweb {
             FileUtil.FileDelete(file);
             return;
         }
+        
         String app = SsnsService.APP_QUAL; //;
-        file = FileLocalPath + app + "data.csv";
+        file = FileLocalPath + app + "data.csv";        
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunk(app, sizeTemp);
+            boolean ret = processETLsplunk(file, app, sizeTemp);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
@@ -1362,7 +1363,7 @@ public class ServiceAFweb {
         app = SsnsService.APP_WLNPRO; //;
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunkWLNPro(app, sizeTemp * 2);
+            boolean ret = processETLsplunkWLNPro(file, app, sizeTemp * 2);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
@@ -1370,19 +1371,28 @@ public class ServiceAFweb {
         }
 
         app = SsnsService.APP_WIFI; //"wifi";
-        file = FileLocalPath + app + "data.csv";
+        file = FileLocalPath + app + "data_config.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunk(app, sizeTemp);
+            boolean ret = processETLsplunk(file, app, sizeTemp);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
             return;
         }
-
+        app = SsnsService.APP_WIFI; //"wifi";
+        file = FileLocalPath + app + "data_all.csv";
+        if (FileUtil.FileTest(file) == true) {
+            boolean ret = processETLsplunk(file, app, sizeTemp);
+            if (ret == true) {
+                FileUtil.FileDelete(file);
+            }
+            return;
+        }
+        
         app = SsnsService.APP_PRODUCT;  //"product"
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunk(app, sizeTemp);
+            boolean ret = processETLsplunk(file, app, sizeTemp);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
@@ -1390,19 +1400,28 @@ public class ServiceAFweb {
         }
 
         app = SsnsService.APP_APP;  //"appointment"
-        file = FileLocalPath + app + "data.csv";
+        file = FileLocalPath + app + "data_update.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunk(app, sizeTemp);
+            boolean ret = processETLsplunk(file, app, sizeTemp);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
             return;
         }
-
+        app = SsnsService.APP_APP;  //"appointment"
+        file = FileLocalPath + app + "data_all.csv";
+        if (FileUtil.FileTest(file) == true) {
+            boolean ret = processETLsplunk(file, app, sizeTemp);
+            if (ret == true) {
+                FileUtil.FileDelete(file);
+            }
+            return;
+        }
+        
         String appTTV = SsnsService.APP_TTVSUB;  //ttvsub"
         file = FileLocalPath + appTTV + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunkTTV(appTTV, sizeTemp);
+            boolean ret = processETLsplunkTTV(file, appTTV, sizeTemp);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
@@ -1412,7 +1431,7 @@ public class ServiceAFweb {
         appTTV = SsnsService.APP_TTVREQ; //"ttvreq";
         file = FileLocalPath + appTTV + "data.csv";
         if (FileUtil.FileTest(file) == true) {
-            boolean ret = processETLsplunkTTV(appTTV, sizeTemp);
+            boolean ret = processETLsplunkTTV(file, appTTV, sizeTemp);
             if (ret == true) {
                 FileUtil.FileDelete(file);
             }
@@ -1453,7 +1472,7 @@ public class ServiceAFweb {
 
     }
 
-    public boolean processETLsplunkTTV(String app, int length) {
+    public boolean processETLsplunkTTV(String file, String app, int length) {
 
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
@@ -1466,7 +1485,6 @@ public class ServiceAFweb {
             return false;
         }
 
-        String file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == false) {
             logger.info("> No File exist " + file);
             return false;
@@ -1682,7 +1700,7 @@ public class ServiceAFweb {
 
     }
 
-    public boolean processETLsplunkWLNPro(String app, int length) {
+    public boolean processETLsplunkWLNPro(String file, String app, int length) {
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
         String LockName = "ETL_" + app;
@@ -1694,7 +1712,6 @@ public class ServiceAFweb {
             return false;
         }
 
-        String file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == false) {
             logger.info("> No File exist " + file);
             return false;
@@ -1885,7 +1902,7 @@ public class ServiceAFweb {
         return true;
     }
 
-    public boolean processETLsplunk(String app, int length) {
+    public boolean processETLsplunk(String file, String app, int length) {
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long lockDateValue = dateNow.getTimeInMillis();
         String LockName = "ETL_" + app;
@@ -1897,7 +1914,6 @@ public class ServiceAFweb {
             return false;
         }
 
-        String file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == false) {
             logger.info("> No File exist " + file);
             return false;
