@@ -399,7 +399,7 @@ public class ServiceAFweb {
                     }
 /////////
 /////////                    
-                    boolean procallflag = true;
+                    boolean procallflag = false;
                     if (procallflag == true) {
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
