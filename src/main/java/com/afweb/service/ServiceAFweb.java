@@ -373,9 +373,11 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////
                     boolean clearssnsflag = false;
                     if (clearssnsflag == true) {
-                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
-                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
+                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_QUAL);
+                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_QUAL);
 
+//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
 //                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_APP);
@@ -397,16 +399,16 @@ public class ServiceAFweb {
                     }
 /////////
 /////////                    
-                    boolean procallflag = false;
+                    boolean procallflag = true;
                     if (procallflag == true) {
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_APP);
 
                         for (int i = 0; i < 100; i++) {
-//                            processFeatureQual();
+                            processFeatureQual();
 //                            processFeatureWLNPro();
-                            processFeatureApp();
+//                            processFeatureApp();
 //                            processFeatureProd();
 //                            processFeatureWifi();
 //                            processFeatureTTVC();
@@ -751,7 +753,7 @@ public class ServiceAFweb {
                 System.gc();
                 //////require to save memory
                 processFeatureWifi();
-
+                processFeatureQual();
             } else if ((getServerObj().getProcessTimerCnt() % 6) == 0) {
                 processFeatureWLNPro();
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
@@ -913,7 +915,7 @@ public class ServiceAFweb {
                 return 0;
             }
 
-            logger.info("processFeatureApp for 2 minutes size " + qualNameArray.size());
+            logger.info("processFeature Qual for 2 minutes size " + qualNameArray.size());
 
             long currentTime = System.currentTimeMillis();
             long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
@@ -987,7 +989,7 @@ public class ServiceAFweb {
                 return 0;
             }
 
-            logger.info("processFeatureApp for 2 minutes size " + wlnproNameArray.size());
+            logger.info("processFeature WLNPro for 2 minutes size " + wlnproNameArray.size());
 
             long currentTime = System.currentTimeMillis();
             long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
@@ -1061,7 +1063,7 @@ public class ServiceAFweb {
                 return 0;
             }
 
-            logger.info("processFeatureApp for 2 minutes size " + wifiNameArray.size());
+            logger.info("processFeature Wifi for 2 minutes size " + wifiNameArray.size());
 
             long currentTime = System.currentTimeMillis();
             long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
@@ -1141,7 +1143,7 @@ public class ServiceAFweb {
                 return 0;
             }
 
-            logger.info("processFeatureApp for 2 minutes size " + ttvcNameArray.size());
+            logger.info("processFeature TTV for 2 minutes size " + ttvcNameArray.size());
 
             long currentTime = System.currentTimeMillis();
             long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
@@ -1215,7 +1217,7 @@ public class ServiceAFweb {
                 return 0;
             }
 
-            logger.info("processFeatureApp for 2 minutes size " + appNameArray.size());
+            logger.info("processFeature App for 2 minutes size " + appNameArray.size());
 
             long currentTime = System.currentTimeMillis();
             long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
@@ -1289,7 +1291,7 @@ public class ServiceAFweb {
                 return 0;
             }
 
-            logger.info("processFeatureProd for 2 minutes size " + prodNameArray.size());
+            logger.info("processFeature Prod for 2 minutes size " + prodNameArray.size());
 
             long currentTime = System.currentTimeMillis();
             long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
@@ -1527,9 +1529,9 @@ public class ServiceAFweb {
                     if (j == 0) {
                         daSt = spList[j];
                         if (inLine.equals("")) {
-                            daSt = spList[j+1];
+                            daSt = spList[j + 1];
                         }
-          
+
                         daSt = replaceAll("\"[", "", daSt);
                         Calendar c = parseDateTimeTTV(daSt);
 
