@@ -56,6 +56,7 @@ public class SsnsService {
     public static String APP_TTVC = "ttv";
     public static String APP_WLNPRO = "wlnpro";
     public static String APP_QUAL = "qual";
+    public static String APP_CALLC = "call";
 
     public static String APP_TTVSUB = "ttvsub";  // ETL name
     public static String APP_TTVREQ = "ttvreq";  // ETL name
@@ -87,8 +88,12 @@ public class SsnsService {
     public static String APP_FEAT_TYPE_QUAL = "QUAL";
     public static String QUAL_AVAL = "availability";
     public static String QUAL_MATCH = "address_matches";
-//
 
+    public static String CALLC_GET = "getCallControl";
+    public static String CALLC_UPDATE = "updateCallControl";
+    public static String CALLC_RESET = "resetCallFeature";
+
+//
     public static String APP_FEAT_TYPE_TTVCL = "TTVCL";
     public static String TT_GetSub = "getCustomerTvSubscription";
     public static String TT_Vadulate = "validateWithAuth";
@@ -426,6 +431,321 @@ public class SsnsService {
         }
 
         return "";
+    }
+
+    ////////////////////////////////////////////
+    public String getFeatureSsnsCallC(SsnsData dataObj) {
+        String feat = "";
+        try {
+            feat = getFeatureSsnsCallCProcess(dataObj);
+        } catch (Exception ex) {
+            logger.info("> getFeatureSsnsCallC Exception " + ex.getMessage());
+        }
+        getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+        return feat;
+    }
+
+    public String getFeatureSsnsCallCProcess(SsnsData dataObj) {
+        ProductData pData = new ProductData();
+        ArrayList<String> cmd = new ArrayList();
+        if (dataObj == null) {
+            return "";
+        }
+
+        String appTId = "";
+        String banid = "";
+        String phone = "";
+        String host = "";
+        String dataSt = "";
+        String postParm = "";
+
+        try {
+            String oper = dataObj.getOper();
+            if (oper.equals(CALLC_UPDATE)) {
+                dataSt = dataObj.getData();
+                dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+                String[] operList = dataSt.split(",");
+                if (operList.length > 1) {
+                    phone = operList[0];
+                    // search call control with phone to find the ban
+
+                    if (operList.length > 5) {
+                        dataSt = dataObj.getData();
+
+                        int beg = dataSt.indexOf("{");
+                        if (beg != -1) {
+                            postParm = dataSt.substring(beg);
+                            postParm += "}}]}";
+                            //"callerList":[{"callerName":","phoneNumber":"355692727113"} error at :", 
+                            postParm = ServiceAFweb.replaceAll(":\",", ":\" \",", postParm);
+
+                            ////find ban from phone nubmer                            
+                            ////assume Get call control has the Ban for this number 
+                            ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByOperCustId(CALLC_GET, phone);
+                            if (ssnsAccObjList != null) {
+                                if (ssnsAccObjList.size() > 0) {
+                                    SsnsAcc acc = ssnsAccObjList.get(0);
+                                    banid = acc.getBanid();
+                                    host = acc.getRet();
+                                }
+                            }
+                        }
+                    }
+                    cmd.add("get call control");
+                    cmd.add(CALLC_GET);
+                    pData.setCmd(cmd);
+                }
+            } else if (oper.equals(CALLC_GET)) { //"getAppointment")) {
+                dataSt = dataObj.getData();
+                dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+                String[] operList = dataSt.split(",");
+                if (operList.length > 3) {
+                    phone = operList[0];
+                    banid = operList[1];
+                    host = operList[2];
+                }
+                cmd.add("get call control");
+                cmd.add(CALLC_GET);
+                pData.setCmd(cmd);
+
+            } else {
+                logger.info("> getFeatureSsnsCallCProcess Other oper " + oper);
+            }
+            if (oper.equals(CALLC_GET)) {
+                // for testing ignore APP_GET_APP becase alwasy no info
+//                return "";
+                // for testing
+            } else if (oper.equals(CALLC_UPDATE)) {
+
+            } else {
+                logger.info(dataSt);
+            }
+//            logger.info(dataSt);
+/////////////
+            SsnsAcc NAccObj = new SsnsAcc();
+            NAccObj.setDown("splunkflow");
+
+            boolean stat = this.updateSsnsCallC(oper, postParm, banid, phone, host, pData, dataObj, NAccObj);
+            if (stat == true) {
+//                if (devOPflag == 1) {
+//                    String feat = NAccObj.getName() + ":TicktoCust";
+//                    NAccObj.setName(feat);
+//                }
+                boolean exist = false;
+                String key = NAccObj.getName()
+                        + NAccObj.getCusid()
+                        + NAccObj.getBanid()
+                        + NAccObj.getTiid();
+                key = key.replaceAll(NAccObj.getUid(), "");
+                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                if (set.add(key)) {
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() != 0) {
+                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                            if (ssnsObj.getDown().equals("splunkflow")) {
+                                exist = true;
+                            }
+                        }
+                    }
+                }
+
+                if (exist == false) {
+                    ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByTiid(NAccObj.getName(), NAccObj.getTiid());
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() > 3) {
+                            exist = true;
+                        }
+                    }
+                }
+                if (exist == false) {
+                    int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
+                }
+
+            }
+            return NAccObj.getName();
+        } catch (Exception ex) {
+            logger.info("> getFeatureSsnsCallCProcess Exception " + ex.getMessage());
+        }
+        return "";
+    }
+
+    public boolean updateSsnsCallC(String oper, String postParm, String banid, String phone, String host, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
+        try {
+            String featTTV = "";
+            String outputSt = null;
+            if (oper.equals(CALLC_GET) || oper.equals(CALLC_UPDATE)) {
+                if ((banid.length() == 0) || (phone.length() == 0)) {
+                    return false;
+                }
+
+                outputSt = SendSsnsCallControl(ServiceAFweb.URL_PRODUCT_PR, banid, phone, host, null);
+                if (outputSt == null) {
+                    return false;
+                }
+                if (outputSt.length() < 80) {
+                    // special case for no appointment {"status":{"statusCd":"200","statusTxt":"OK"},"appointmentList":[]}
+                    return false;
+                }
+                if (outputSt.indexOf("responseCode:400500") != -1) {
+                    return false;
+                }
+                featTTV = parseCallControlFeature(outputSt, oper, host);
+
+            } else {
+                return false;
+            }
+
+//            logger.info("> updateSsnsCallC feat " + featTTV);
+            if (NAccObj.getDown().equals("splunkflow")) {
+
+                ArrayList<String> flow = new ArrayList();
+                int faulure = getSsnsFlowTrace(dataObj, flow);
+                if (flow == null) {
+                    logger.info("> updateSsnsCallC skip no flow");
+                    return false;
+                }
+                pData.setFlow(flow);
+
+                if (faulure == 1) {
+                    featTTV += ":splunkfailed";
+                }
+            }
+            logger.info("> updateSsnsCallC feat " + featTTV);
+            pData.setPostParam(postParm);
+            NAccObj.setName(featTTV);
+            NAccObj.setBanid(banid);
+            NAccObj.setCusid(phone);
+            NAccObj.setUid(dataObj.getUid());
+            NAccObj.setApp(dataObj.getApp());
+            NAccObj.setOper(oper);
+
+//          NAccObj.setDown(""); // set by NAccObj
+            NAccObj.setRet(host);
+            NAccObj.setExec(dataObj.getExec());
+
+            String nameSt = new ObjectMapper().writeValueAsString(pData);
+            NAccObj.setData(nameSt);
+
+            NAccObj.setUpdatedatel(dataObj.getUpdatedatel());
+            NAccObj.setUpdatedatedisplay(new java.sql.Date(dataObj.getUpdatedatel()));
+
+            return true;
+        } catch (Exception ex) {
+            logger.info("> updateSsnsCallC Exception " + ex.getMessage());
+        }
+        return false;
+    }
+
+    public String TestFeatureSsnsProdCallC(SsnsAcc dataObj, ArrayList<String> outputList, String Oper, String LABURL) {
+        if (dataObj == null) {
+            return "";
+        }
+        if (LABURL.length() == 0) {
+            LABURL = ServiceAFweb.URL_PRODUCT_PR;
+        }
+        dataObj.getData();
+        String banid = dataObj.getBanid();
+        String appTId = dataObj.getTiid();
+        String cust = dataObj.getCusid();
+        String host = dataObj.getRet();
+        String outputSt = null;
+        ArrayList<String> inList = new ArrayList();
+        if (Oper.equals(APP_GET_APP)) {
+
+            outputSt = SendSsnsAppointmentGetApp(LABURL, appTId, banid, cust, host, inList);
+            if (outputSt == null) {
+                return "";
+            }
+            ////special char #, need to ignore for this system
+            outputSt = outputSt.replaceAll("#", "");
+            outputSt = outputSt.replaceAll("~", "");
+            outputSt = outputSt.replaceAll("^", "");
+
+            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+            String feat = parseAppointmentFeature(outputSt, Oper);
+            if (outputSt.indexOf("responseCode:400500") != -1) {
+                feat += ":testfailed";
+            }
+            outputList.add(feat);
+            outputList.addAll(inList);
+            outputList.addAll(outList);
+
+            return feat;
+        } else if (Oper.equals(APP_GET_TIMES)) {
+            outputSt = SendSsnsAppointmentGetTimeslot(LABURL, appTId, banid, cust, host, inList);
+            if (outputSt == null) {
+                return "";
+            }
+            ////special char #, need to ignore for this system
+            outputSt = outputSt.replaceAll("#", "");
+            outputSt = outputSt.replaceAll("~", "");
+            outputSt = outputSt.replaceAll("^", "");
+
+            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+            String feat = parseAppointmentTimeSlotFeature(outputSt, Oper, host);
+
+            if (outputSt.indexOf("responseCode:400500") != -1) {
+                feat += ":testfailed";
+            }
+            outputList.add(feat);
+            outputList.addAll(inList);
+            outputList.addAll(outList);
+            return feat;
+        }
+
+        return "";
+    }
+
+    public String SendSsnsCallCApp(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
+        if (host.length() > 0) {
+            host = host.replace("9", ""); // remove OMS9
+            host = host.replace("6", ""); // remove OMS9
+        }
+        String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/appointment?customerid=" + cust;
+        if (banid.length() > 0) {
+            url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=" + banid + "&customerid=" + cust;
+            if (host.length() > 0) {
+                url += "&appointmentlist.hostsystemcd.in=" + host;
+            }
+        }
+        try {
+            if (inList != null) {
+                inList.add(url);
+            }
+            // calculate elapsed time in milli seconds
+            long startTime = TimeConvertion.currentTimeMillis();
+
+            String output = this.sendRequest_Ssns(METHOD_GET, url, null, null, null);
+
+            long endTime = TimeConvertion.currentTimeMillis();
+            long elapsedTime = endTime - startTime;
+//            System.out.println("Elapsed time in milli seconds: " + elapsedTime);
+            if (inList != null) {
+                String tzid = "America/New_York"; //EDT
+                TimeZone tz = TimeZone.getTimeZone(tzid);
+                Date d = new Date(startTime);
+                // timezone symbol (z) included in the format pattern 
+                DateFormat format = new SimpleDateFormat("M/dd/yyyy hh:mm a z");
+                // format date in target timezone
+                format.setTimeZone(tz);
+                String ESTdate = format.format(d);
+
+                inList.add(ESTdate + " elapsedTime:" + elapsedTime);
+                inList.add("output:");
+            }
+            return output;
+        } catch (Exception ex) {
+            logger.info("> SsnsAppointment exception " + ex.getMessage());
+        }
+        return null;
     }
 
 ////////////////////////////////////////////    
@@ -1617,7 +1937,8 @@ public class SsnsService {
             pData.setPostParam(postParm);
             NAccObj.setName(featTTV);
             NAccObj.setBanid(banid);
-            NAccObj.setCusid(dataObj.getCusid());
+//            NAccObj.setCusid(dataObj.getCusid());
+            NAccObj.setCusid(serialid);  // try to find out if duplicate BAN with the same SerialID
 
             String deviceInfo = uniquid + ":" + prodClass + ":" + serialid + ":" + parm + ":end";
             NAccObj.setTiid(deviceInfo);
@@ -2723,18 +3044,11 @@ public class SsnsService {
             LABURL = ServiceAFweb.URL_PRODUCT_PR;
         }
         String banid = dataObj.getBanid();
-
-        String appTId = dataObj.getCusid();
-        if (appTId.length() == 0) {
-            return "";
-        }
-        String CCparL[] = appTId.split(":");
-
-        String phone = CCparL[0];
-        String sys = CCparL[1];
+        String phone = dataObj.getCusid();
+        String host = dataObj.getRet();
 
         ArrayList<String> inList = new ArrayList();
-        String outputSt = SendSsnsCallControl(LABURL, banid, phone, sys, inList);
+        String outputSt = SendSsnsCallControl(LABURL, banid, phone, host, inList);
         if (outputSt == null) {
             return "";
         }
@@ -2745,7 +3059,49 @@ public class SsnsService {
         outputSt = outputSt.replaceAll("^", "");
         ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
 
-        featTTV = parseCallControlFeature(outputSt, oper);
+        featTTV = parseCallControlFeature(outputSt, oper, host);
+
+        if (outputSt.indexOf("responseCode:400500") != -1) {
+            featTTV += ":testfailed";
+        }
+        outputList.add(featTTV);
+        outputList.addAll(inList);
+        outputList.addAll(outList);
+
+        return featTTV;
+    }
+
+    public String TestFeatureSsnsCallControlFromProdInv(SsnsAcc dataObj, ArrayList<String> outputList, String oper, String LABURL) {
+        if (dataObj == null) {
+            return "";
+        }
+        if (LABURL.length() == 0) {
+            LABURL = ServiceAFweb.URL_PRODUCT_PR;
+        }
+        String banid = dataObj.getBanid();
+
+        String appTId = dataObj.getCusid();
+        if (appTId.length() == 0) {
+            return "";
+        }
+        String CCparL[] = appTId.split(":");
+
+        String phone = CCparL[0];
+        String host = CCparL[1];
+
+        ArrayList<String> inList = new ArrayList();
+        String outputSt = SendSsnsCallControl(LABURL, banid, phone, host, inList);
+        if (outputSt == null) {
+            return "";
+        }
+        String featTTV = "";
+        ////special char #, need to ignore for this system
+        outputSt = outputSt.replaceAll("#", "");
+        outputSt = outputSt.replaceAll("~", "");
+        outputSt = outputSt.replaceAll("^", "");
+        ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+
+        featTTV = parseCallControlFeature(outputSt, oper, host);
 
         if (outputSt.indexOf("responseCode:400500") != -1) {
             featTTV += ":testfailed";
@@ -3040,34 +3396,34 @@ public class SsnsService {
                 if (returnParm.size() > 0) {
                     custId = (String) returnParm.get(0);
                     //////////
-                    if (feat.indexOf("noCallControl") == -1) {
-                        if (feat.indexOf("fifa") != -1) {
-                            custId += ":FIFA";
-                            custId += ":VoiceMail";
-                            ArrayList cmd = new ArrayList();
-                            cmd = pData.getCmd();
-                            cmd.add("get Call control"); // description
-                            cmd.add(PROD_GET_CC); // cmd
-                            pData.setCmd(cmd);
-                        } else {
-                            custId += ":COMPASS";
-                            if (feat.indexOf("VoiceMail") != -1) {
-                                custId += ":VoiceMail";
-                            }
-                            ArrayList cmd = new ArrayList();
-                            cmd = pData.getCmd();
-                            cmd.add("get Call control"); // description
-                            cmd.add(PROD_GET_CC); // cmd
-                            pData.setCmd(cmd);
-                        }
-                        String CCparL[] = custId.split(":");
-
-                        String phone = CCparL[0];
-                        String sys = CCparL[1];
-                        String outputCCSt = SendSsnsCallControl(ServiceAFweb.URL_PRODUCT_PR, banid, phone, sys, null);
-                        String featCC = parseCallControlFeature(outputCCSt, dataObj.getOper());
-                        down = featCC;
-                    }
+//                    if (feat.indexOf("noCallControl") == -1) {
+//                        if (feat.indexOf("fifa") != -1) {
+//                            custId += ":FIFA";
+//                            custId += ":VoiceMail";
+//                            ArrayList cmd = new ArrayList();
+//                            cmd = pData.getCmd();
+//                            cmd.add("get Call control"); // description
+//                            cmd.add(PROD_GET_CC); // cmd
+//                            pData.setCmd(cmd);
+//                        } else {
+//                            custId += ":COMPASS";
+//                            if (feat.indexOf("VoiceMail") != -1) {
+//                                custId += ":VoiceMail";
+//                            }
+//                            ArrayList cmd = new ArrayList();
+//                            cmd = pData.getCmd();
+//                            cmd.add("get Call control"); // description
+//                            cmd.add(PROD_GET_CC); // cmd
+//                            pData.setCmd(cmd);
+//                        }
+//                        String CCparL[] = custId.split(":");
+//
+//                        String phone = CCparL[0];
+//                        String sys = CCparL[1];
+//                        String outputCCSt = SendSsnsCallControl(ServiceAFweb.URL_PRODUCT_PR, banid, phone, sys, null);
+//                        String featCC = parseCallControlFeature(outputCCSt, dataObj.getOper());
+//                        down = featCC;
+//                    }
                     ///////////  
                 }
 
@@ -3139,34 +3495,34 @@ public class SsnsService {
                 if (returnParm.size() > 0) {
                     custId = (String) returnParm.get(0);
                     //////////
-                    if (feat.indexOf("noCallControl") == -1) {
-                        if (feat.indexOf("fifa") != -1) {
-                            custId += ":FIFA";
-                            custId += ":VoiceMail";
-                            ArrayList cmd = new ArrayList();
-                            cmd = pData.getCmd();
-                            cmd.add("get Call control"); // description
-                            cmd.add(PROD_GET_CC); // cmd
-                            pData.setCmd(cmd);
-                        } else {
-                            custId += ":COMPASS";
-                            if (feat.indexOf("VoiceMail") != -1) {
-                                custId += ":VoiceMail";
-                            }
-                            ArrayList cmd = new ArrayList();
-                            cmd = pData.getCmd();
-                            cmd.add("get Call control"); // description
-                            cmd.add(PROD_GET_CC); // cmd
-                            pData.setCmd(cmd);
-                        }
-                        String CCparL[] = custId.split(":");
-
-                        String phone = CCparL[0];
-                        String sys = CCparL[1];
-                        String outputCCSt = SendSsnsCallControl(ServiceAFweb.URL_PRODUCT_PR, banid, phone, sys, null);
-                        String featCC = parseCallControlFeature(outputCCSt, dataObj.getOper());
-                        down = featCC;
-                    }
+//                    if (feat.indexOf("noCallControl") == -1) {
+//                        if (feat.indexOf("fifa") != -1) {
+//                            custId += ":FIFA";
+//                            custId += ":VoiceMail";
+//                            ArrayList cmd = new ArrayList();
+//                            cmd = pData.getCmd();
+//                            cmd.add("get Call control"); // description
+//                            cmd.add(PROD_GET_CC); // cmd
+//                            pData.setCmd(cmd);
+//                        } else {
+//                            custId += ":COMPASS";
+//                            if (feat.indexOf("VoiceMail") != -1) {
+//                                custId += ":VoiceMail";
+//                            }
+//                            ArrayList cmd = new ArrayList();
+//                            cmd = pData.getCmd();
+//                            cmd.add("get Call control"); // description
+//                            cmd.add(PROD_GET_CC); // cmd
+//                            pData.setCmd(cmd);
+//                        }
+//                        String CCparL[] = custId.split(":");
+//
+//                        String phone = CCparL[0];
+//                        String sys = CCparL[1];
+//                        String outputCCSt = SendSsnsCallControl(ServiceAFweb.URL_PRODUCT_PR, banid, phone, sys, null);
+//                        String featCC = parseCallControlFeature(outputCCSt, dataObj.getOper());
+//                        down = featCC;
+//                    }
                     ///////////  
                 }
             }
@@ -3403,7 +3759,7 @@ public class SsnsService {
         return "";
     }
 
-    public static String parseCallControlFeature(String outputSt, String oper) {
+    public static String parseCallControlFeature(String outputSt, String oper, String host) {
 
         if (outputSt == null) {
             return "";
@@ -3453,7 +3809,7 @@ public class SsnsService {
             }
 
             String featTTV = APP_FEATT_TYPE_CC;
-            featTTV += ":" + oper;
+            featTTV += ":" + oper + ":" + host;
             featTTV += ":" + whiteList;
             featTTV += ":" + blackList;
             featTTV += ":" + spamOn;
@@ -3812,7 +4168,9 @@ public class SsnsService {
 
     public String SendSsnsCallControl(String ProductURL, String ban, String phoneNum, String sys, ArrayList<String> inList) {
         String url = "";
-
+        if ((ban.length() == 0) || (phoneNum.length() == 0) || (sys.length() == 0)) {
+            return null;
+        }
         url = ProductURL + "/v1/cmo/selfmgmt/callcontrolmanagement/callcontrol/" + phoneNum
                 + "?relatedpartylist.id=" + ban
                 + "&characteristiclist.system=" + sys;

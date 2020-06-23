@@ -403,10 +403,11 @@ public class ServiceAFweb {
                     if (procallflag == true) {
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_APP);
 
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_CALLC);
                         for (int i = 0; i < 100; i++) {
-                            processFeatureQual();
+//                            processFeatureQual();
+                            processFeatureCallC();
 //                            processFeatureWLNPro();
 //                            processFeatureApp();
 //                            processFeatureProd();
@@ -742,6 +743,7 @@ public class ServiceAFweb {
             }
             if ((getServerObj().getProcessTimerCnt() % 13) == 0) {
                 processFeatureProd();
+                processFeatureCallC();
 
             } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
                 processFeatureApp();
@@ -937,6 +939,80 @@ public class ServiceAFweb {
                 int id = Integer.parseInt(idSt);
                 SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
                 String feature = ss.getFeatureSsnsQual(data);
+//                logger.info("> feature " + i + " " + feature);
+
+                AFSleep();
+            }
+        } catch (Exception ex) {
+        }
+        removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
+        return result;
+
+    }
+
+/////////////////////////////////
+    ArrayList<String> getAllOpenCallCArray() {
+        String app = SsnsService.APP_CALLC;
+        String ret = "parameter";
+        int status = ConstantKey.OPEN;
+        return getSsnsDataImp().getSsnsDataIDList(app, ret, status, 15);
+    }
+
+    ArrayList<String> callCNameArray = new ArrayList();
+
+    private ArrayList updateCallCNameArray() {
+        if (callCNameArray != null && callCNameArray.size() > 0) {
+            return callCNameArray;
+        }
+        ArrayList ttvNameArrayTemp = getAllOpenCallCArray();
+        if (ttvNameArrayTemp != null) {
+            callCNameArray = ttvNameArrayTemp;
+        }
+        return callCNameArray;
+    }
+
+    public int processFeatureCallC() {
+
+        updateCallCNameArray();
+        if ((callCNameArray == null) || (callCNameArray.size() == 0)) {
+            return 0;
+        }
+        int result = 0;
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        long lockDateValue = dateNow.getTimeInMillis();
+        String LockName = "ETL_" + SsnsService.APP_CALLC;
+
+        try {
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processFeatureWifi");
+            if (CKey.NN_DEBUG == true) {
+                lockReturn = 1;
+            }
+            if (lockReturn == 0) {
+                return 0;
+            }
+
+            logger.info("processFeature CallC for 2 minutes size " + callCNameArray.size());
+
+            long currentTime = System.currentTimeMillis();
+            long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
+
+            for (int i = 0; i < 5; i++) {
+                currentTime = System.currentTimeMillis();
+//                if (CKey.NN_DEBUG != true) {
+                if (lockDate1Min < currentTime) {
+                    break;
+                }
+//                }
+                if (callCNameArray.size() == 0) {
+                    break;
+                }
+
+                String idSt = (String) callCNameArray.get(0);
+                callCNameArray.remove(0);
+                SsnsService ss = new SsnsService();
+                int id = Integer.parseInt(idSt);
+                SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
+                String feature = ss.getFeatureSsnsCallC(data);
 //                logger.info("> feature " + i + " " + feature);
 
                 AFSleep();
@@ -1352,6 +1428,15 @@ public class ServiceAFweb {
         }
 
         String app = SsnsService.APP_QUAL; //;
+        file = FileLocalPath + app + "data.csv";
+        if (FileUtil.FileTest(file) == true) {
+            boolean ret = processETLsplunk(file, app, sizeTemp);
+            if (ret == true) {
+                FileUtil.FileDelete(file);
+            }
+            return;
+        }
+        app = SsnsService.APP_CALLC; //;
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             boolean ret = processETLsplunk(file, app, sizeTemp);
@@ -2085,33 +2170,33 @@ public class ServiceAFweb {
                 }
 
                 SsnsData item = new SsnsData();
-                if (oper.equals(SsnsService.APP_GET_APP) || oper.equals(SsnsService.APP_CAN_APP) || oper.equals(SsnsService.APP_GET_TIMES) || oper.equals(SsnsService.APP_UPDATE)) {
-                    if (app.equals(SsnsService.APP_APP) == false) {
-                        logger.info("Wrong data file " + app + " detected:" + SsnsService.APP_APP);
-                        return true;
-                    }
-                    app = SsnsService.APP_APP;
-                } else if (oper.equals(SsnsService.PROD_GET_BYID) || oper.equals(SsnsService.PROD_GET_PROD)) {
-                    if (app.equals(SsnsService.APP_PRODUCT) == false) {
-                        logger.info("Wrong data file " + app + " detected:" + SsnsService.APP_PRODUCT);
-                        return true;
-                    }
-                    app = SsnsService.APP_PRODUCT;
-                } else if (oper.equals(SsnsService.WI_GetDeviceStatus) || oper.equals(SsnsService.WI_Callback) || oper.equals(SsnsService.WI_GetDevice) || oper.equals(SsnsService.WI_config)) {
-                    if (app.equals(SsnsService.APP_WIFI) == false) {
-                        logger.info("Wrong data file " + app + " detected:" + SsnsService.APP_WIFI);
-                        return true;
-                    }
-                    app = SsnsService.APP_WIFI;
-                } else if (oper.equals(SsnsService.QUAL_AVAL) || oper.equals(SsnsService.QUAL_MATCH)) {
-                    if (app.equals(SsnsService.APP_QUAL) == false) {
-                        logger.info("Wrong data file " + app + " detected:" + SsnsService.APP_QUAL);
-                        return true;
-                    }
-                    app = SsnsService.APP_QUAL;
-                } else {
-                    continue;
-                }
+//                if (oper.equals(SsnsService.APP_GET_APP) || oper.equals(SsnsService.APP_CAN_APP) || oper.equals(SsnsService.APP_GET_TIMES) || oper.equals(SsnsService.APP_UPDATE)) {
+//                    if (app.equals(SsnsService.APP_APP) == false) {
+//                        logger.info("Wrong data file " + app + " detected:" + SsnsService.APP_APP);
+//                        return true;
+//                    }
+//                    app = SsnsService.APP_APP;
+//                } else if (oper.equals(SsnsService.PROD_GET_BYID) || oper.equals(SsnsService.PROD_GET_PROD)) {
+//                    if (app.equals(SsnsService.APP_PRODUCT) == false) {
+//                        logger.info("Wrong data file " + app + " detected:" + SsnsService.APP_PRODUCT);
+//                        return true;
+//                    }
+//                    app = SsnsService.APP_PRODUCT;
+//                } else if (oper.equals(SsnsService.WI_GetDeviceStatus) || oper.equals(SsnsService.WI_Callback) || oper.equals(SsnsService.WI_GetDevice) || oper.equals(SsnsService.WI_config)) {
+//                    if (app.equals(SsnsService.APP_WIFI) == false) {
+//                        logger.info("Wrong data file " + app + " detected:" + SsnsService.APP_WIFI);
+//                        return true;
+//                    }
+//                    app = SsnsService.APP_WIFI;
+//                } else if (oper.equals(SsnsService.QUAL_AVAL) || oper.equals(SsnsService.QUAL_MATCH)) {
+//                    if (app.equals(SsnsService.APP_QUAL) == false) {
+//                        logger.info("Wrong data file " + app + " detected:" + SsnsService.APP_QUAL);
+//                        return true;
+//                    }
+//                    app = SsnsService.APP_QUAL;
+//                } else {
+//                    continue;
+//                }
 
                 item.setUid(tran);
                 item.setApp(app);
@@ -2859,6 +2944,8 @@ public class ServiceAFweb {
         ssnsList.add("SSNS WLN Protection");
         ssnsList.add(SsnsService.APP_QUAL);
         ssnsList.add("SSNS Qualfiication");
+        ssnsList.add(SsnsService.APP_CALLC);
+        ssnsList.add("SSNS Call Control");
         return ssnsList;
 
     }
@@ -3200,6 +3287,53 @@ public class ServiceAFweb {
         return null;
     }
 
+    public ArrayList<String> testSsnsprodCallCByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(prod, PIDSt);
+        if (ssnsAccObjList != null) {
+            if (ssnsAccObjList.size() > 0) {
+                SsnsAcc ssnsAccObj = (SsnsAcc) ssnsAccObjList.get(0);
+                ArrayList<String> outputList = new ArrayList();
+                SsnsService ss = new SsnsService();
+                String feat = "";
+                if (Oper.equals(CALLC_GET) || Oper.equals(CALLC_UPDATE)) {
+                    feat = ss.TestFeatureSsnsCallControl(ssnsAccObj, outputList, Oper, LABURL);
+
+                    if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {
+                        // disabled this Acc Obj
+                        int type = ssnsAccObj.getType();
+                        String name = ssnsAccObj.getName();
+                        int status = ssnsAccObj.getStatus();
+                        type = type + 1; // increate error count
+
+                        this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
+                    } else {
+                        String name = ssnsAccObj.getName();
+                        int type = ssnsAccObj.getType();
+                        int status = ssnsAccObj.getStatus();
+                        if (type > 0) {
+                            type = 0; // increate error count
+                            this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
+                        }
+                    }
+                }
+                return outputList;
+            }
+        }
+        return null;
+    }
+
     public ArrayList<String> testSsnsprodTTVCByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
@@ -3260,6 +3394,8 @@ public class ServiceAFweb {
             return testSsnsprodWLNPROByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         } else if (prod.equals(SsnsService.APP_QUAL)) {
             return testSsnsprodQualByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+        } else if (prod.equals(SsnsService.APP_CALLC)) {
+            return testSsnsprodCallCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         }
         return null;
     }
@@ -3491,7 +3627,7 @@ public class ServiceAFweb {
                 SsnsService ss = new SsnsService();
                 float exec = 0;
                 if (ProdOper.equals(SsnsService.PROD_GET_CC)) {
-                    String featRet = ss.TestFeatureSsnsCallControl(accObj, response, ProdOper, LABURL);
+                    String featRet = ss.TestFeatureSsnsCallControlFromProdInv(accObj, response, ProdOper, LABURL);
                     if (response != null) {
                         if (response.size() > 3) {
                             String feat = response.get(0);
@@ -3606,7 +3742,7 @@ public class ServiceAFweb {
 
                 if (ProdOper.equals(SsnsService.PROD_GET_CC)) {
                     String oper = SsnsService.APP_FEATT_TYPE_CC;
-                    feat = ss.TestFeatureSsnsCallControl(ssnsAccObj, outputList, ProdOper, LABURL);
+                    feat = ss.TestFeatureSsnsCallControlFromProdInv(ssnsAccObj, outputList, ProdOper, LABURL);
 
                     return outputList;
                 }

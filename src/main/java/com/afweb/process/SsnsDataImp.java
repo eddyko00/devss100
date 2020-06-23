@@ -209,6 +209,10 @@ public class SsnsDataImp {
         return ssnsdb.getSsnsAccObjListByTiid(name, tiid);
     }
 
+    public ArrayList<SsnsAcc> getSsnsAccObjListByOperCustId(String oper, String cusid) {        
+        return ssnsdb.getSsnsAccObjListByOperCustId(oper, cusid);
+    }
+            
     public ArrayList<SsnsAcc> getSsnsAccObjList(String name, String uid) {
         return ssnsdb.getSsnsAccObjList(name, uid);
     }

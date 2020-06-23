@@ -1142,6 +1142,12 @@ public class SsnsDataDB {
         return entries;
     }
 
+    public ArrayList<SsnsAcc> getSsnsAccObjListByOperCustId(String oper, String cusid) {
+        String sql = "select * from ssnsacc where oper='" + oper + "' and cusid='" + cusid + "'";
+        ArrayList entries = getAllSsnsAccSQL(sql, 0);
+        return entries;
+    }
+    
     public ArrayList<SsnsAcc> getSsnsAccObjList(String name, String uid) {
         String sql = "select * from ssnsacc where name='" + name + "' and uid='" + uid + "'";
         ArrayList entries = getAllSsnsAccSQL(sql, 0);
