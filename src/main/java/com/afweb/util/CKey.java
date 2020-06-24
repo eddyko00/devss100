@@ -19,7 +19,7 @@ public class CKey {
 
     public static final int SQL_DATABASE = LOCAL_MYSQL;
     public static final boolean SQL_RemoveServerDB = false; // need true and REMOTE_MYSQL using remote server not PHP 
-    public static final boolean SQL_Devop = false; 
+//    public static final boolean SQL_Devop = false; 
     //
     //////////////////////
     //
@@ -32,7 +32,7 @@ public class CKey {
 
     public static boolean NN_DEBUG = false; //false; //true; 
     public static boolean UI_ONLY = false;
-    public static boolean DEVOP = false;
+//    public static boolean DEVOP = false;
 
 //    //
 //    //

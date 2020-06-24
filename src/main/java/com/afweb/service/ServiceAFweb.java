@@ -374,11 +374,11 @@ public class ServiceAFweb {
                     boolean clearssnsflag = false;
                     if (clearssnsflag == true) {
                         getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
-                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVC);
-                        
+                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
+                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);
+
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_QUAL);
 //                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_QUAL);
-
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
@@ -410,12 +410,12 @@ public class ServiceAFweb {
 //                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_CALLC);
                         for (int i = 0; i < 100; i++) {
 //                            processFeatureQual();
-                            processFeatureCallC();
+//                            processFeatureCallC();
 //                            processFeatureWLNPro();
 //                            processFeatureApp();
 //                            processFeatureProd();
 //                            processFeatureWifi();
-//                            processFeatureTTVC();
+                            processFeatureTTVC();
                         }
                     }
 

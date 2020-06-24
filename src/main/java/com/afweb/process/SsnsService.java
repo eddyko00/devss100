@@ -2522,19 +2522,19 @@ public class SsnsService {
 //            logger.info(dataSt);
 /////////////
             //call devop to get customer id
-            if ((banid.length() == 0) && (cust.length() == 0)) {
-                if (CKey.DEVOP == true) {
-                    if (host.equals("FIFA") || host.equals("LYNX")) {
-                        String custid = getCustIdAppointmentDevop(ServiceAFweb.URL_PRODUCT_PR, appTId, banid, cust, host);
-                        if (custid.length() != 0) {
-                            cust = custid;
-                            dataObj.setCusid(custid);
-                            devOPflag = 1;
-                            logger.info("> getFeatureSsnsAppointmentProcess found Ticket to custid " + cust);
-                        }
-                    }
-                }
-            }
+//            if ((banid.length() == 0) && (cust.length() == 0)) {
+//                if (CKey.DEVOP == true) {
+//                    if (host.equals("FIFA") || host.equals("LYNX")) {
+//                        String custid = getCustIdAppointmentDevop(ServiceAFweb.URL_PRODUCT_PR, appTId, banid, cust, host);
+//                        if (custid.length() != 0) {
+//                            cust = custid;
+//                            dataObj.setCusid(custid);
+//                            devOPflag = 1;
+//                            logger.info("> getFeatureSsnsAppointmentProcess found Ticket to custid " + cust);
+//                        }
+//                    }
+//                }
+//            }
             SsnsAcc NAccObj = new SsnsAcc();
             NAccObj.setDown("splunkflow");
 
@@ -2803,49 +2803,49 @@ public class SsnsService {
         return featTTV;
     }
 
-    public String getCustIdAppointmentDevop(String ProductURL, String appTId, String banid, String cust, String host) {
-        String url = "http://localhost:8080/v2/cmo/selfmgmt/appointmentmanagement/devop/searchtimeslot";
-        HashMap newbodymap = new HashMap();
-        newbodymap.put("customerId", cust);
-        newbodymap.put("id", appTId);
-        newbodymap.put("hostSystemCd", host);
-        try {
-            String custid = "";
-            String output = this.sendRequest_Ssns(METHOD_POST, url, null, newbodymap, null);
-
-            if (output == null) {
-                return "";
-            }
-            if (output.indexOf("responseCode:400500") != -1) {
-                return "";
-
-            }
-            ArrayList arrayItem = new ObjectMapper().readValue(output, ArrayList.class
-            );
-            if (arrayItem.size() < 1) {
-                return "";
-            }
-            output = (String) arrayItem.get(1);
-            output = ServiceAFweb.replaceAll("\"", "", output);
-            output = ServiceAFweb.replaceAll("\\", "", output);
-            String[] oList = output.split(",");
-            for (int i = 0; i < oList.length; i++) {
-                String line = oList[i];
-                if (line.indexOf("customerId:") != -1) {
-                    custid = ServiceAFweb.replaceAll("customerId:", "", line);
-                    if (custid.equals("null")) {
-                        return "";
-                    }
-                    return custid;
-                }
-            }
-
-            return "";
-        } catch (Exception ex) {
-//            logger.info("> getCustIdAppointmentDevop exception " + ex.getMessage());
-        }
-        return "";
-    }
+//    public String getCustIdAppointmentDevop(String ProductURL, String appTId, String banid, String cust, String host) {
+//        String url = "http://localhost:8080/v2/cmo/selfmgmt/appointmentmanagement/devop/searchtimeslot";
+//        HashMap newbodymap = new HashMap();
+//        newbodymap.put("customerId", cust);
+//        newbodymap.put("id", appTId);
+//        newbodymap.put("hostSystemCd", host);
+//        try {
+//            String custid = "";
+//            String output = this.sendRequest_Ssns(METHOD_POST, url, null, newbodymap, null);
+//
+//            if (output == null) {
+//                return "";
+//            }
+//            if (output.indexOf("responseCode:400500") != -1) {
+//                return "";
+//
+//            }
+//            ArrayList arrayItem = new ObjectMapper().readValue(output, ArrayList.class
+//            );
+//            if (arrayItem.size() < 1) {
+//                return "";
+//            }
+//            output = (String) arrayItem.get(1);
+//            output = ServiceAFweb.replaceAll("\"", "", output);
+//            output = ServiceAFweb.replaceAll("\\", "", output);
+//            String[] oList = output.split(",");
+//            for (int i = 0; i < oList.length; i++) {
+//                String line = oList[i];
+//                if (line.indexOf("customerId:") != -1) {
+//                    custid = ServiceAFweb.replaceAll("customerId:", "", line);
+//                    if (custid.equals("null")) {
+//                        return "";
+//                    }
+//                    return custid;
+//                }
+//            }
+//
+//            return "";
+//        } catch (Exception ex) {
+////            logger.info("> getCustIdAppointmentDevop exception " + ex.getMessage());
+//        }
+//        return "";
+//    }
 
     public String SendSsnsAppointmentGetTimeslot(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
 
