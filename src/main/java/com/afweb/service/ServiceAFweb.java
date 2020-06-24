@@ -373,7 +373,7 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////
                     boolean clearssnsflag = false;
                     if (clearssnsflag == true) {
-                        ArrayList<SsnsAcc> ssnsObjList = getSsnsDataImp().testWifiSerial();
+//                        ArrayList<SsnsAcc> ssnsObjList = getSsnsDataImp().testWifiSerial();
 
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
 //                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
@@ -403,7 +403,7 @@ public class ServiceAFweb {
                     }
 /////////
 /////////                    
-                    boolean procallflag = false;
+                    boolean procallflag = true;
                     if (procallflag == true) {
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
@@ -416,7 +416,8 @@ public class ServiceAFweb {
 //                            processFeatureApp();
 //                            processFeatureProd();
 //                            processFeatureWifi();
-                            processFeatureTTVC();
+//                            processFeatureTTVC();
+                            processFeatureActCfg();                            
                         }
                     }
 
@@ -1028,6 +1029,82 @@ public class ServiceAFweb {
 
     }
 
+    
+/////////////////////////////////
+    ArrayList<String> getAllOpenActCfgArray() {
+        String app = SsnsService.APP_ACTCFG;
+        String ret = "parameter";
+        int status = ConstantKey.OPEN;
+        return getSsnsDataImp().getSsnsDataIDList(app, ret, status, 15);
+    }
+
+    ArrayList<String> actCfgNameArray = new ArrayList();
+
+    private ArrayList updateActCfgNameArray() {
+        if (actCfgNameArray != null && actCfgNameArray.size() > 0) {
+            return actCfgNameArray;
+        }
+        ArrayList ttvNameArrayTemp = getAllOpenActCfgArray();
+        if (ttvNameArrayTemp != null) {
+            actCfgNameArray = ttvNameArrayTemp;
+        }
+        return actCfgNameArray;
+    }
+
+    public int processFeatureActCfg() {
+
+        updateActCfgNameArray();
+        if ((actCfgNameArray == null) || (actCfgNameArray.size() == 0)) {
+            return 0;
+        }
+        int result = 0;
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        long lockDateValue = dateNow.getTimeInMillis();
+        String LockName = "ETL_" + SsnsService.APP_ACTCFG;
+
+        try {
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.ETL_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processFeatureWifi");
+            if (CKey.NN_DEBUG == true) {
+                lockReturn = 1;
+            }
+            if (lockReturn == 0) {
+                return 0;
+            }
+
+            logger.info("processFeature CallC for 2 minutes size " + actCfgNameArray.size());
+
+            long currentTime = System.currentTimeMillis();
+            long lockDate1Min = TimeConvertion.addMinutes(currentTime, 2);
+
+            for (int i = 0; i < 5; i++) {
+                currentTime = System.currentTimeMillis();
+//                if (CKey.NN_DEBUG != true) {
+                if (lockDate1Min < currentTime) {
+                    break;
+                }
+//                }
+                if (actCfgNameArray.size() == 0) {
+                    break;
+                }
+
+                String idSt = (String) actCfgNameArray.get(0);
+                actCfgNameArray.remove(0);
+                SsnsService ss = new SsnsService();
+                int id = Integer.parseInt(idSt);
+                SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
+                String feature = ss.getFeatureSsnsActCfg(data);
+//                logger.info("> feature " + i + " " + feature);
+
+                AFSleep();
+            }
+        } catch (Exception ex) {
+        }
+        removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
+        return result;
+
+    }
+    
+    
 ////////////////////////////////
     ArrayList<String> getAllOpenWLNProArray() {
         String app = SsnsService.APP_WLNPRO;
@@ -1440,7 +1517,18 @@ public class ServiceAFweb {
             }
             return;
         }
+        
         app = SsnsService.APP_CALLC; //;
+        file = FileLocalPath + app + "data.csv";
+        if (FileUtil.FileTest(file) == true) {
+            boolean ret = processETLsplunk(file, app, sizeTemp);
+            if (ret == true) {
+                FileUtil.FileDelete(file);
+            }
+            return;
+        }
+
+        app = SsnsService.APP_ACTCFG; //;
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
             boolean ret = processETLsplunk(file, app, sizeTemp);

@@ -57,6 +57,7 @@ public class SsnsService {
     public static String APP_WLNPRO = "wlnpro";
     public static String APP_QUAL = "qual";
     public static String APP_CALLC = "call";
+    public static String APP_ACTCFG = "actcfg";
 
     public static String APP_TTVSUB = "ttvsub";  // ETL name
     public static String APP_TTVREQ = "ttvreq";  // ETL name
@@ -89,10 +90,15 @@ public class SsnsService {
     public static String QUAL_AVAL = "availability";
     public static String QUAL_MATCH = "address_matches";
 
+    //call control
     public static String CALLC_GET = "getCallControl";
     public static String CALLC_UPDATE = "updateCallControl";
     public static String CALLC_RESET = "resetCallFeature";
 
+    //ActCfg activation and configuration
+    public static String APP_FEAT_TYPE_ACTCFG = "ACTCFG";
+    public static String ACTCFG_GET_SRV = "getService";
+    public static String ACTCFG_UPDATE_SRV = "updateService";
 //
     public static String APP_FEAT_TYPE_TTVCL = "TTVCL";
     public static String TT_GetSub = "getCustomerTvSubscription";
@@ -644,78 +650,248 @@ public class SsnsService {
         return false;
     }
 
-    public String TestFeatureSsnsProdCallC(SsnsAcc dataObj, ArrayList<String> outputList, String Oper, String LABURL) {
+    ////////////////////////////////////////////
+    public String getFeatureSsnsActCfg(SsnsData dataObj) {
+        String feat = "";
+        try {
+            feat = getFeatureSsnsActCfgProcess(dataObj);
+        } catch (Exception ex) {
+            logger.info("> getFeatureSsnsActCfg Exception " + ex.getMessage());
+        }
+        getSsnsDataImp().updatSsnsDataStatusById(dataObj.getId(), ConstantKey.COMPLETED);
+        return feat;
+    }
+
+    public String getFeatureSsnsActCfgProcess(SsnsData dataObj) {
+        ProductData pData = new ProductData();
+        ArrayList<String> cmd = new ArrayList();
         if (dataObj == null) {
             return "";
         }
-        if (LABURL.length() == 0) {
-            LABURL = ServiceAFweb.URL_PRODUCT_PR;
+
+        String custid = "";
+        String consumer = "";
+        String service = "";
+        String dataSt = "";
+        String postParm = "";
+        String refId ="";
+
+        try {
+            String oper = dataObj.getOper();
+            if (oper.equals(ACTCFG_UPDATE_SRV)) {
+                dataSt = dataObj.getData();
+                dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+                String[] operList = dataSt.split(",");
+                if (operList.length > 1) {
+                    refId = operList[0];
+                    //How to get the refid to get it back from customer id???
+
+                    if (operList.length > 5) {
+                        dataSt = dataObj.getData();
+
+                        int beg = dataSt.indexOf("{");
+                        if (beg != -1) {
+                            postParm = dataSt.substring(beg);
+                            postParm += "}";
+                        }
+                    }
+                    cmd.add("get email");
+                    cmd.add(ACTCFG_GET_SRV);
+                    pData.setCmd(cmd);
+                }
+            } else if (oper.equals(ACTCFG_GET_SRV)) { //"getAppointment")) {
+                dataSt = dataObj.getData();
+                dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+                String[] operList = dataSt.split(",");
+                if (operList.length > 2) {
+                    custid = operList[0];
+                    consumer = operList[1];
+                    service = operList[2];
+
+                }
+                cmd.add("get email");
+                cmd.add(ACTCFG_GET_SRV);
+                pData.setCmd(cmd);
+
+            } else {
+                logger.info("> getFeatureSsnsActCfgProcess Other oper " + oper);
+            }
+            if (oper.equals(ACTCFG_GET_SRV)) {
+                // for testing ignore APP_GET_APP becase alwasy no info
+//                return "";
+                // for testing
+            } else if (oper.equals(ACTCFG_UPDATE_SRV)) {
+
+            } else {
+                logger.info(dataSt);
+            }
+//            logger.info(dataSt);
+/////////////
+            SsnsAcc NAccObj = new SsnsAcc();
+            NAccObj.setDown("splunkflow");
+
+            boolean stat = this.updateSsnsActCfg(oper, postParm, custid, consumer, service, pData, dataObj, NAccObj);
+            if (stat == true) {
+//                if (devOPflag == 1) {
+//                    String feat = NAccObj.getName() + ":TicktoCust";
+//                    NAccObj.setName(feat);
+//                }
+                boolean exist = false;
+                String key = NAccObj.getName()
+                        + NAccObj.getCusid()
+                        + NAccObj.getBanid()
+                        + NAccObj.getTiid();
+                key = key.replaceAll(NAccObj.getUid(), "");
+                ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjList(NAccObj.getName(), NAccObj.getUid());
+                if (set.add(key)) {
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() != 0) {
+                            SsnsAcc ssnsObj = ssnsAccObjList.get(0);
+                            if (ssnsObj.getDown().equals("splunkflow")) {
+                                exist = true;
+                            }
+                        }
+                    }
+                }
+
+                if (exist == false) {
+                    ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByTiid(NAccObj.getName(), NAccObj.getTiid());
+                    if (ssnsAccObjList != null) {
+                        if (ssnsAccObjList.size() > 3) {
+                            exist = true;
+                        }
+                    }
+                }
+                if (exist == false) {
+                    int ret = getSsnsDataImp().insertSsnsAccObject(NAccObj);
+                }
+
+            }
+            return NAccObj.getName();
+        } catch (Exception ex) {
+            logger.info("> getFeatureSsnsActCfgProcess Exception " + ex.getMessage());
         }
-        dataObj.getData();
-        String banid = dataObj.getBanid();
-        String appTId = dataObj.getTiid();
-        String cust = dataObj.getCusid();
-        String host = dataObj.getRet();
-        String outputSt = null;
-        ArrayList<String> inList = new ArrayList();
-        if (Oper.equals(APP_GET_APP)) {
-
-            outputSt = SendSsnsAppointmentGetApp(LABURL, appTId, banid, cust, host, inList);
-            if (outputSt == null) {
-                return "";
-            }
-            ////special char #, need to ignore for this system
-            outputSt = outputSt.replaceAll("#", "");
-            outputSt = outputSt.replaceAll("~", "");
-            outputSt = outputSt.replaceAll("^", "");
-
-            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            String feat = parseAppointmentFeature(outputSt, Oper);
-            if (outputSt.indexOf("responseCode:400500") != -1) {
-                feat += ":testfailed";
-            }
-            outputList.add(feat);
-            outputList.addAll(inList);
-            outputList.addAll(outList);
-
-            return feat;
-        } else if (Oper.equals(APP_GET_TIMES)) {
-            outputSt = SendSsnsAppointmentGetTimeslot(LABURL, appTId, banid, cust, host, inList);
-            if (outputSt == null) {
-                return "";
-            }
-            ////special char #, need to ignore for this system
-            outputSt = outputSt.replaceAll("#", "");
-            outputSt = outputSt.replaceAll("~", "");
-            outputSt = outputSt.replaceAll("^", "");
-
-            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            String feat = parseAppointmentTimeSlotFeature(outputSt, Oper, host);
-
-            if (outputSt.indexOf("responseCode:400500") != -1) {
-                feat += ":testfailed";
-            }
-            outputList.add(feat);
-            outputList.addAll(inList);
-            outputList.addAll(outList);
-            return feat;
-        }
-
         return "";
     }
 
-    public String SendSsnsCallCApp(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
-        if (host.length() > 0) {
-            host = host.replace("9", ""); // remove OMS9
-            host = host.replace("6", ""); // remove OMS9
-        }
-        String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/appointment?customerid=" + cust;
-        if (banid.length() > 0) {
-            url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=" + banid + "&customerid=" + cust;
-            if (host.length() > 0) {
-                url += "&appointmentlist.hostsystemcd.in=" + host;
+    public boolean updateSsnsActCfg(String oper, String postParm, String custid, String consumer, String service, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
+        try {
+            String featTTV = "";
+            String outputSt = null;
+            if (oper.equals(ACTCFG_GET_SRV) || oper.equals(ACTCFG_UPDATE_SRV)) {
+                if ((custid.length() == 0) || (consumer.length() == 0)) {
+                    return false;
+                }
+
+                outputSt = SendSsnsActCfg(ServiceAFweb.URL_PRODUCT_PR, custid, consumer, service, null);
+                if (outputSt == null) {
+                    return false;
+                }
+                if (outputSt.length() < 80) {
+                    // special case for no appointment {"status":{"statusCd":"200","statusTxt":"OK"},"appointmentList":[]}
+                    return false;
+                }
+                if (outputSt.indexOf("responseCode:400500") != -1) {
+                    return false;
+                }
+                featTTV = parseActCfgFeature(outputSt, oper, service);
+
+            } else {
+                return false;
             }
+
+//            logger.info("> updateSsnsCallC feat " + featTTV);
+            if (NAccObj.getDown().equals("splunkflow")) {
+
+                ArrayList<String> flow = new ArrayList();
+                int faulure = getSsnsFlowTrace(dataObj, flow);
+                if (flow == null) {
+                    logger.info("> updateSsnsActCfg skip no flow");
+                    return false;
+                }
+                pData.setFlow(flow);
+
+                if (faulure == 1) {
+                    featTTV += ":splunkfailed";
+                }
+            }
+            logger.info("> updateSsnsActCfg feat " + featTTV);
+            pData.setPostParam(postParm);
+            NAccObj.setName(featTTV);
+            NAccObj.setBanid(dataObj.getBanid());
+            NAccObj.setCusid(custid);
+            NAccObj.setTiid(service);
+            NAccObj.setUid(dataObj.getUid());
+            NAccObj.setApp(dataObj.getApp());
+            NAccObj.setOper(oper);
+
+//          NAccObj.setDown(""); // set by NAccObj
+            NAccObj.setRet(consumer);
+            NAccObj.setExec(dataObj.getExec());
+
+            String nameSt = new ObjectMapper().writeValueAsString(pData);
+            NAccObj.setData(nameSt);
+
+            NAccObj.setUpdatedatel(dataObj.getUpdatedatel());
+            NAccObj.setUpdatedatedisplay(new java.sql.Date(dataObj.getUpdatedatel()));
+
+            return true;
+        } catch (Exception ex) {
+            logger.info("> updateSsnsCallC Exception " + ex.getMessage());
         }
+        return false;
+    }
+
+    public static String parseActCfgFeature(String outputSt, String oper, String service) {
+
+        if (outputSt == null) {
+            return "";
+        }
+        int userName = 0;
+        int name = 0;
+        ArrayList<String> outputList = ServiceAFweb.prettyPrintJSON(outputSt);
+        for (int j = 0; j < outputList.size(); j++) {
+            String inLine = outputList.get(j);
+//            logger.info("" + inLine);
+
+            if (inLine.indexOf("userName") != -1) {
+                userName++;
+                continue;
+            }
+            if (inLine.indexOf("name") != -1) {
+                name++;
+                continue;
+            }
+            
+            //"refId": "13825353", save refid to customer id for future use
+        }
+
+        String featTTV = APP_FEAT_TYPE_ACTCFG;
+        featTTV += ":" + oper;
+        featTTV += ":" + service;
+        featTTV += ":" + "userName_" + userName;
+        featTTV += ":" + "name_" + name;
+        return featTTV;
+    }
+
+    public String SendSsnsActCfg(String ProductURL, String custid, String consumer, String service, ArrayList<String> inList) {
+        String url = "";
+        if ((custid.length() == 0) || (consumer.length() == 0) || (service.length() == 0)) {
+            return null;
+        }
+
+        url = ProductURL + "/service/cmsServiceActivationAndConfiguration/v1/service?servicetype=" + service
+                + "&relatedpartylist.customerid=" + custid
+                + "&relatedpartylist.accounttype=" + consumer;
+
         try {
             if (inList != null) {
                 inList.add(url);
@@ -741,9 +917,10 @@ public class SsnsService {
                 inList.add(ESTdate + " elapsedTime:" + elapsedTime);
                 inList.add("output:");
             }
+
             return output;
         } catch (Exception ex) {
-            logger.info("> SsnsAppointment exception " + ex.getMessage());
+            logger.info("> SsnsProdiuctInventory exception " + ex.getMessage());
         }
         return null;
     }
@@ -2846,7 +3023,6 @@ public class SsnsService {
 //        }
 //        return "";
 //    }
-
     public String SendSsnsAppointmentGetTimeslot(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
 
         String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
