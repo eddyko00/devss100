@@ -82,7 +82,6 @@ public class SsnsDataImp {
         return ssnsdb.updatSsReportDataStatusTypeRetById(id, data, status, type, ret);
     }
 
-   
     public int updatSsReportDataStatusTypeById(int id, String data, int status, int type) {
         return ssnsdb.updatSsReportDataStatusTypeById(id, data, status, type);
     }
@@ -209,10 +208,10 @@ public class SsnsDataImp {
         return ssnsdb.getSsnsAccObjListByTiid(name, tiid);
     }
 
-    public ArrayList<SsnsAcc> getSsnsAccObjListByOperCustId(String oper, String cusid) {        
+    public ArrayList<SsnsAcc> getSsnsAccObjListByOperCustId(String oper, String cusid) {
         return ssnsdb.getSsnsAccObjListByOperCustId(oper, cusid);
     }
-            
+
     public ArrayList<SsnsAcc> getSsnsAccObjList(String name, String uid) {
         return ssnsdb.getSsnsAccObjList(name, uid);
     }
@@ -322,4 +321,7 @@ public class SsnsDataImp {
         }
     }
 
+    public ArrayList<SsnsAcc> testWifiSerial() {
+        return ssnsdb.testWifiSerial();
+    }
 }

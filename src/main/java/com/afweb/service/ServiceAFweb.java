@@ -373,10 +373,11 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////
                     boolean clearssnsflag = false;
                     if (clearssnsflag == true) {
-                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
-                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
-                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);
+                        ArrayList<SsnsAcc> ssnsObjList = getSsnsDataImp().testWifiSerial();
 
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_QUAL);
 //                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_QUAL);
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();

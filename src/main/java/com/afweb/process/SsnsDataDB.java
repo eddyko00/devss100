@@ -698,7 +698,6 @@ public class SsnsDataDB {
         return 0;
     }
 
-
     public int updatSsReportDataStatusTypeById(int id, String dataSt, int status, int type) {
         try {
 
@@ -1147,7 +1146,7 @@ public class SsnsDataDB {
         ArrayList entries = getAllSsnsAccSQL(sql, 0);
         return entries;
     }
-    
+
     public ArrayList<SsnsAcc> getSsnsAccObjList(String name, String uid) {
         String sql = "select * from ssnsacc where name='" + name + "' and uid='" + uid + "'";
         ArrayList entries = getAllSsnsAccSQL(sql, 0);
@@ -1417,6 +1416,37 @@ public class SsnsDataDB {
         return "";
     }
 
+    public ArrayList<SsnsAcc> testWifiSerial() {
+        ArrayList<SsnsAcc> ssnsObjList = new ArrayList();
+        String sql = "select DISTINCT cusid as name from ssnsacc where app='wifi'";
+        ArrayList array = getAllNameSQL(sql);
+        for (int i = 0; i < array.size(); i++) {
+            String cusid = (String) array.get(i);
+            ArrayList<SsnsAcc> ssnsList = testWifiGetSerial(cusid);
+
+            SsnsAcc ssnsObj_0 = null;
+            for (int j = 0; j < ssnsList.size(); j++) {
+                SsnsAcc ssnsObj = ssnsList.get(j);
+                if (j == 0) {
+                    ssnsObj_0 = ssnsObj;
+
+                }
+                if (ssnsObj_0.getBanid().equals(ssnsObj.getBanid())) {
+                    continue;
+                }
+                logger.info("> testWifiSerial_0 " + cusid + " " + ssnsObj_0.getBanid() + " " + ssnsObj_0.getUid());
+                logger.info("> testWifiSerial " + cusid + " " + ssnsObj.getBanid() + " " + ssnsObj.getUid());
+                ssnsObjList.add(ssnsObj);
+            }
+        }
+        return ssnsObjList;
+    }
+
+    public ArrayList<SsnsAcc> testWifiGetSerial(String cusid) {
+        String sql = "select * from ssnsacc where app='wifi' and cusid='" + cusid + "'";
+        ArrayList entries = getAllSsnsAccSQL(sql, 0);
+        return entries;
+    }
 //    public String getRemoteMYSQL(String sql) throws SQLException {
 //        Statement stmt = null;
 //        Connection con = null;
