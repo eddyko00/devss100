@@ -1418,11 +1418,11 @@ public class SsnsService {
         String featTTV = APP_FEAT_TYPE_TTVCL;
         featTTV += ":" + oper;
 
-        String gm = geomarket;
-        if (gm.length() == 0) {
-            gm = "noGeoMarket";
-        }
-        featTTV += ":" + gm;
+//        String gm = geomarket;
+//        if (gm.length() == 0) {
+//            gm = "noGeoMarket";
+//        }
+//        featTTV += ":" + gm;
         featTTV += ":" + offer;
         String coll = collectionCd;
         if (coll.length() == 0) {
