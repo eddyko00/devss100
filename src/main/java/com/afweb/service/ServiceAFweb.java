@@ -373,8 +373,11 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////
                     boolean clearssnsflag = false;
                     if (clearssnsflag == true) {
-                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_QUAL);
-                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_QUAL);
+                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
+                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVC);
+                        
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_QUAL);
+//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_QUAL);
 
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
