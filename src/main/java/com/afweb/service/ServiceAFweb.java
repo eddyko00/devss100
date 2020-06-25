@@ -756,6 +756,7 @@ public class ServiceAFweb {
 
             } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
                 processFeatureApp();
+                processFeatureActCfg();
                 // monitor
                 SsnsRegression regression = new SsnsRegression();
                 regression.processMonitorTesting(this);
@@ -3059,7 +3060,7 @@ public class ServiceAFweb {
         ssnsList.add(SsnsService.APP_CALLC);
         ssnsList.add("SSNS Call Control");
         ssnsList.add(SsnsService.APP_ACTCFG);
-        ssnsList.add("SSNS Activation Cfg");        
+        ssnsList.add("SSNS Activation Cfg");
         return ssnsList;
 
     }
@@ -3401,9 +3402,6 @@ public class ServiceAFweb {
         return null;
     }
 
-
-        
-
     public ArrayList<String> testSsnsprodActCfgByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
@@ -3450,7 +3448,6 @@ public class ServiceAFweb {
         }
         return null;
     }
-                
 
     public ArrayList<String> testSsnsprodCallCByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {
