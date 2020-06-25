@@ -488,6 +488,7 @@ public class SsnsService {
                             postParm += "}}]}";
                             //"callerList":[{"callerName":","phoneNumber":"355692727113"} error at :", 
                             postParm = ServiceAFweb.replaceAll(":\",", ":\" \",", postParm);
+                            postParm = ServiceAFweb.replaceAll("= ", "", postParm);
 
                             ////find ban from phone nubmer                            
                             ////assume Get call control has the Ban for this number 
