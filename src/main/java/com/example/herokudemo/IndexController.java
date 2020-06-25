@@ -509,7 +509,6 @@ public class IndexController {
     }
 
 /////////////////////////////////////    
-/////////////////////    
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/call/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<ProdSummary> getcallcprodSummary(
@@ -644,6 +643,147 @@ public class IndexController {
         }
         int length = 20; //10;     
         ArrayList<SsnsAcc> ret = afWebService.getSsnsprodByFeatureName(username, idSt, name, SsnsService.APP_CALLC, length);
+
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+/////////////////////////////////////     
+/////////////////////    
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/actcf/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<ProdSummary> getactcfgprodSummary(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "length", required = false) String lengthSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;
+        if (lengthSt != null) {
+            length = Integer.parseInt(lengthSt);
+        }
+        ArrayList<ProdSummary> ret = afWebService.getSsnsprodSummary(username, idSt, length, SsnsService.APP_ACTCFG);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/actcfg", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<SsnsAcc> getactcfgprod(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "length", required = false) String lengthSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;
+        if (lengthSt != null) {
+            length = Integer.parseInt(lengthSt);
+        }
+        ArrayList<SsnsAcc> ret = afWebService.getSsnsprod(username, idSt, length, SsnsService.APP_ACTCFG);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/actcfg/id/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    SsnsAcc getactcfgpid(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @PathVariable("pid") String pidSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        SsnsAcc ret = afWebService.getSsnsprodById(username, idSt, pidSt, SsnsService.APP_ACTCFG);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/actcfg/id/{pid}/rt/getservice", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList getactcfgrtsub(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @PathVariable("pid") String pidSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        String oper = SsnsService.ACTCFG_GET_SRV;
+        ArrayList<String> ret = afWebService.testSsnsprodActCfgByIdRT(username, idSt, pidSt, SsnsService.APP_ACTCFG, oper, "");
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/actcfg/featureall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<String> getactcfgfeature(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        ArrayList<String> ret = afWebService.getSsnsprodByFeature(username, idSt, SsnsService.APP_ACTCFG);
+
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/actcfg/feature/name/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<ProdSummary> getactcfgfeatureSummary(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "name", required = true) String name,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;     
+        ArrayList<ProdSummary> ret = afWebService.getSsnsprodByFeatureNameSummary(username, idSt, name, SsnsService.APP_ACTCFG, length);
+
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
+    @RequestMapping(value = "/cust/{username}/id/{id}/serv/actcfg/feature/name", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ArrayList<SsnsAcc> getactcfgfeature(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @RequestParam(value = "name", required = true) String name,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        int length = 20; //10;     
+        ArrayList<SsnsAcc> ret = afWebService.getSsnsprodByFeatureName(username, idSt, name, SsnsService.APP_ACTCFG, length);
 
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;

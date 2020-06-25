@@ -373,7 +373,11 @@ public class ServiceAFweb {
 ///////////////////////////////////////////////////////////////////////////////////
                     boolean clearssnsflag = false;
                     if (clearssnsflag == true) {
+
 //                        ArrayList<SsnsAcc> ssnsObjList = getSsnsDataImp().testWifiSerial();
+                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_ACTCFG);
+                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_ACTCFG);
+                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_ACTCFG);
 
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
 //                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
@@ -403,7 +407,7 @@ public class ServiceAFweb {
                     }
 /////////
 /////////                    
-                    boolean procallflag = true;
+                    boolean procallflag = false;
                     if (procallflag == true) {
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
@@ -417,7 +421,7 @@ public class ServiceAFweb {
 //                            processFeatureProd();
 //                            processFeatureWifi();
 //                            processFeatureTTVC();
-                            processFeatureActCfg();                            
+                            processFeatureActCfg();
                         }
                     }
 
@@ -1029,7 +1033,6 @@ public class ServiceAFweb {
 
     }
 
-    
 /////////////////////////////////
     ArrayList<String> getAllOpenActCfgArray() {
         String app = SsnsService.APP_ACTCFG;
@@ -1103,8 +1106,7 @@ public class ServiceAFweb {
         return result;
 
     }
-    
-    
+
 ////////////////////////////////
     ArrayList<String> getAllOpenWLNProArray() {
         String app = SsnsService.APP_WLNPRO;
@@ -1517,7 +1519,7 @@ public class ServiceAFweb {
             }
             return;
         }
-        
+
         app = SsnsService.APP_CALLC; //;
         file = FileLocalPath + app + "data.csv";
         if (FileUtil.FileTest(file) == true) {
@@ -2234,6 +2236,24 @@ public class ServiceAFweb {
                                 continue;
                             }
                         }
+                        if (app.equals(SsnsService.APP_ACTCFG)) {
+                            status = inLine.replace("parameter=", "");
+                            String parmSt = spSt;
+                            int beg = parmSt.indexOf("parameter=");
+
+                            String temSt = parmSt.substring(beg + 10, parmSt.length());
+                            int end = temSt.indexOf("]");
+                            if (end != -1) {
+//                                status = temSt.substring(0, end + 1);
+                                status = temSt;
+                            }
+                            status = replaceAll("\"\"", "\"", status);
+                            ret = "parameter";
+
+                            continue;
+                        }
+                        /////////////////
+                        //default
                         status = inLine.replace("parameter=", "");
                         String parmSt = spSt;
                         int beg = parmSt.indexOf("parameter=");
@@ -3038,6 +3058,8 @@ public class ServiceAFweb {
         ssnsList.add("SSNS Qualfiication");
         ssnsList.add(SsnsService.APP_CALLC);
         ssnsList.add("SSNS Call Control");
+        ssnsList.add(SsnsService.APP_ACTCFG);
+        ssnsList.add("SSNS Activation Cfg");        
         return ssnsList;
 
     }
@@ -3378,6 +3400,57 @@ public class ServiceAFweb {
         }
         return null;
     }
+
+
+        
+
+    public ArrayList<String> testSsnsprodActCfgByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByID(prod, PIDSt);
+        if (ssnsAccObjList != null) {
+            if (ssnsAccObjList.size() > 0) {
+                SsnsAcc ssnsAccObj = (SsnsAcc) ssnsAccObjList.get(0);
+                ArrayList<String> outputList = new ArrayList();
+                SsnsService ss = new SsnsService();
+                String feat = "";
+                if (Oper.equals(ACTCFG_GET_SRV) || Oper.equals(ACTCFG_UPDATE_SRV)) {
+                    feat = ss.TestFeatureSsnsActCfg(ssnsAccObj, outputList, Oper, LABURL);
+
+                    if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {
+                        // disabled this Acc Obj
+                        int type = ssnsAccObj.getType();
+                        String name = ssnsAccObj.getName();
+                        int status = ssnsAccObj.getStatus();
+                        type = type + 1; // increate error count
+
+                        this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
+                    } else {
+                        String name = ssnsAccObj.getName();
+                        int type = ssnsAccObj.getType();
+                        int status = ssnsAccObj.getStatus();
+                        if (type > 0) {
+                            type = 0; // increate error count
+                            this.getSsnsDataImp().updatSsnsAccNameStatusTypeById(ssnsAccObj.getId(), name, status, type);
+                        }
+                    }
+                }
+                return outputList;
+            }
+        }
+        return null;
+    }
+                
 
     public ArrayList<String> testSsnsprodCallCByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {

@@ -674,7 +674,7 @@ public class SsnsService {
         String service = "";
         String dataSt = "";
         String postParm = "";
-        String refId ="";
+        String refId = "";
 
         try {
             String oper = dataObj.getOper();
@@ -688,7 +688,9 @@ public class SsnsService {
                 String[] operList = dataSt.split(",");
                 if (operList.length > 1) {
                     refId = operList[0];
-                    //How to get the refid to get it back from customer id???
+
+                    consumer = "C";
+                    service = "email";
 
                     if (operList.length > 5) {
                         dataSt = dataObj.getData();
@@ -697,6 +699,22 @@ public class SsnsService {
                         if (beg != -1) {
                             postParm = dataSt.substring(beg);
                             postParm += "}";
+                            postParm = ServiceAFweb.replaceAll("}]}]}", "}]}", postParm);
+                            //[{""id"":""86062848"",""name"":""customerid""}
+                            String[] parmList = postParm.split(",");
+                            for (int j = 0; j < parmList.length; j++) {
+                                String inLine = parmList[j];
+                                if (inLine.indexOf("customerid") != -1) {
+                                    String value = parmList[j - 1];
+                                    //"relatedPartyList":[{"id":"20006858"
+                                    value = ServiceAFweb.replaceAll("\"", "", value);
+                                    value = ServiceAFweb.replaceAll("relatedPartyList:[{id:", "", value);
+                                    custid = value;
+                                    break;
+                                }
+
+                            }
+
                         }
                     }
                     cmd.add("get email");
@@ -732,13 +750,14 @@ public class SsnsService {
 
             } else {
                 logger.info(dataSt);
+                return "";
             }
 //            logger.info(dataSt);
 /////////////
             SsnsAcc NAccObj = new SsnsAcc();
             NAccObj.setDown("splunkflow");
 
-            boolean stat = this.updateSsnsActCfg(oper, postParm, custid, consumer, service, pData, dataObj, NAccObj);
+            boolean stat = this.updateSsnsActCfg(oper, postParm, custid, consumer, service, refId, pData, dataObj, NAccObj);
             if (stat == true) {
 //                if (devOPflag == 1) {
 //                    String feat = NAccObj.getName() + ":TicktoCust";
@@ -782,7 +801,7 @@ public class SsnsService {
         return "";
     }
 
-    public boolean updateSsnsActCfg(String oper, String postParm, String custid, String consumer, String service, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
+    public boolean updateSsnsActCfg(String oper, String postParm, String custid, String consumer, String service, String refId, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
             String featTTV = "";
             String outputSt = null;
@@ -828,13 +847,13 @@ public class SsnsService {
             NAccObj.setName(featTTV);
             NAccObj.setBanid(dataObj.getBanid());
             NAccObj.setCusid(custid);
-            NAccObj.setTiid(service);
+            NAccObj.setTiid(refId);
             NAccObj.setUid(dataObj.getUid());
             NAccObj.setApp(dataObj.getApp());
             NAccObj.setOper(oper);
 
 //          NAccObj.setDown(""); // set by NAccObj
-            NAccObj.setRet(consumer);
+            NAccObj.setRet(service);
             NAccObj.setExec(dataObj.getExec());
 
             String nameSt = new ObjectMapper().writeValueAsString(pData);
@@ -850,6 +869,7 @@ public class SsnsService {
         return false;
     }
 
+//    public static HashMap<String, String> actCfgMap = new HashMap<String, String>();
     public static String parseActCfgFeature(String outputSt, String oper, String service) {
 
         if (outputSt == null) {
@@ -862,6 +882,16 @@ public class SsnsService {
             String inLine = outputList.get(j);
 //            logger.info("" + inLine);
 
+            //"refId": "13685041",
+//            if (custid.length() > 0) {
+//                if (inLine.indexOf("refId") != -1) {
+//                    String valueSt = ServiceAFweb.replaceAll("\"", "", inLine);
+//                    valueSt = ServiceAFweb.replaceAll("refId:", "", valueSt);
+//                    valueSt = ServiceAFweb.replaceAll(",", "", valueSt);
+//                    actCfgMap.put(valueSt, custid);
+//                    continue;
+//                }
+//            }
             if (inLine.indexOf("userName") != -1) {
                 userName++;
                 continue;
@@ -870,7 +900,7 @@ public class SsnsService {
                 name++;
                 continue;
             }
-            
+
             //"refId": "13825353", save refid to customer id for future use
         }
 
@@ -3202,6 +3232,42 @@ public class SsnsService {
             featTTV = parseProductPhoneFeature(outputSt, dataObj.getOper(), null);
 
         }
+        if (outputSt.indexOf("responseCode:400500") != -1) {
+            featTTV += ":testfailed";
+        }
+        outputList.add(featTTV);
+        outputList.addAll(inList);
+        outputList.addAll(outList);
+
+        return featTTV;
+    }
+
+    public String TestFeatureSsnsActCfg(SsnsAcc dataObj, ArrayList<String> outputList, String oper, String LABURL) {
+        if (dataObj == null) {
+            return "";
+        }
+        if (LABURL.length() == 0) {
+            LABURL = ServiceAFweb.URL_PRODUCT_PR;
+        }
+
+        String custid = dataObj.getCusid();
+        String consumer = "C";
+        String service = dataObj.getRet();
+
+        ArrayList<String> inList = new ArrayList();
+        String outputSt = SendSsnsActCfg(LABURL, custid, consumer, service, inList);
+        if (outputSt == null) {
+            return "";
+        }
+        String featTTV = "";
+        ////special char #, need to ignore for this system
+        outputSt = outputSt.replaceAll("#", "");
+        outputSt = outputSt.replaceAll("~", "");
+        outputSt = outputSt.replaceAll("^", "");
+        ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+
+        featTTV = parseActCfgFeature(outputSt, oper, service);
+
         if (outputSt.indexOf("responseCode:400500") != -1) {
             featTTV += ":testfailed";
         }

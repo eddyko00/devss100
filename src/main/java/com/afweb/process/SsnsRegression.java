@@ -854,6 +854,7 @@ public class SsnsRegression {
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WLNPRO, testRList, overviewList);
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_QUAL, testRList, overviewList);
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_CALLC, testRList, overviewList);
+            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_ACTCFG, testRList, overviewList);            
             logger.info("> reportList  " + testRList.size());
 
             uid = REPORT_RESULT;
