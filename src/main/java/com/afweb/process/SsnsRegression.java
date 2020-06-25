@@ -109,9 +109,6 @@ public class SsnsRegression {
                     }
                 }
             }
-
-            int qualCnt = 0;
-            int wlnProCnt = 0;
             int totalAdded = 0;
 
             ReportData reportdata = new ReportData();
@@ -225,7 +222,7 @@ public class SsnsRegression {
                     }
                 }
             }
-            logger.info("> startMonitor " + name + " wlnProCnt:" + wlnProCnt + " qualCnt:" + qualCnt);
+//            logger.info("> startMonitor " + name + " wlnProCnt:" + wlnProCnt + " qualCnt:" + qualCnt);
             // make random list on testIdList 
             Collections.shuffle(testIdList);
 
