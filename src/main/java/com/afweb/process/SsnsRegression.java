@@ -115,7 +115,7 @@ public class SsnsRegression {
             ArrayList<String> servList = serviceAFweb.getSsnsprodAll(name, null, 0);
             for (int i = 0; i < servList.size(); i += 2) {
                 String servProd = servList.get(i);
-                int exitSrv = 50; //100;
+                int exitSrv = 30; //100;
                 if (app != null) {
                     if (app.length() > 0) {
                         if (app.equals(servProd)) {
