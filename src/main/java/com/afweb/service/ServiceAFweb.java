@@ -572,37 +572,38 @@ public class ServiceAFweb {
 
                     }
 
-                    boolean monflag = false;
+                    boolean monflag = true;
                     if (monflag == true) {
 //                        this.getSsnsDataImp().deleteAllSsReport(0);
+//
                         SsnsRegression regression = new SsnsRegression();
                         String name = CKey.ADMIN_USERNAME;
                         ArrayList<SsReport> ret = new ArrayList();
-                        /////////Regression
-                        name = "GUEST";
-
-                        getSsReportRegressionStart(name, null, APP_APP, DEF_LABURL); //"http://L097105:8080");
-                        ret = getSsReportRegression(name, null);
-                        for (int i = 0; i < 10; i++) {
-                            regression.processMonitorTesting(this);
-                            if (i == 2) {
-                                regression.stopMonitor(this, name);
-                            }
-                            ret = getSsReportRegression(name, null);
-                        }
-                        ret = getSsReportRegression(name, null);
-
-                        /////////monitor
-//                        ret = getSsReportMon(name, null);
-//                        regression.startMonitor(this, name);
+//                        /////////Regression
+//                        name = "GUEST";
 //
+//                        getSsReportRegressionStart(name, null, APP_APP, DEF_LABURL); //"http://L097105:8080");
+//                        ret = getSsReportRegression(name, null);
 //                        for (int i = 0; i < 10; i++) {
 //                            regression.processMonitorTesting(this);
 //                            if (i == 2) {
 //                                regression.stopMonitor(this, name);
 //                            }
-//                            ret = getSsReportMon(name, null);
+//                            ret = getSsReportRegression(name, null);
 //                        }
+//                        ret = getSsReportRegression(name, null);
+
+                        /////////monitor
+//                        ret = getSsReportMon(name, null);
+//                        regression.startMonitor(this, name);
+//
+                        for (int i = 0; i < 10; i++) {
+                            regression.processMonitorTesting(this);
+//                            if (i == 2) {
+//                                regression.stopMonitor(this, name);
+//                            }
+                            ret = getSsReportMon(name, null);
+                        }
 //                        ret = getSsReportMon(name, null);
                     }
 /////////
@@ -3558,6 +3559,8 @@ public class ServiceAFweb {
             return testSsnsprodQualByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         } else if (prod.equals(SsnsService.APP_CALLC)) {
             return testSsnsprodCallCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+        } else if (prod.equals(SsnsService.APP_ACTCFG)) {
+            return testSsnsprodActCfgByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);            
         }
         return null;
     }

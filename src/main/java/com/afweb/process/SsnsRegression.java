@@ -109,17 +109,16 @@ public class SsnsRegression {
                     }
                 }
             }
-            int exitTest = 800;  // 1000000;
 
             int qualCnt = 0;
             int wlnProCnt = 0;
+            int totalAdded = 0;
 
-            int added = 0;
             ReportData reportdata = new ReportData();
             ArrayList<String> servList = serviceAFweb.getSsnsprodAll(name, null, 0);
             for (int i = 0; i < servList.size(); i += 2) {
                 String servProd = servList.get(i);
-                int exitSrv = 25; //100;
+                int exitSrv = 50; //100;
                 if (app != null) {
                     if (app.length() > 0) {
                         if (app.equals(servProd)) {
@@ -129,8 +128,25 @@ public class SsnsRegression {
                         }
                     }
                 }
-                ArrayList<String> featallList = serviceAFweb.getSsnsprodByFeature(name, null, servProd);
-                for (int j = 0; j < featallList.size(); j += 2) {
+                int added = 0;
+                ArrayList<String> featallListTmp = serviceAFweb.getSsnsprodByFeature(name, null, servProd);
+
+                ArrayList<String> featallList = new ArrayList();
+                for (int k = 0; k < featallListTmp.size(); k += 2) {
+                    String featN = featallListTmp.get(k);
+                    if (featN.indexOf("failed") != -1) {
+                        continue;
+                    }
+                    if (featN.indexOf("failed") != -1) {
+                        continue;
+                    }
+                    featallList.add(featN);
+
+                }
+                // make random list on testIdList 
+                Collections.shuffle(featallList);
+
+                for (int j = 0; j < featallList.size(); j++) {
                     String featN = featallList.get(j);
                     if (featN.indexOf("failed") != -1) {
                         continue;
@@ -184,32 +200,27 @@ public class SsnsRegression {
                             st = st.replace('"', '^');
                             testIdList.add(st);
                             added++;
+                            totalAdded++;
 
-                            if (accObj.getApp().equals(SsnsService.APP_WLNPRO)) {
-                                // add double test becuase the TC is too low
-                                testIdList.add(st);
-                                added++;
-                                wlnProCnt += 2;
-
-                            }
-                            if (accObj.getApp().equals(SsnsService.APP_QUAL)) {
-                                testIdList.add(st);
-                                added++;
-                                qualCnt += 2;
-
-                            }
+//                            if (accObj.getApp().equals(SsnsService.APP_WLNPRO)) {
+//                                // add double test becuase the TC is too low
+//                                testIdList.add(st);
+//                                added++;
+//                                totalAdded++;
+//                                wlnProCnt += 2;
+//
+//                            }
 ////////////////////////////////////////////////
-                            if (added > exitTest) {
-                                break;
-                            }
                             if (added > exitSrv) {  // 100 each product
                                 break;
                             }
-
+                            if (featallList.size() > 50) {
+                                break;
+                            }
 ////////////////////////////////////////////////
                         }
                     }
-                    if (added > exitTest) {
+                    if (added > exitSrv) {  // 100 each product
                         break;
                     }
                 }
@@ -226,7 +237,7 @@ public class SsnsRegression {
             // format date in target timezone
             format.setTimeZone(tz);
             String ESTdate = format.format(d);
-            String StartTC = "TC:" + added + " start:" + ESTdate;
+            String StartTC = "TC:" + totalAdded + " start:" + ESTdate;
             logger.info("> startMonitor " + name + " " + StartTC);
             testFeatList.add(0, StartTC);
 
@@ -854,7 +865,7 @@ public class SsnsRegression {
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WLNPRO, testRList, overviewList);
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_QUAL, testRList, overviewList);
             this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_CALLC, testRList, overviewList);
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_ACTCFG, testRList, overviewList);            
+            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_ACTCFG, testRList, overviewList);
             logger.info("> reportList  " + testRList.size());
 
             uid = REPORT_RESULT;
