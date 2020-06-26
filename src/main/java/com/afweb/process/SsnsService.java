@@ -1704,8 +1704,9 @@ public class SsnsService {
                 }
                 // calculate elapsed time in milli seconds
                 long startTime = TimeConvertion.currentTimeMillis();
-                String st = ServiceAFweb.replaceAll("\":\",", "\":\"\",", postParm);
-                st = st.substring(0, st.length() - 2);
+                String st = postParm;                
+//                String st = ServiceAFweb.replaceAll("\":\",", "\":\"\",", postParm);
+//                st = st.substring(0, st.length() - 2);
 
                 Map<String, String> map = new ObjectMapper().readValue(st, Map.class
                 );
@@ -1745,8 +1746,9 @@ public class SsnsService {
                 }
                 // calculate elapsed time in milli seconds
                 long startTime = TimeConvertion.currentTimeMillis();
-                String st = ServiceAFweb.replaceAll("\":\",", "\":\"\",", postParm);
-                st = st.substring(0, st.length() - 2);
+                String st = postParm;
+//                String st = ServiceAFweb.replaceAll("\":\",", "\":\"\",", postParm);
+//                st = st.substring(0, st.length() - 2);
 
                 Map<String, String> map = new ObjectMapper().readValue(st, Map.class
                 );
