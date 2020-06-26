@@ -1913,20 +1913,34 @@ public class SsnsService {
                     parm = operList[4];
                     if (operList.length > 5) {
                         dataSt = dataObj.getData();
-                        dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
-                        if (dataSt.indexOf("asynchronousRequest") == -1) {
-                            async = 1;
-                            int beg = dataSt.indexOf("{");
-                            if (beg != -1) {
-                                postParm = dataSt.substring(beg, dataSt.length() - 1);
-                            }
-                        } else {
-                            int beg = dataSt.indexOf("{");
-                            if (beg != -1) {
-                                postParm = dataSt.substring(beg);
-                                postParm += "]";
+
+                        int beg = dataSt.indexOf("{");
+                        if (beg != -1) {
+                            postParm = dataSt.substring(beg);
+                            postParm += "}";
+                            postParm = ServiceAFweb.replaceAll(":\",", ":\" \",", postParm);
+                            postParm = ServiceAFweb.replaceAll("= ", "", postParm);
+                            if (dataSt.indexOf("asynchronousRequest") != -1) {
+                                async = 1;
+                                postParm = ServiceAFweb.replaceAll("}}]}", "}}", postParm);
                             }
                         }
+
+//                        dataSt = dataObj.getData();
+//                        dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+//                        if (dataSt.indexOf("asynchronousRequest") == -1) {
+//                            async = 1;
+//                            int beg = dataSt.indexOf("{");
+//                            if (beg != -1) {
+//                                postParm = dataSt.substring(beg, dataSt.length() - 1);
+//                            }
+//                        } else {
+//                            int beg = dataSt.indexOf("{");
+//                            if (beg != -1) {
+//                                postParm = dataSt.substring(beg);
+//                                postParm += "]";
+//                            }
+//                        }
                     }
                 }
                 cmd.add("get wifi device"); // description
@@ -1953,20 +1967,33 @@ public class SsnsService {
 
                     if (operList.length > 5) {
                         dataSt = dataObj.getData();
-                        dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
-                        if (dataSt.indexOf("asynchronousRequest") != -1) {
-                            async = 1;
-                            int beg = dataSt.indexOf("{");
-                            if (beg != -1) {
-                                postParm = dataSt.substring(beg, dataSt.length() - 1);
-                            }
-                        } else {
-                            int beg = dataSt.indexOf("{");
-                            if (beg != -1) {
-                                postParm = dataSt.substring(beg);
-                                postParm += "}";
+
+                        int beg = dataSt.indexOf("{");
+                        if (beg != -1) {
+                            postParm = dataSt.substring(beg);
+                            postParm += "}";
+                            postParm = ServiceAFweb.replaceAll(":\",", ":\" \",", postParm);
+                            postParm = ServiceAFweb.replaceAll("= ", "", postParm);
+                            if (dataSt.indexOf("asynchronousRequest") != -1) {
+                                async = 1;
+                                postParm = ServiceAFweb.replaceAll("}}]}", "}}", postParm);
                             }
                         }
+//                        dataSt = dataObj.getData();
+//                        dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+//                        if (dataSt.indexOf("asynchronousRequest") != -1) {
+//                            async = 1;
+//                            int beg = dataSt.indexOf("{");
+//                            if (beg != -1) {
+//                                postParm = dataSt.substring(beg, dataSt.length() - 1);
+//                            }
+//                        } else {
+//                            int beg = dataSt.indexOf("{");
+//                            if (beg != -1) {
+//                                postParm = dataSt.substring(beg);
+//                                postParm += "}";
+//                            }
+//                        }
                     }
                 }
                 cmd.add("get wifi device"); // description

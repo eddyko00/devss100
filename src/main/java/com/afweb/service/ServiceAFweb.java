@@ -376,8 +376,10 @@ public class ServiceAFweb {
 
 //                        ArrayList<SsnsAcc> ssnsObjList = getSsnsDataImp().testWifiSerial();
 //
-                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_APP);
-                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
+                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
+                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_APP);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
 //
 //                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);
 //                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
@@ -400,8 +402,7 @@ public class ServiceAFweb {
 //                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
 //
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
-//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_APP);
+
 //                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
 //                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WIFI);
 //                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
@@ -430,9 +431,9 @@ public class ServiceAFweb {
 //                            processFeatureQual();
 //                            processFeatureCallC();
 //                            processFeatureWLNPro();
-                            processFeatureApp();
+//                            processFeatureApp();
 //                            processFeatureProd();
-//                            processFeatureWifi();
+                            processFeatureWifi();
 //                            processFeatureTTVC();
 //                            processFeatureActCfg();
                         }
