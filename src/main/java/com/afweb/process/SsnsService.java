@@ -1358,6 +1358,9 @@ public class SsnsService {
                         if (beg != -1) {
                             postParm = dataSt.substring(beg);
                             postParm += "}";
+                            postParm = ServiceAFweb.replaceAll(":\",", ":\" \",", postParm);
+                            postParm = ServiceAFweb.replaceAll("= ", "", postParm);                            
+                            postParm = ServiceAFweb.replaceAll("}]}", "}", postParm);    
                         }
                     }
                 }
