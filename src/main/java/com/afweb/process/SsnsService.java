@@ -1359,8 +1359,8 @@ public class SsnsService {
                             postParm = dataSt.substring(beg);
                             postParm += "}";
                             postParm = ServiceAFweb.replaceAll(":\",", ":\" \",", postParm);
-                            postParm = ServiceAFweb.replaceAll("= ", "", postParm);                            
-                            postParm = ServiceAFweb.replaceAll("}]}", "}", postParm);    
+                            postParm = ServiceAFweb.replaceAll("= ", "", postParm);
+                            postParm = ServiceAFweb.replaceAll("}]}", "}", postParm);
                         }
                     }
                 }
@@ -2599,6 +2599,7 @@ public class SsnsService {
         String cust = "";
         String host = "";
         String dataSt = "";
+        String postParm = "";
         int devOPflag = 0;
         try {
             String oper = dataObj.getOper();
@@ -2616,6 +2617,7 @@ public class SsnsService {
                     banid = banid.replace("ban:", "");
                     cust = operList[2];
                     cust = cust.replace("customerId:", "");
+
                     for (int k = 0; k < operList.length; k++) {
                         String inLine = operList[k];
 
@@ -2624,6 +2626,19 @@ public class SsnsService {
                             host = host.replace("hostSystemCd:", "");
                         }
                     }
+                    if (operList.length > 5) {
+                        dataSt = dataObj.getData();
+
+                        int beg = dataSt.indexOf("{");
+                        if (beg != -1) {
+                            postParm = dataSt.substring(beg);
+                            postParm += "}";
+                            postParm = ServiceAFweb.replaceAll(":\",", ":\" \",", postParm);
+                            postParm = ServiceAFweb.replaceAll("= ", "", postParm);
+                            postParm = ServiceAFweb.replaceAll("}]}", "}", postParm);
+                        }
+                    }
+
                 }
                 if ((banid.length() == 0) && (cust.length() == 0)) {
                     ;
@@ -2749,7 +2764,7 @@ public class SsnsService {
             SsnsAcc NAccObj = new SsnsAcc();
             NAccObj.setDown("splunkflow");
 
-            boolean stat = this.updateSsnsAppointment(oper, appTId, banid, cust, host, pData, dataObj, NAccObj);
+            boolean stat = this.updateSsnsAppointment(oper, appTId, banid, cust, host, postParm, pData, dataObj, NAccObj);
             if (stat == true) {
 //                if (devOPflag == 1) {
 //                    String feat = NAccObj.getName() + ":TicktoCust";
@@ -2793,7 +2808,7 @@ public class SsnsService {
         return "";
     }
 
-    public boolean updateSsnsAppointment(String oper, String appTId, String banid, String cust, String host, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
+    public boolean updateSsnsAppointment(String oper, String appTId, String banid, String cust, String host, String postParm, ProductData pData, SsnsData dataObj, SsnsAcc NAccObj) {
         try {
             String featTTV = "";
             String outputSt = null;
@@ -2873,7 +2888,9 @@ public class SsnsService {
                     featTTV += ":splunkfailed";
                 }
             }
+
             logger.info("> updateSsnsAppointment feat " + featTTV);
+            pData.setPostParam(postParm);
             NAccObj.setName(featTTV);
             NAccObj.setBanid(banid);
             NAccObj.setCusid(cust);
