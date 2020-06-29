@@ -2015,7 +2015,7 @@ public class SsnsService {
                 // skip no information
 
             } else {
-                logger.info("> getFeatureSsnsAppointment Other oper " + oper);
+                logger.info("> getFeatureSsnsWifiProcess Other oper " + oper);
                 return "";
             }
             if (oper.equals(WI_GetDevice)) {
