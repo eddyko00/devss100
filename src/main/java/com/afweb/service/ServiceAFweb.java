@@ -4452,7 +4452,7 @@ public class ServiceAFweb {
         return 0;
     }
 
-    public int systemBackupSsnsAcc() {
+    public int systemBackupAll() {
         logger.info("systemBackupSsnsAcc start");
         backupSystem();
         logger.info("systemBackupSsnsAcc end");

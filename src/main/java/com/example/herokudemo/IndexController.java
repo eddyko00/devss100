@@ -1732,8 +1732,7 @@ public class IndexController {
         }
         return null;
     }
-
-    @RequestMapping(value = "/cust/{username}/sys/backupssnsacc", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/sys/backupall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     WebStatus SystemBackupacc(@PathVariable("username") String username) {
         WebStatus msg = new WebStatus();
@@ -1741,7 +1740,7 @@ public class IndexController {
         CustomerObj cust = afWebService.getCustomerIgnoreMaintenance(username, null);
         if (cust != null) {
             if (cust.getType() == CustomerObj.INT_ADMIN_USER) {
-                msg.setResponse(afWebService.systemBackupSsnsAcc() + "");
+                msg.setResponse(afWebService.systemBackupAll() + "");
                 msg.setResult(true);
                 return msg;
             }
@@ -1750,28 +1749,8 @@ public class IndexController {
         return null;
     }
 
-    // using server/restoressnsacc
-//    @RequestMapping(value = "/cust/{username}/sys/restoressnsacc", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-//    public @ResponseBody
-//    WebStatus SystemRestoreacc(@PathVariable("username") String username) {
-//        WebStatus msg = new WebStatus();
-//        // remote is stopped
-//        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
-//            if (username.toLowerCase().equals(CKey.ADMIN_USERNAME.toLowerCase())) {
-//                return null;
-//            }
-//        }
-//        CustomerObj cust = afWebService.getCustomerIgnoreMaintenance(username, null);
-//        if (cust != null) {
-//            if (cust.getType() == CustomerObj.INT_ADMIN_USER) {
-//                msg.setResponse(afWebService.systemRestoresSsnsAcc() + "");
-//                msg.setResult(true);
-//                return msg;
-//            }
-//        }
-//
-//        return null;
-//    }
+
+
     @RequestMapping(value = "/cust/{username}/sys/reopenssnsdata", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     WebStatus SystemReopen(@PathVariable("username") String username) {
