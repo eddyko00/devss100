@@ -4655,7 +4655,7 @@ public class SsnsService {
 //                con = (HttpsURLConnection) request.openConnection(proxy);
 //                //////Add Proxy 
 //            } else {
-            con = (HttpsURLConnection) request.openConnection(Proxy.NO_PROXY);
+            con = (HttpsURLConnection) request.openConnection();
 //            }
 
 //            if (URLPath.indexOf(":8080") == -1) {
