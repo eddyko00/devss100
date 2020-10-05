@@ -1704,7 +1704,7 @@ public class SsnsService {
                 }
                 // calculate elapsed time in milli seconds
                 long startTime = TimeConvertion.currentTimeMillis();
-                String st = postParm;                
+                String st = postParm;
 //                String st = ServiceAFweb.replaceAll("\":\",", "\":\"\",", postParm);
 //                st = st.substring(0, st.length() - 2);
 
@@ -3209,6 +3209,7 @@ public class SsnsService {
     }
 
     public String SendSsnsAppointmentGetApp(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
+
         if (host.length() > 0) {
             host = host.replace("9", ""); // remove OMS9
             host = host.replace("6", ""); // remove OMS9
@@ -3221,6 +3222,7 @@ public class SsnsService {
             }
         }
         try {
+            logger.info("> SendSsnsAppointmentGetApp url: " + url + ", host: " + host);
             if (inList != null) {
                 inList.add(url);
             }
@@ -4669,6 +4671,9 @@ public class SsnsService {
             } else if (method.equals(METHOD_GET)) {
                 con.setRequestMethod("GET");
             }
+            ///////////
+            logger.info("POST request method:" + method + " url: " + request.getPath());
+            ///////            
             con.setRequestProperty("User-Agent", USER_AGENT);
 //            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
             con.setRequestProperty("Content-Type", "application/json");
@@ -4795,6 +4800,9 @@ public class SsnsService {
             } else if (method.equals(METHOD_GET)) {
                 con.setRequestMethod("GET");
             }
+            ///////////
+            logger.info("POST request method:" + method + " url: " + request.getPath());
+            ///////
             con.setRequestProperty("User-Agent", USER_AGENT);
 //            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
 //            con.setRequestProperty("Content-Type", "application/json; utf-8");
