@@ -1791,6 +1791,9 @@ public class ServiceAFweb {
     }
 
     void processETL_process() {
+        if (getEnv.checkLocalPC() == true) {
+            return;
+        }
         int sizeTemp = 4000;
         String file = FileLocalPath + "clear.txt";
         if (FileUtil.FileTest(file) == true) {
