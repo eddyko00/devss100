@@ -470,14 +470,15 @@ public class ServiceAFweb {
 
     void debugtest() {
         try {
-            String urlSt = "https://soa-mp-rmsk-pr.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
-            String url = replaceAll("abc", "", urlSt);
             SsnsService ssns = new SsnsService();
-            String url1 = "http://l097105:8080/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=218366120&customerid=1894301&appointmentlist.hostsystemcd.in=LYNX";
-            String resp1 = ssns.sendRequest_Ssns("get", url1, null, null, null);
-            logger.info("> debugtest resp1: " + resp1);
+//            String urlSt = "https://soa-mp-rmsk-pr.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
+            String urlSt = "http://ssns-appointmentmgmt-it03.paas-app-east-np.tsl.telus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
+            String url = replaceAll("abc", "", urlSt);
             String resp = ssns.sendRequest_Ssns("get", url, null, null, null);
-            logger.info("> debugtest resp: " + resp);
+            logger.info("> debugtest resp it03: " + resp);
+            url = replaceAll("-it03.", "-pr.", urlSt);
+            resp = ssns.sendRequest_Ssns("get", url, null, null, null);
+            logger.info("> debugtest resp pr: " + resp);
         } catch (Exception ex) {
         }
     }
