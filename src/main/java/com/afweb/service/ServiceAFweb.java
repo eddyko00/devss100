@@ -993,9 +993,7 @@ public class ServiceAFweb {
             }
         }
         if (CKey.UI_ONLY == true) {
-//            if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
-//
-//            }
+
             return;
         }
 
@@ -1791,7 +1789,7 @@ public class ServiceAFweb {
     }
 
     void processETL_process() {
-        if (getEnv.checkLocalPC() == true) {
+        if (getEnv.checkLocalPC() == false) {
             return;
         }
         int sizeTemp = 4000;
@@ -2624,9 +2622,9 @@ public class ServiceAFweb {
                         ServiceAFweb.AFSleep();
                         writeSQLArray.clear();
                     }
-                    if ((numAdd % 500) == 0) {
-                        logger.info("> ETLsplunkProcess  " + numAdd);
-                    }
+//                    if ((numAdd % 500) == 0) {
+//                        logger.info("> ETLsplunkProcess  " + numAdd);
+//                    }
                     numAdd++;
                     ////////just for testing
 //                    if (numAdd > 3000) {
