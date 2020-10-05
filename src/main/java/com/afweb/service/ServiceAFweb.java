@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.logging.Level;
 
 import java.util.logging.Logger;
 import javax.sql.DataSource;
@@ -289,8 +290,12 @@ public class ServiceAFweb {
                 // final initialization
 //                getSsnsDataImp().updateSsnsDataAllOpenStatus();
             } else {
-
-                processTimer();
+                if (timerThreadMsg != null) {
+                    if (timerThreadMsg.indexOf("debugtest") != -1) {
+                        processTimer("debugtest");
+                    }
+                }
+                processTimer("");
             }
 
         } catch (Exception ex) {
@@ -360,7 +365,7 @@ public class ServiceAFweb {
     public boolean debugFlag = false;
     public static HashMap<String, SsnsData> wifiMap = new HashMap<String, SsnsData>();
 
-    private void processTimer() {
+    private void processTimer(String cmd) {
 
         if (getEnv.checkLocalPC() == true) {
             if (CKey.NN_DEBUG == true) {
@@ -372,619 +377,8 @@ public class ServiceAFweb {
 //
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
+                    TestExec();
 ///////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////
-                    boolean wifidebug = false;
-                    if (wifidebug == true) {
-                        String app = SsnsService.APP_WIFI; //"wifi";
-                        String file = FileLocalPath + app + "data_debug.csv";
-                        if (FileUtil.FileTest(file) == true) {
-                            int length = 0;
-
-                            ArrayList<String> writeArray = new ArrayList();
-                            FileUtil.FileReadTextArray(file, writeArray);
-
-                            ArrayList<String> writeSQLArray = new ArrayList();
-                            logger.info("> ETLsplunkProcess " + app + " " + writeArray.size());
-                            String spSt = "";
-                            int size = writeArray.size();
-                            if (length == 0) {
-                                size = writeArray.size();
-                            } else {
-                                if (size > length) {
-                                    size = length;
-                                }
-                            }
-                            for (int i = 0; i < size; i++) {
-                                try {
-                                    String daSt = "";
-                                    String timeSt = "";
-                                    String oper = "";
-                                    String down = "";
-                                    String execSt = "";
-                                    long exec = 0;
-                                    String tran = "";
-                                    String status = "";
-                                    String ret = "";
-                                    long datel = 0;
-                                    spSt = writeArray.get(i);
-                                    boolean processFlag = true;
-                                    String[] spList = spSt.split(" ");
-                                    for (int j = 0; j < spList.length; j++) {
-                                        if (spList.length < 3) {
-                                            processFlag = false;
-                                            break;
-                                        }
-                                        String inLine = spList[j];
-                                        if (j == 0) {
-                                            daSt = spList[j];
-                                            daSt = daSt.replaceAll("\"", "");
-                                            timeSt = spList[j + 1];
-                                            Calendar c = parseDateTime(daSt, timeSt);
-
-                                            if (c == null) {
-                                                processFlag = false;
-                                                break;
-                                            }
-                                            datel = c.getTimeInMillis();
-                                            continue;
-                                        }
-
-                                        if (inLine.indexOf("operation=") != -1) {
-                                            oper = inLine.replace("operation=", "");
-                                            continue;
-                                        }
-                                        if (inLine.indexOf("clientOperation=") != -1) {
-                                            down = inLine.replace("clientOperation=", "");
-                                            continue;
-                                        }
-                                        if (inLine.indexOf("executionTime=") != -1) {
-                                            execSt = inLine.replace("executionTime=", "");
-                                            if (execSt.length() > 0) {
-                                                exec = Long.parseLong(execSt);
-                                            }
-                                            continue;
-                                        }
-
-                                        if (inLine.indexOf("transactionId=") != -1) {
-                                            tran = inLine.replace("transactionId=", "");
-                                            continue;
-                                        }
-                                        if (inLine.indexOf("status=") != -1) {
-                                            status = inLine.replace("status=", "");
-                                            int beg = spSt.indexOf("status=");
-                                            String temSt = spSt.substring(beg + 7, spSt.length());
-                                            int end = temSt.indexOf("}");
-                                            if (end != -1) {
-                                                status = temSt.substring(0, end + 1);
-                                            }
-                                            continue;
-                                        }
-                                        if (inLine.indexOf("parameter=") != -1) {
-                                            if (app.equals(SsnsService.APP_WIFI)) {
-                                                if (oper.equals(SsnsService.WI_Callback)) {
-                                                    String parmSt = spSt;
-                                                    int beg = parmSt.indexOf("parameter=");
-
-                                                    String temSt = parmSt.substring(beg + 10, parmSt.length());
-                                                    int end = temSt.indexOf("]");
-                                                    if (end != -1) {
-                                                        status = temSt.substring(0, end + 1);
-                                                    }
-                                                    status = replaceAll("\"", "", status);
-                                                    status = replaceAll("\\n", "", status);
-                                                    status = replaceAll("\\", "\"", status);
-                                                    String[] statusL = status.split(" ");
-                                                    String tranUid = "";
-                                                    if (statusL.length > 0) {
-                                                        tranUid = getCallback(statusL);
-                                                    }
-                                                    if (tranUid.length() > 0) {
-                                                        tran = tranUid;
-                                                        down = "TOCP";
-                                                    }
-                                                    ret = "parameter";
-                                                    continue;
-                                                } else {
-                                                    String parmSt = spSt;
-                                                    int beg = parmSt.indexOf("parameter=");
-
-                                                    String temSt = parmSt.substring(beg + 10, parmSt.length());
-                                                    int end = temSt.indexOf("]");
-                                                    if (end != -1) {
-                                                        status = temSt.substring(0, end + 1);
-                                                    }
-                                                    status = replaceAll("\"\"", "\"", status);
-
-                                                    ret = "parameter";
-                                                    continue;
-                                                }
-                                            }
-                                            /////////////////
-                                            //default
-                                            status = inLine.replace("parameter=", "");
-                                            String parmSt = spSt;
-                                            int beg = parmSt.indexOf("parameter=");
-
-                                            String temSt = parmSt.substring(beg + 10, parmSt.length());
-                                            int end = temSt.indexOf("]");
-                                            if (end != -1) {
-                                                status = temSt.substring(0, end + 1);
-                                            }
-                                            status = replaceAll("\"\"", "\"", status);
-                                            ret = "parameter";
-
-                                            continue;
-                                        }
-
-                                    }
-                                    if (processFlag == false) {
-                                        continue;
-                                    }
-                                    if (datel == 0) {
-                                        continue;
-                                    }
-                                    if (tran.length() == 0) {
-                                        continue;
-                                    }
-
-                                    SsnsData dataObj = new SsnsData();
-
-                                    dataObj.setUid(tran);
-                                    dataObj.setApp(app);
-                                    dataObj.setOper(oper);
-                                    dataObj.setDown(down);
-                                    dataObj.setRet(ret);
-                                    dataObj.setExec(exec);
-                                    dataObj.setData(status);
-                                    dataObj.setUpdatedatel(datel);
-                                    dataObj.setUpdatedatedisplay(new java.sql.Date(datel));
-
-                                    /////
-                                    if (ret.equals("parameter")) {
-                                        String dataSt = dataObj.getData();
-
-                                        oper = dataObj.getOper();
-                                        String banid = "";
-                                        String uniquid = "";
-                                        String prodClass = "";
-                                        String serialid = "";
-                                        String parm = "";
-                                        String postParm = "";
-                                        if (dataSt.indexOf("GTBA9100403980") != -1) {
-                                            logger.info("> Wifi banid duplicate ");
-                                        }
-                                        try {
-
-                                            if (oper.equals(WI_GetDeviceStatus)) { //"updateAppointment")) {
-
-                                                dataSt = dataObj.getData();
-                                                dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
-                                                dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
-                                                dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
-                                                dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
-                                                dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
-                                                String[] operList = dataSt.split(",");
-                                                if (operList.length > 3) {
-                                                    banid = operList[0];
-                                                    uniquid = operList[1];
-                                                    prodClass = operList[2];
-                                                    serialid = operList[3];
-                                                    parm = operList[4];
-                                                    if (operList.length > 5) {
-                                                        dataSt = dataObj.getData();
-
-                                                        int beg = dataSt.indexOf("{");
-                                                        if (beg != -1) {
-                                                            postParm = dataSt.substring(beg);
-                                                            postParm += "}";
-                                                            postParm = ServiceAFweb.replaceAll(":\",", ":\" \",", postParm);
-                                                            postParm = ServiceAFweb.replaceAll("= ", "", postParm);
-                                                        }
-
-                                                    }
-                                                }
-
-                                            } else if (oper.equals(WI_config)) {
-                                                dataSt = dataObj.getData();
-                                                dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
-                                                dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
-                                                dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
-                                                dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
-                                                dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
-                                                String[] operList = dataSt.split(",");
-                                                if (operList.length > 3) {
-                                                    banid = operList[0];
-                                                    uniquid = operList[1];
-                                                    prodClass = operList[2];
-                                                    serialid = operList[3];
-                                                    parm = operList[4];
-
-                                                    if (operList.length > 5) {
-                                                        dataSt = dataObj.getData();
-
-                                                        int beg = dataSt.indexOf("{");
-                                                        if (beg != -1) {
-                                                            postParm = dataSt.substring(beg);
-                                                            postParm += "}";
-                                                            postParm = ServiceAFweb.replaceAll(":\",", ":\" \",", postParm);
-                                                            postParm = ServiceAFweb.replaceAll("= ", "", postParm);
-
-                                                        }
-
-                                                    }
-                                                }
-                                            }
-                                            dataObj.setBanid(banid);
-                                            dataObj.setTiid(serialid);
-                                            /// check serialid  SsnsData dataObj 
-                                            if (serialid.length() > 0) {
-                                                SsnsData dataObjTmp = wifiMap.get(serialid);
-                                                if (dataObjTmp == null) {
-                                                    wifiMap.put(serialid, dataObj);
-                                                } else {
-                                                    String banidObj = dataObjTmp.getBanid();
-                                                    if (banidObj.equals(banid)) {
-                                                        ;
-                                                    } else {
-                                                        logger.info("> Wifi banid duplicate " + dataObj.getOper() + " " + dataObj.getBanid() + " " + dataObj.getTiid() + " " + dataObj.getUid() + " " + dataObj.getUpdatedatedisplay());
-                                                        logger.info("> Wifi banid duplicate " + dataObj.getOper() + " " + dataObjTmp.getBanid() + " " + dataObjTmp.getTiid() + " " + dataObjTmp.getUid() + " " + dataObjTmp.getUpdatedatedisplay());
-                                                    }
-                                                }
-
-                                            }
-                                        } catch (Exception e) {
-                                            logger.info("> ETLsplunkProcess exception " + e.getMessage() + " " + spSt);
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    logger.info("> ETLsplunkProcess exception " + e.getMessage() + " " + spSt);
-
-                                }
-                            }
-                        }
-                    }
-//                    
-                    boolean clearssnsflag = false;
-                    if (clearssnsflag == true) {
-
-//                        ArrayList<SsnsAcc> ssnsObjList = getSsnsDataImp().testWifiSerial();
-//
-                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
-                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_APP);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
-//
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
-//                        // remember SSNS ACC is using APP_TTVC
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
-//                        
-
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_CALLC);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_CALLC);
-//
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_ACTCFG);
-//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_ACTCFG);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_ACTCFG);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_QUAL);
-//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_QUAL);
-//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
-//
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
-//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WIFI);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
-                    }
-
-                    boolean ETLsplunkFlat = false;
-                    if (ETLsplunkFlat == true) {
-
-                        boolean clearsplunkflag = false;
-                        if (clearsplunkflag == true) {
-                            this.getSsnsDataImp().deleteAllSsnsData(0);
-                        }
-                        for (int i = 0; i < 10; i++) {
-                            processETL();
-                        }
-                    }
-/////////
-/////////                    
-                    boolean procallflag = false;
-                    if (procallflag == true) {
-//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
-
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_CALLC);
-                        for (int i = 0; i < 100; i++) {
-//                            processFeatureQual();
-//                            processFeatureCallC();
-//                            processFeatureWLNPro();
-//                            processFeatureApp();
-//                            processFeatureProd();
-                            processFeatureWifi();
-//                            processFeatureTTVC();
-//                            processFeatureActCfg();
-                        }
-                    }
-
-                    boolean restoreSsnsAccFlag = false; // work for remote d
-                    if (restoreSsnsAccFlag == true) {
-                        systemRestoresSsnsAcc();
-                    }
-
-                    boolean restoreSsRepotFlag = false; // work for remote d
-                    if (restoreSsRepotFlag == true) {
-                        logger.info("restoreSsReportDB start");
-                        this.getSsnsDataImp().deleteAllSsReport(0);
-                        boolean retSatus = getAccountImp().restoreSsReportDB(this);
-                        logger.info("restoreSsReportDB end");
-                    }
-
-//                    boolean restoreSsnsDataFlag = false; // work for remote d
-//                    if (restoreSsnsDataFlag == true) {
-//                        this.getSsnsDataImp().deleteAllSsnsData(0);
-//                        boolean retSatus = getAccountImp().restoreSsnsDataDB(this);
-//                    }
-///////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////   
-                    boolean tempflag = false;
-                    if (tempflag == true) {
-//                        String uid = "97c69ce5-bd22-4c7f-b215-3fcc8e358535";
-//                        ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList(uid);
-//                        SsnsData data = dataList.get(0);
-//                        SsnsService ss = new SsnsService();
-//                        String feature = ss.getFeatureSsnsProdiuctInventory(data);
-
-                        ArrayList<String> testIdList = new ArrayList();
-                        ArrayList<String> testFeatList = new ArrayList();
-                        int added = 0;
-                        ReportData reportdata = new ReportData();
-                        String app = SsnsService.APP_APP;
-                        ArrayList<String> servList = getSsnsprodAll(CKey.ADMIN_USERNAME, null, 0);
-                        for (int i = 0; i < servList.size(); i += 2) {
-                            String servProd = servList.get(i);
-                            int exitSrv = 100;
-                            if (app != null) {
-                                if (app.length() > 0) {
-                                    if (app.equals(servProd)) {
-                                        ;
-                                    } else {
-                                        continue;
-                                    }
-                                }
-                            }
-                            ArrayList<String> featallList = getSsnsprodByFeature(CKey.ADMIN_USERNAME, null, servProd);
-                            for (int j = 0; j < featallList.size(); j += 2) {
-                                String featN = featallList.get(j);
-                                if (featN.indexOf("failed") != -1) {
-                                    continue;
-                                }
-                                if (featN.indexOf("failed") != -1) {
-                                    continue;
-                                }
-                                testFeatList.add(featN);
-                                Set<String> set = new HashSet<>();
-
-                                ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, 5);
-                                if (SsnsAcclist != null) {
-                                    for (int k = 0; k < SsnsAcclist.size(); k++) {
-                                        try {
-                                            SsnsAcc accObj = SsnsAcclist.get(k);
-
-                                            if (accObj.getType() > 10) {  // testfailed will increment this type
-                                                continue;
-                                            }
-                                            if (accObj.getApp().equals(SsnsService.APP_PRODUCT)) {
-                                                if (accObj.getBanid().length() > 0) {
-                                                    if (!set.add(accObj.getBanid())) {
-                                                        continue;
-                                                    }
-                                                }
-                                            }
-                                            testData tObj = new testData();
-                                            tObj.setAccid(accObj.getId());
-                                            tObj.setUsername(CKey.ADMIN_USERNAME);
-                                            tObj.setTesturl("");
-                                            String st = new ObjectMapper().writeValueAsString(tObj);
-                                            st = st.replace('"', '^');
-                                            testIdList.add(st);
-                                            int id = tObj.getAccid();
-                                            String LABURL = tObj.getTesturl();  // " empty for monitor, not empay for regression
-
-                                            accObj = getSsnsDataImp().getSsnsAccObjByID(id);
-                                            String dataSt = accObj.getData();
-                                            ProductData pData = new ObjectMapper().readValue(dataSt, ProductData.class
-                                            );
-                                            ArrayList<String> response = new ArrayList();
-                                            ArrayList<String> labResponse = new ArrayList();
-                                            String passSt;
-                                            int totalTC = 0;
-                                            float exec = 0;
-                                            String oper = SsnsService.APP_GET_TIMES;
-                                            if (LABURL.length() == 0) {
-                                                passSt = R_FAIL;
-
-                                                response = testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
-                                                totalTC++;
-                                                if (response != null) {
-                                                    if (response.size() > 3) {
-                                                        String feat = response.get(0);
-                                                        String execSt = response.get(2);
-                                                        int index = execSt.indexOf("elapsedTime:");
-                                                        if (index != -1) {
-                                                            execSt = execSt.substring(index + 12);
-                                                            exec = Long.parseLong(execSt);
-                                                        }
-
-                                                        if (feat.equals(accObj.getName())) {
-                                                            passSt = R_PASS;
-                                                        } else {
-                                                            passSt = R_PASS;
-                                                            String[] featL = feat.split(":");
-                                                            String[] nameL = accObj.getName().split(":");
-                                                            if ((featL.length > 4) && (nameL.length > 4)) {
-                                                                if (!featL[2].equals(nameL[2])) {
-                                                                    passSt = R_FAIL;
-                                                                }
-                                                                if (!featL[3].equals(nameL[3])) {
-                                                                    passSt = R_FAIL;
-                                                                }
-                                                                if (!featL[4].equals(nameL[4])) {
-                                                                    passSt = R_FAIL;
-                                                                }
-                                                            } else if ((featL.length > 3) && (nameL.length > 3)) {
-                                                                if (!featL[2].equals(nameL[2])) {
-                                                                    passSt = R_FAIL;
-                                                                }
-                                                                if (!featL[3].equals(nameL[3])) {
-                                                                    passSt = R_FAIL;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                passSt = accObj.getName() + ":" + passSt;
-                                            }
-                                        } catch (Exception ex) {
-                                        }
-
-                                    }
-                                }
-                            }
-                        }
-
-                    }
-
-                    boolean monflag = false;
-                    if (monflag == true) {
-//                        this.getSsnsDataImp().deleteAllSsReport(0);
-//
-                        SsnsRegression regression = new SsnsRegression();
-                        String name = CKey.ADMIN_USERNAME;
-                        ArrayList<SsReport> ret = new ArrayList();
-//                        /////////Regression
-//                        name = "GUEST";
-//
-//                        getSsReportRegressionStart(name, null, APP_APP, DEF_LABURL); //"http://L097105:8080");
-//                        ret = getSsReportRegression(name, null);
-//                        for (int i = 0; i < 10; i++) {
-//                            regression.processMonitorTesting(this);
-//                            if (i == 2) {
-//                                regression.stopMonitor(this, name);
-//                            }
-//                            ret = getSsReportRegression(name, null);
-//                        }
-//                        ret = getSsReportRegression(name, null);
-
-                        /////////monitor
-//                        ret = getSsReportMon(name, null);
-//                        regression.startMonitor(this, name);
-//
-                        for (int i = 0; i < 10; i++) {
-                            regression.processMonitorTesting(this);
-//                            if (i == 2) {
-//                                regression.stopMonitor(this, name);
-//                            }
-                            ret = getSsReportMon(name, null);
-                        }
-//                        ret = getSsReportMon(name, null);
-                    }
-/////////
-/////////
-                    boolean procflag = false;
-                    if (procflag == true) {
-
-                        SsnsService ss = new SsnsService();
-                        String feature = "";
-                        boolean prodflag = true;
-                        if (prodflag == true) {
-                            ArrayList ttvNameArrayTemp = getAllOpenProductArray();
-                            if (ttvNameArrayTemp != null) {
-                                for (int i = 0; i < ttvNameArrayTemp.size(); i++) {
-                                    String idSt = (String) ttvNameArrayTemp.get(i);
-
-                                    int id = Integer.parseInt(idSt);
-                                    SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
-                                    feature = ss.getFeatureSsnsProdiuctInventory(data);
-
-//                                    ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList("cf0adc01-588e-4717-b87b-876441d79a1e");
-//                                    feature = ss.getFeatureSsnsProdiuctInventory(dataList.get(0));
-                                }
-                            }
-                        }
-                    }
-/////////
-/////////
-                    boolean wififlag = false;
-                    if (wififlag == true) {
-
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
-                        SsnsService ss = new SsnsService();
-                        String feature = "";
-                        ArrayList appNameArrayTemp = getAllOpenWifiArray();
-                        if (appNameArrayTemp != null) {
-                            for (int i = 0; i < appNameArrayTemp.size(); i++) {
-                                String idSt = (String) appNameArrayTemp.get(i);
-
-                                int id = Integer.parseInt(idSt);
-                                SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
-                                feature = ss.getFeatureSsnsWifi(data);
-
-//                                    ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList("0f8825e8-d628-405e-83d6-3ff63dd82654");
-//                                    ss.getFeatureSsnsWifi(dataList.get(0));
-                            }
-                        }
-                    }
-/////////
-/////////
-                    boolean appflag = false;
-                    if (appflag == true) {
-
-//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
-                        SsnsService ss = new SsnsService();
-                        String feature = "";
-                        ArrayList appNameArrayTemp = getAllOpenAppArray();
-                        if (appNameArrayTemp != null) {
-                            for (int i = 0; i < appNameArrayTemp.size(); i++) {
-                                String idSt = (String) appNameArrayTemp.get(i);
-
-                                int id = Integer.parseInt(idSt);
-                                SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
-                                feature = ss.getFeatureSsnsAppointment(data);
-                            }
-                        }
-                    }
-
-                    boolean ttvReqflag = false;
-                    if (ttvReqflag == true) {
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);                        
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
-
-                        for (int m = 0; m < 20; m++) {
-                            SsnsService ss = new SsnsService();
-                            String feature = "";
-                            ArrayList appNameArrayTemp = getAllOpenTTVCArray();
-                            if (appNameArrayTemp != null) {
-                                for (int i = 0; i < appNameArrayTemp.size(); i++) {
-                                    String idSt = (String) appNameArrayTemp.get(i);
-
-                                    int id = Integer.parseInt(idSt);
-                                    SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
-                                    feature = ss.getFeatureSsnsTTVC(data);
-
-//                                    ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList("28d552b9-df3d-4bd8-8a22-3ff63dd8b337");
-//                                    feature = ss.getFeatureSsnsTTVC(dataList.get(1));
-                                }
-                            }
-                        }
-                    }
-
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////  
                     logger.info("> Debug end ");
@@ -994,6 +388,9 @@ public class ServiceAFweb {
         }
         if (CKey.UI_ONLY == true) {
 
+            if (cmd.equals("debugtest")) {
+                debugtest();
+            }
             return;
         }
 
@@ -1069,6 +466,632 @@ public class ServiceAFweb {
         } catch (Exception ex) {
             logger.info("> processTimer Exception" + ex.getMessage());
         }
+    }
+
+    void debugtest() {
+        try {
+            String urlSt = "https://soa-mp-rmsk-pr.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
+            String url = replaceAll("abc", "", urlSt);
+            SsnsService ssns = new SsnsService();
+            String resp = ssns.sendRequest_Ssns("get", url, null, null, null);
+            logger.info("> debugtest resp: " + resp);
+        } catch (Exception ex) {
+        }
+    }
+
+    void TestExec() {
+        ///////////////////////////////////////////////////////////////////////////////////
+        boolean wifidebug = false;
+        if (wifidebug == true) {
+            String app = SsnsService.APP_WIFI; //"wifi";
+            String file = FileLocalPath + app + "data_debug.csv";
+            if (FileUtil.FileTest(file) == true) {
+                int length = 0;
+
+                ArrayList<String> writeArray = new ArrayList();
+                FileUtil.FileReadTextArray(file, writeArray);
+
+                ArrayList<String> writeSQLArray = new ArrayList();
+                logger.info("> ETLsplunkProcess " + app + " " + writeArray.size());
+                String spSt = "";
+                int size = writeArray.size();
+                if (length == 0) {
+                    size = writeArray.size();
+                } else {
+                    if (size > length) {
+                        size = length;
+                    }
+                }
+                for (int i = 0; i < size; i++) {
+                    try {
+                        String daSt = "";
+                        String timeSt = "";
+                        String oper = "";
+                        String down = "";
+                        String execSt = "";
+                        long exec = 0;
+                        String tran = "";
+                        String status = "";
+                        String ret = "";
+                        long datel = 0;
+                        spSt = writeArray.get(i);
+                        boolean processFlag = true;
+                        String[] spList = spSt.split(" ");
+                        for (int j = 0; j < spList.length; j++) {
+                            if (spList.length < 3) {
+                                processFlag = false;
+                                break;
+                            }
+                            String inLine = spList[j];
+                            if (j == 0) {
+                                daSt = spList[j];
+                                daSt = daSt.replaceAll("\"", "");
+                                timeSt = spList[j + 1];
+                                Calendar c = parseDateTime(daSt, timeSt);
+
+                                if (c == null) {
+                                    processFlag = false;
+                                    break;
+                                }
+                                datel = c.getTimeInMillis();
+                                continue;
+                            }
+
+                            if (inLine.indexOf("operation=") != -1) {
+                                oper = inLine.replace("operation=", "");
+                                continue;
+                            }
+                            if (inLine.indexOf("clientOperation=") != -1) {
+                                down = inLine.replace("clientOperation=", "");
+                                continue;
+                            }
+                            if (inLine.indexOf("executionTime=") != -1) {
+                                execSt = inLine.replace("executionTime=", "");
+                                if (execSt.length() > 0) {
+                                    exec = Long.parseLong(execSt);
+                                }
+                                continue;
+                            }
+
+                            if (inLine.indexOf("transactionId=") != -1) {
+                                tran = inLine.replace("transactionId=", "");
+                                continue;
+                            }
+                            if (inLine.indexOf("status=") != -1) {
+                                status = inLine.replace("status=", "");
+                                int beg = spSt.indexOf("status=");
+                                String temSt = spSt.substring(beg + 7, spSt.length());
+                                int end = temSt.indexOf("}");
+                                if (end != -1) {
+                                    status = temSt.substring(0, end + 1);
+                                }
+                                continue;
+                            }
+                            if (inLine.indexOf("parameter=") != -1) {
+                                if (app.equals(SsnsService.APP_WIFI)) {
+                                    if (oper.equals(SsnsService.WI_Callback)) {
+                                        String parmSt = spSt;
+                                        int beg = parmSt.indexOf("parameter=");
+
+                                        String temSt = parmSt.substring(beg + 10, parmSt.length());
+                                        int end = temSt.indexOf("]");
+                                        if (end != -1) {
+                                            status = temSt.substring(0, end + 1);
+                                        }
+                                        status = replaceAll("\"", "", status);
+                                        status = replaceAll("\\n", "", status);
+                                        status = replaceAll("\\", "\"", status);
+                                        String[] statusL = status.split(" ");
+                                        String tranUid = "";
+                                        if (statusL.length > 0) {
+                                            tranUid = getCallback(statusL);
+                                        }
+                                        if (tranUid.length() > 0) {
+                                            tran = tranUid;
+                                            down = "TOCP";
+                                        }
+                                        ret = "parameter";
+                                        continue;
+                                    } else {
+                                        String parmSt = spSt;
+                                        int beg = parmSt.indexOf("parameter=");
+
+                                        String temSt = parmSt.substring(beg + 10, parmSt.length());
+                                        int end = temSt.indexOf("]");
+                                        if (end != -1) {
+                                            status = temSt.substring(0, end + 1);
+                                        }
+                                        status = replaceAll("\"\"", "\"", status);
+
+                                        ret = "parameter";
+                                        continue;
+                                    }
+                                }
+                                /////////////////
+                                //default
+                                status = inLine.replace("parameter=", "");
+                                String parmSt = spSt;
+                                int beg = parmSt.indexOf("parameter=");
+
+                                String temSt = parmSt.substring(beg + 10, parmSt.length());
+                                int end = temSt.indexOf("]");
+                                if (end != -1) {
+                                    status = temSt.substring(0, end + 1);
+                                }
+                                status = replaceAll("\"\"", "\"", status);
+                                ret = "parameter";
+
+                                continue;
+                            }
+
+                        }
+                        if (processFlag == false) {
+                            continue;
+                        }
+                        if (datel == 0) {
+                            continue;
+                        }
+                        if (tran.length() == 0) {
+                            continue;
+                        }
+
+                        SsnsData dataObj = new SsnsData();
+
+                        dataObj.setUid(tran);
+                        dataObj.setApp(app);
+                        dataObj.setOper(oper);
+                        dataObj.setDown(down);
+                        dataObj.setRet(ret);
+                        dataObj.setExec(exec);
+                        dataObj.setData(status);
+                        dataObj.setUpdatedatel(datel);
+                        dataObj.setUpdatedatedisplay(new java.sql.Date(datel));
+
+                        /////
+                        if (ret.equals("parameter")) {
+                            String dataSt = dataObj.getData();
+
+                            oper = dataObj.getOper();
+                            String banid = "";
+                            String uniquid = "";
+                            String prodClass = "";
+                            String serialid = "";
+                            String parm = "";
+                            String postParm = "";
+                            if (dataSt.indexOf("GTBA9100403980") != -1) {
+                                logger.info("> Wifi banid duplicate ");
+                            }
+                            try {
+
+                                if (oper.equals(WI_GetDeviceStatus)) { //"updateAppointment")) {
+
+                                    dataSt = dataObj.getData();
+                                    dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                                    dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+                                    dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+                                    dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+                                    dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+                                    String[] operList = dataSt.split(",");
+                                    if (operList.length > 3) {
+                                        banid = operList[0];
+                                        uniquid = operList[1];
+                                        prodClass = operList[2];
+                                        serialid = operList[3];
+                                        parm = operList[4];
+                                        if (operList.length > 5) {
+                                            dataSt = dataObj.getData();
+
+                                            int beg = dataSt.indexOf("{");
+                                            if (beg != -1) {
+                                                postParm = dataSt.substring(beg);
+                                                postParm += "}";
+                                                postParm = ServiceAFweb.replaceAll(":\",", ":\" \",", postParm);
+                                                postParm = ServiceAFweb.replaceAll("= ", "", postParm);
+                                            }
+
+                                        }
+                                    }
+
+                                } else if (oper.equals(WI_config)) {
+                                    dataSt = dataObj.getData();
+                                    dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                                    dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+                                    dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+                                    dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+                                    dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+                                    String[] operList = dataSt.split(",");
+                                    if (operList.length > 3) {
+                                        banid = operList[0];
+                                        uniquid = operList[1];
+                                        prodClass = operList[2];
+                                        serialid = operList[3];
+                                        parm = operList[4];
+
+                                        if (operList.length > 5) {
+                                            dataSt = dataObj.getData();
+
+                                            int beg = dataSt.indexOf("{");
+                                            if (beg != -1) {
+                                                postParm = dataSt.substring(beg);
+                                                postParm += "}";
+                                                postParm = ServiceAFweb.replaceAll(":\",", ":\" \",", postParm);
+                                                postParm = ServiceAFweb.replaceAll("= ", "", postParm);
+
+                                            }
+
+                                        }
+                                    }
+                                }
+                                dataObj.setBanid(banid);
+                                dataObj.setTiid(serialid);
+                                /// check serialid  SsnsData dataObj 
+                                if (serialid.length() > 0) {
+                                    SsnsData dataObjTmp = wifiMap.get(serialid);
+                                    if (dataObjTmp == null) {
+                                        wifiMap.put(serialid, dataObj);
+                                    } else {
+                                        String banidObj = dataObjTmp.getBanid();
+                                        if (banidObj.equals(banid)) {
+                                            ;
+                                        } else {
+                                            logger.info("> Wifi banid duplicate " + dataObj.getOper() + " " + dataObj.getBanid() + " " + dataObj.getTiid() + " " + dataObj.getUid() + " " + dataObj.getUpdatedatedisplay());
+                                            logger.info("> Wifi banid duplicate " + dataObj.getOper() + " " + dataObjTmp.getBanid() + " " + dataObjTmp.getTiid() + " " + dataObjTmp.getUid() + " " + dataObjTmp.getUpdatedatedisplay());
+                                        }
+                                    }
+
+                                }
+                            } catch (Exception e) {
+                                logger.info("> ETLsplunkProcess exception " + e.getMessage() + " " + spSt);
+                            }
+                        }
+                    } catch (Exception e) {
+                        logger.info("> ETLsplunkProcess exception " + e.getMessage() + " " + spSt);
+
+                    }
+                }
+            }
+        }
+//                    
+        boolean clearssnsflag = false;
+        if (clearssnsflag == true) {
+
+//                        ArrayList<SsnsAcc> ssnsObjList = getSsnsDataImp().testWifiSerial();
+//
+            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
+            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_APP);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
+//
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
+//                        // remember SSNS ACC is using APP_TTVC
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
+//                        
+
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_CALLC);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_CALLC);
+//
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_ACTCFG);
+//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_ACTCFG);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_ACTCFG);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_QUAL);
+//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_QUAL);
+//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
+//
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
+//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WIFI);
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
+        }
+
+        boolean ETLsplunkFlat = false;
+        if (ETLsplunkFlat == true) {
+
+            boolean clearsplunkflag = false;
+            if (clearsplunkflag == true) {
+                this.getSsnsDataImp().deleteAllSsnsData(0);
+            }
+            for (int i = 0; i < 10; i++) {
+                processETL();
+            }
+        }
+/////////
+/////////                    
+        boolean procallflag = false;
+        if (procallflag == true) {
+//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
+
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_CALLC);
+            for (int i = 0; i < 100; i++) {
+//                            processFeatureQual();
+//                            processFeatureCallC();
+//                            processFeatureWLNPro();
+//                            processFeatureApp();
+//                            processFeatureProd();
+                processFeatureWifi();
+//                            processFeatureTTVC();
+//                            processFeatureActCfg();
+            }
+        }
+
+        boolean restoreSsnsAccFlag = false; // work for remote d
+        if (restoreSsnsAccFlag == true) {
+            systemRestoresSsnsAcc();
+        }
+
+        boolean restoreSsRepotFlag = false; // work for remote d
+        if (restoreSsRepotFlag == true) {
+            logger.info("restoreSsReportDB start");
+            this.getSsnsDataImp().deleteAllSsReport(0);
+            boolean retSatus = getAccountImp().restoreSsReportDB(this);
+            logger.info("restoreSsReportDB end");
+        }
+
+//                    boolean restoreSsnsDataFlag = false; // work for remote d
+//                    if (restoreSsnsDataFlag == true) {
+//                        this.getSsnsDataImp().deleteAllSsnsData(0);
+//                        boolean retSatus = getAccountImp().restoreSsnsDataDB(this);
+//                    }
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////   
+        boolean tempflag = false;
+        if (tempflag == true) {
+//                        String uid = "97c69ce5-bd22-4c7f-b215-3fcc8e358535";
+//                        ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList(uid);
+//                        SsnsData data = dataList.get(0);
+//                        SsnsService ss = new SsnsService();
+//                        String feature = ss.getFeatureSsnsProdiuctInventory(data);
+
+            ArrayList<String> testIdList = new ArrayList();
+            ArrayList<String> testFeatList = new ArrayList();
+            int added = 0;
+            ReportData reportdata = new ReportData();
+            String app = SsnsService.APP_APP;
+            ArrayList<String> servList = getSsnsprodAll(CKey.ADMIN_USERNAME, null, 0);
+            for (int i = 0; i < servList.size(); i += 2) {
+                String servProd = servList.get(i);
+                int exitSrv = 100;
+                if (app != null) {
+                    if (app.length() > 0) {
+                        if (app.equals(servProd)) {
+                            ;
+                        } else {
+                            continue;
+                        }
+                    }
+                }
+                ArrayList<String> featallList = getSsnsprodByFeature(CKey.ADMIN_USERNAME, null, servProd);
+                for (int j = 0; j < featallList.size(); j += 2) {
+                    String featN = featallList.get(j);
+                    if (featN.indexOf("failed") != -1) {
+                        continue;
+                    }
+                    if (featN.indexOf("failed") != -1) {
+                        continue;
+                    }
+                    testFeatList.add(featN);
+                    Set<String> set = new HashSet<>();
+
+                    ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, 5);
+                    if (SsnsAcclist != null) {
+                        for (int k = 0; k < SsnsAcclist.size(); k++) {
+                            try {
+                                SsnsAcc accObj = SsnsAcclist.get(k);
+
+                                if (accObj.getType() > 10) {  // testfailed will increment this type
+                                    continue;
+                                }
+                                if (accObj.getApp().equals(SsnsService.APP_PRODUCT)) {
+                                    if (accObj.getBanid().length() > 0) {
+                                        if (!set.add(accObj.getBanid())) {
+                                            continue;
+                                        }
+                                    }
+                                }
+                                testData tObj = new testData();
+                                tObj.setAccid(accObj.getId());
+                                tObj.setUsername(CKey.ADMIN_USERNAME);
+                                tObj.setTesturl("");
+                                String st = new ObjectMapper().writeValueAsString(tObj);
+                                st = st.replace('"', '^');
+                                testIdList.add(st);
+                                int id = tObj.getAccid();
+                                String LABURL = tObj.getTesturl();  // " empty for monitor, not empay for regression
+
+                                accObj = getSsnsDataImp().getSsnsAccObjByID(id);
+                                String dataSt = accObj.getData();
+                                ProductData pData = new ObjectMapper().readValue(dataSt, ProductData.class
+                                );
+                                ArrayList<String> response = new ArrayList();
+                                ArrayList<String> labResponse = new ArrayList();
+                                String passSt;
+                                int totalTC = 0;
+                                float exec = 0;
+                                String oper = SsnsService.APP_GET_TIMES;
+                                if (LABURL.length() == 0) {
+                                    passSt = R_FAIL;
+
+                                    response = testSsnsprodPRocessByIdRT(CKey.ADMIN_USERNAME, null, accObj.getId() + "", accObj.getApp(), oper, LABURL);
+                                    totalTC++;
+                                    if (response != null) {
+                                        if (response.size() > 3) {
+                                            String feat = response.get(0);
+                                            String execSt = response.get(2);
+                                            int index = execSt.indexOf("elapsedTime:");
+                                            if (index != -1) {
+                                                execSt = execSt.substring(index + 12);
+                                                exec = Long.parseLong(execSt);
+                                            }
+
+                                            if (feat.equals(accObj.getName())) {
+                                                passSt = R_PASS;
+                                            } else {
+                                                passSt = R_PASS;
+                                                String[] featL = feat.split(":");
+                                                String[] nameL = accObj.getName().split(":");
+                                                if ((featL.length > 4) && (nameL.length > 4)) {
+                                                    if (!featL[2].equals(nameL[2])) {
+                                                        passSt = R_FAIL;
+                                                    }
+                                                    if (!featL[3].equals(nameL[3])) {
+                                                        passSt = R_FAIL;
+                                                    }
+                                                    if (!featL[4].equals(nameL[4])) {
+                                                        passSt = R_FAIL;
+                                                    }
+                                                } else if ((featL.length > 3) && (nameL.length > 3)) {
+                                                    if (!featL[2].equals(nameL[2])) {
+                                                        passSt = R_FAIL;
+                                                    }
+                                                    if (!featL[3].equals(nameL[3])) {
+                                                        passSt = R_FAIL;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    passSt = accObj.getName() + ":" + passSt;
+                                }
+                            } catch (Exception ex) {
+                            }
+
+                        }
+                    }
+                }
+            }
+
+        }
+
+        boolean monflag = false;
+        if (monflag == true) {
+//                        this.getSsnsDataImp().deleteAllSsReport(0);
+//
+            SsnsRegression regression = new SsnsRegression();
+            String name = CKey.ADMIN_USERNAME;
+            ArrayList<SsReport> ret = new ArrayList();
+//                        /////////Regression
+//                        name = "GUEST";
+//
+//                        getSsReportRegressionStart(name, null, APP_APP, DEF_LABURL); //"http://L097105:8080");
+//                        ret = getSsReportRegression(name, null);
+//                        for (int i = 0; i < 10; i++) {
+//                            regression.processMonitorTesting(this);
+//                            if (i == 2) {
+//                                regression.stopMonitor(this, name);
+//                            }
+//                            ret = getSsReportRegression(name, null);
+//                        }
+//                        ret = getSsReportRegression(name, null);
+
+            /////////monitor
+//                        ret = getSsReportMon(name, null);
+//                        regression.startMonitor(this, name);
+//
+            for (int i = 0; i < 10; i++) {
+                regression.processMonitorTesting(this);
+//                            if (i == 2) {
+//                                regression.stopMonitor(this, name);
+//                            }
+                ret = getSsReportMon(name, null);
+            }
+//                        ret = getSsReportMon(name, null);
+        }
+/////////
+/////////
+        boolean procflag = false;
+        if (procflag == true) {
+
+            SsnsService ss = new SsnsService();
+            String feature = "";
+            boolean prodflag = true;
+            if (prodflag == true) {
+                ArrayList ttvNameArrayTemp = getAllOpenProductArray();
+                if (ttvNameArrayTemp != null) {
+                    for (int i = 0; i < ttvNameArrayTemp.size(); i++) {
+                        String idSt = (String) ttvNameArrayTemp.get(i);
+
+                        int id = Integer.parseInt(idSt);
+                        SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
+                        feature = ss.getFeatureSsnsProdiuctInventory(data);
+
+//                                    ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList("cf0adc01-588e-4717-b87b-876441d79a1e");
+//                                    feature = ss.getFeatureSsnsProdiuctInventory(dataList.get(0));
+                    }
+                }
+            }
+        }
+/////////
+/////////
+        boolean wififlag = false;
+        if (wififlag == true) {
+
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
+            SsnsService ss = new SsnsService();
+            String feature = "";
+            ArrayList appNameArrayTemp = getAllOpenWifiArray();
+            if (appNameArrayTemp != null) {
+                for (int i = 0; i < appNameArrayTemp.size(); i++) {
+                    String idSt = (String) appNameArrayTemp.get(i);
+
+                    int id = Integer.parseInt(idSt);
+                    SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
+                    feature = ss.getFeatureSsnsWifi(data);
+
+//                                    ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList("0f8825e8-d628-405e-83d6-3ff63dd82654");
+//                                    ss.getFeatureSsnsWifi(dataList.get(0));
+                }
+            }
+        }
+/////////
+/////////
+        boolean appflag = false;
+        if (appflag == true) {
+
+//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
+            SsnsService ss = new SsnsService();
+            String feature = "";
+            ArrayList appNameArrayTemp = getAllOpenAppArray();
+            if (appNameArrayTemp != null) {
+                for (int i = 0; i < appNameArrayTemp.size(); i++) {
+                    String idSt = (String) appNameArrayTemp.get(i);
+
+                    int id = Integer.parseInt(idSt);
+                    SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
+                    feature = ss.getFeatureSsnsAppointment(data);
+                }
+            }
+        }
+
+        boolean ttvReqflag = false;
+        if (ttvReqflag == true) {
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
+//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);                        
+//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
+
+            for (int m = 0; m < 20; m++) {
+                SsnsService ss = new SsnsService();
+                String feature = "";
+                ArrayList appNameArrayTemp = getAllOpenTTVCArray();
+                if (appNameArrayTemp != null) {
+                    for (int i = 0; i < appNameArrayTemp.size(); i++) {
+                        String idSt = (String) appNameArrayTemp.get(i);
+
+                        int id = Integer.parseInt(idSt);
+                        SsnsData data = getSsnsDataImp().getSsnsDataObjByID(id);
+                        feature = ss.getFeatureSsnsTTVC(data);
+
+//                                    ArrayList<SsnsData> dataList = getSsnsDataImp().getSsnsDataObjByUUIDList("28d552b9-df3d-4bd8-8a22-3ff63dd8b337");
+//                                    feature = ss.getFeatureSsnsTTVC(dataList.get(1));
+                    }
+                }
+            }
+        }
+
     }
 
     private void ProcessAllLockCleanup() {

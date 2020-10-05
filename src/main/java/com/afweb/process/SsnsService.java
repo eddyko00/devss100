@@ -4546,7 +4546,7 @@ public class SsnsService {
     private static final String METHOD_POST = "post";
     private static final String METHOD_GET = "get";
 
-    private String sendRequest_Ssns(String method, String subResourcePath, Map<String, String> queryParams,
+    public String sendRequest_Ssns(String method, String subResourcePath, Map<String, String> queryParams,
             Map<String, String> bodyParams, String postParmSt) throws Exception {
         String response = null;
         for (int i = 0; i < 4; i++) {
