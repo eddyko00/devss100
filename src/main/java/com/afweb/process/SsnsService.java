@@ -3222,7 +3222,7 @@ public class SsnsService {
             }
         }
         try {
-            logger.info("> SendSsnsAppointmentGetApp url: " + url + ", host: " + host);
+//            logger.info("> SendSsnsAppointmentGetApp url: " + url + ", host: " + host);
             if (inList != null) {
                 inList.add(url);
             }

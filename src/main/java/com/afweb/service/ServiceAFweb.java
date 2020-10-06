@@ -377,7 +377,7 @@ public class ServiceAFweb {
 //
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
-                    TestExec();
+                    testExec();
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////  
@@ -472,8 +472,8 @@ public class ServiceAFweb {
         try {
             SsnsService ssns = new SsnsService();
 //            String urlSt = "https://soa-mp-rmsk-pr.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
-//            String urlSt = "http://ssns-appointmentmgmt-it03.paas-app-east-np.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
-            String urlSt = "https://soa-mp-rmsk-it02.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
+            String urlSt = "http://ssns-appointmentmgmt-it03.paas-app-east-np.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
+//            String urlSt = "https://soa-mp-rmsk-it02.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
             String url = replaceAll("abc", "", urlSt);
             String resp = ssns.sendRequest_Ssns("get", url, null, null, null);
             logger.info("> debugtest resp it03: " + resp);
@@ -481,7 +481,7 @@ public class ServiceAFweb {
         }
     }
 
-    void TestExec() {
+    void testExec() {
         ///////////////////////////////////////////////////////////////////////////////////
         boolean wifidebug = false;
         if (wifidebug == true) {
@@ -2784,9 +2784,9 @@ public class ServiceAFweb {
 
     public static void AFSleep1Sec(int sec) {
         // delay seems causing openshif not working        
-        if (true) {
-            return;
-        }
+//        if (true) {
+//            return;
+//        }
         try {
             if ((sec < 0) || (sec > 10)) {
                 sec = 1;
@@ -2798,9 +2798,9 @@ public class ServiceAFweb {
 
     public static void AFSleep() {
         // delay seems causing openshif not working        
-        if (true) {
-            return;
-        }
+//        if (true) {
+//            return;
+//        }
         try {
             Thread.sleep(10);
         } catch (Exception ex) {
