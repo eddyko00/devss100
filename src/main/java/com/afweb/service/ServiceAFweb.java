@@ -472,7 +472,8 @@ public class ServiceAFweb {
         try {
             SsnsService ssns = new SsnsService();
 //            String urlSt = "https://soa-mp-rmsk-pr.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
-            String urlSt = "http://ssns-appointmentmgmt-it03.paas-app-east-np.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
+//            String urlSt = "http://ssns-appointmentmgmt-it03.paas-app-east-np.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
+            String urlSt = "https://soa-mp-rmsk-it02.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
             String url = replaceAll("abc", "", urlSt);
             String resp = ssns.sendRequest_Ssns("get", url, null, null, null);
             logger.info("> debugtest resp it03: " + resp);
