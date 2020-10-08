@@ -754,6 +754,8 @@ public class ServiceAFweb {
             }
         }
 //                    
+//        getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_WIFI);
+        
         boolean clearssnsflag = false;
         if (clearssnsflag == true) {
 

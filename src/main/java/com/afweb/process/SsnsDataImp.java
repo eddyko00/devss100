@@ -57,7 +57,12 @@ public class SsnsDataImp {
     public int removeLock(String name, int type) {
         return ssnsdb.removeLock(name, type);
     }
+    
+    public int updateSsnsDataCompleteStatus(String app) {
+        return ssnsdb.updateSsnsDataCompleteStatus(app);
+    }
 
+    
     public int updateSsnsDataOpenStatus(String app) {
         return ssnsdb.updateSsnsDataOpenStatus(app);
     }

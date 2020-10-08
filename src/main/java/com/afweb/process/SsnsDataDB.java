@@ -548,6 +548,18 @@ public class SsnsDataDB {
         return 0;
     }
 
+
+    public int updateSsnsDataCompleteStatus(String app) {
+        try {
+            String sqlCMD = "update ssnsdata set status=" + ConstantKey.COMPLETED
+                    + " where app='" + app + "'";
+            return processUpdateDB(sqlCMD);
+        } catch (Exception e) {
+            logger.info("> updateSsnsDataCloseStatus exception " + e.getMessage());
+        }
+        return 0;
+    }
+
     public int updateSsnsDataOpenStatus(String app) {
         try {
             String sqlCMD = "update ssnsdata set status=" + ConstantKey.OPEN
