@@ -548,7 +548,6 @@ public class SsnsDataDB {
         return 0;
     }
 
-
     public int updateSsnsDataCompleteStatus(String app) {
         try {
             String sqlCMD = "update ssnsdata set status=" + ConstantKey.COMPLETED
@@ -918,6 +917,29 @@ public class SsnsDataDB {
         return 0;
     }
 
+    public int deleteAllSsnsAccByUpdatedatel(String app, long timeL) {
+        try {
+            String deleteSQL = "delete from ssnsacc where where app='" + app + "' and updatedatel < " + timeL;
+            processExecuteDB(deleteSQL);
+            return 1;
+        } catch (Exception e) {
+            logger.info("> deleteAllSsnsAccByUpdatedatel exception " + e.getMessage());
+        }
+        return 0;
+    }
+    
+    public int deleteAllSsnsDataByUpdatedatel(String app, long timeL) {
+        try {
+            String deleteSQL = "delete from ssnsdata where where app='" + app + "' and updatedatel < " + timeL;
+            processExecuteDB(deleteSQL);
+            return 1;
+        } catch (Exception e) {
+            logger.info("> deleteAllSsnsDataByUpdatedatel exception " + e.getMessage());
+        }
+        return 0;
+    }
+    
+
     public int deleteAllSsnsAcc(int month) {
         try {
             String deleteSQL = "delete from ssnsacc";
@@ -1120,6 +1142,7 @@ public class SsnsDataDB {
 //    }
     public ArrayList<SsnsAcc> getSsnsAccObjListByApp(String app, int length) {
         String sql = "select * from ssnsacc where app='" + app + "'";
+        sql += " order by updatedatel desc";
         ArrayList entries = getAllSsnsAccSQL(sql, length);
         return entries;
     }

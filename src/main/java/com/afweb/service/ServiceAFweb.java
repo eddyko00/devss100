@@ -432,6 +432,7 @@ public class ServiceAFweb {
             }
             if ((getServerObj().getProcessTimerCnt() % 20) == 0) {
                 ProcessAllLockCleanup();
+                ProcessAllOldSsnsAccCleanup(this);
             }
             if ((getServerObj().getProcessTimerCnt() % 13) == 0) {
                 processFeatureProd();
@@ -757,10 +758,11 @@ public class ServiceAFweb {
 
         boolean clearssnsflag = false;
         if (clearssnsflag == true) {
-            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
-            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_PRODUCT);     
             
+//            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_PRODUCT);
 
+//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
+//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_PRODUCT);
 //            ArrayList<SsnsAcc> ssnsObjList = getSsnsDataImp().testWifiSerial();
 //
 //            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
@@ -1119,6 +1121,26 @@ public class ServiceAFweb {
                     }
                 }
             }
+        }
+    }
+
+    private void ProcessAllOldSsnsAccCleanup(ServiceAFweb serviceAFweb) {
+
+        ArrayList<String> servList = serviceAFweb.getSsnsprodAll(CKey.ADMIN_USERNAME, null, 0);
+        for (int i = 0; i < servList.size(); i += 2) {
+            String servProd = servList.get(i);
+            ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByApp(servProd, 2);
+            if (ssnsAccObjList == null) {
+                continue;
+            }
+            if (ssnsAccObjList.size() > 0) {
+                SsnsAcc accObj = ssnsAccObjList.get(0);
+                long timeL = accObj.getUpdatedatel();
+                timeL = TimeConvertion.addMonths(timeL, -1); // delete last month
+                getSsnsDataImp().deleteAllSsnsAccByUpdatedatel(servProd, timeL);
+                getSsnsDataImp().deleteAllSsnsDataByUpdatedatel(servProd, timeL);
+            }
+
         }
     }
 

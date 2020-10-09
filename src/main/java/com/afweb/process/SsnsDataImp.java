@@ -57,12 +57,11 @@ public class SsnsDataImp {
     public int removeLock(String name, int type) {
         return ssnsdb.removeLock(name, type);
     }
-    
+
     public int updateSsnsDataCompleteStatus(String app) {
         return ssnsdb.updateSsnsDataCompleteStatus(app);
     }
 
-    
     public int updateSsnsDataOpenStatus(String app) {
         return ssnsdb.updateSsnsDataOpenStatus(app);
     }
@@ -261,6 +260,14 @@ public class SsnsDataImp {
 
     public int deleteAllSsnsData(int month) {
         return ssnsdb.deleteAllSsnsData(month);
+    }
+
+    public int deleteAllSsnsAccByUpdatedatel(String app, long timeL) {
+        return ssnsdb.deleteAllSsnsAccByUpdatedatel(app, timeL);
+    }
+
+    public int deleteAllSsnsDataByUpdatedatel(String app, long timeL) {
+        return ssnsdb.deleteAllSsnsDataByUpdatedatel(app, timeL);
     }
 
     public SsnsData getSsnsDataObjapp_uuid_datel(SsnsData item) {
