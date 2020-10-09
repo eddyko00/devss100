@@ -3956,7 +3956,8 @@ public class SsnsService {
                     if (valueSt.length() != 0) {
                         PrimaryPricePlan = valueSt;
                     } else {
-                        valueSt = checkProductNm(outputList.size() - 1 - j + 1, outputList);
+                        valueSt = checkProductOfferingNextProductNmForSING(outputList.size() - 1 - j + 1, outputList);
+//                        valueSt = checkProductNm(outputList.size() - 1 - j + 1, outputList);
                         if (valueSt.length() != 0) {
                             PrimaryPricePlan = valueSt;
                         }
@@ -4039,6 +4040,30 @@ public class SsnsService {
                         String inLL = outputList.get(outputList.size() - 1 - m);
                         if (inLL.indexOf("productNm") != -1) {
                             String valueSt = outputList.get(outputList.size() - 1 - m + 1);
+                            valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
+                            valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
+                            valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
+                            return valueSt;
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            logger.info("> checkProductOfferingProductNm " + ex.getMessage());
+        }
+        return "";
+    }
+
+    public static String checkProductOfferingNextProductNmForSING(int j, ArrayList<String> outputList) {
+        try {
+            for (int k = j; k < outputList.size(); k++) {
+                String inL = outputList.get(outputList.size() - 1 - k);
+                if (inL.indexOf("productOffering") != -1) {
+                    int tmp = outputList.size() - 1 - k;
+                    for (int m = tmp; m < outputList.size(); m++) {
+                        String inLL = outputList.get(m);// (outputList.size() - 1 - m);
+                        if (inLL.indexOf("productNm") != -1) {
+                            String valueSt = outputList.get(m + 1);
                             valueSt = ServiceAFweb.replaceAll("\"", "", valueSt);
                             valueSt = ServiceAFweb.replaceAll("value:", "", valueSt);
                             valueSt = ServiceAFweb.replaceAll(" ", "_", valueSt);
