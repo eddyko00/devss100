@@ -3952,11 +3952,11 @@ public class SsnsService {
                         continue;
                     }
                     planInit = 1;
-                    String valueSt = checkProductOfferingProductNm(j, outputList);
+                    String valueSt = checkProductOfferingProductNm(outputList.size() - 1 - j + 1, outputList);
                     if (valueSt.length() != 0) {
                         PrimaryPricePlan = valueSt;
                     } else {
-                        valueSt = checkProductNm(j, outputList);
+                        valueSt = checkProductNm(outputList.size() - 1 - j + 1, outputList);
                         if (valueSt.length() != 0) {
                             PrimaryPricePlan = valueSt;
                         }

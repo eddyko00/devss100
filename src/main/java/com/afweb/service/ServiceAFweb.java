@@ -754,41 +754,42 @@ public class ServiceAFweb {
             }
         }
 //                    
-//        getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_WIFI);
-        
+
         boolean clearssnsflag = false;
         if (clearssnsflag == true) {
+            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
+            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_PRODUCT);     
+            
 
-//                        ArrayList<SsnsAcc> ssnsObjList = getSsnsDataImp().testWifiSerial();
+//            ArrayList<SsnsAcc> ssnsObjList = getSsnsDataImp().testWifiSerial();
 //
-            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
-            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_APP);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
+//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
+//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
+//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_APP);
+//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_APP);
 //
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
-//                        // remember SSNS ACC is using APP_TTVC
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
-//                        
-
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_CALLC);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_CALLC);
+//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);
+//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
+//            // remember SSNS ACC is using APP_TTVC
+//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
 //
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_ACTCFG);
-//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_ACTCFG);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_ACTCFG);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_QUAL);
-//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_QUAL);
-//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
+//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_CALLC);
+//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_CALLC);
 //
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
-//                        getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
-//                        getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WIFI);
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
+//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_ACTCFG);
+//            getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_ACTCFG);
+//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_ACTCFG);
+//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
+//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVSUB);
+//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_TTVREQ);
+//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_QUAL);
+//            getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_QUAL);
+//            getSsnsDataImp().updateSsnsDataAllOpenStatus();
+//
+//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
+//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WIFI);
+//            getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WIFI);
+//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
         }
 
         boolean ETLsplunkFlat = false;
