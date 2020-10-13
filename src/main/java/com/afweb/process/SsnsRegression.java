@@ -115,7 +115,7 @@ public class SsnsRegression {
             ArrayList<String> servList = serviceAFweb.getSsnsprodAll(name, null, 0);
             for (int i = 0; i < servList.size(); i += 2) {
                 String servProd = servList.get(i);
-                int exitSrv = 30; //100;
+
                 if (app != null) {
                     if (app.length() > 0) {
                         if (app.equals(servProd)) {
@@ -125,7 +125,6 @@ public class SsnsRegression {
                         }
                     }
                 }
-                int added = 0;
                 ArrayList<String> featallListTmp = serviceAFweb.getSsnsprodByFeature(name, null, servProd);
 
                 ArrayList<String> featallList = new ArrayList();
@@ -142,6 +141,8 @@ public class SsnsRegression {
                 }
                 // make random list on testIdList 
                 Collections.shuffle(featallList);
+                ArrayList<String> testFeatListTemp = new ArrayList();
+                int MaxFeatExit = 15;
 
                 for (int j = 0; j < featallList.size(); j++) {
                     String featN = featallList.get(j);
@@ -151,7 +152,8 @@ public class SsnsRegression {
                     if (featN.indexOf("failed") != -1) {
                         continue;
                     }
-                    testFeatList.add(featN);
+                    testFeatListTemp.add(featN);
+
                     Set<String> set = new HashSet<>();
 
                     ArrayList<SsnsAcc> SsnsAcclist = getSsnsDataImp().getSsnsAccObjListByFeature(servProd, featN, 5);
@@ -162,6 +164,7 @@ public class SsnsRegression {
                             if (accObj.getType() > 10) {  // testfailed will increment this type
                                 continue;
                             }
+//////////////////////////////                              
                             if (accObj.getApp().equals(SsnsService.APP_PRODUCT)) {
                                 if (accObj.getBanid().length() > 0) {
                                     if (!set.add(accObj.getBanid())) {
@@ -173,6 +176,7 @@ public class SsnsRegression {
                                     continue;
                                 }
                             }
+//////////////////////////////                            
                             if (accObj.getApp().equals(SsnsService.APP_TTVC)) {
                                 String oper = accObj.getOper();
                                 if (oper.equals(SsnsService.TT_SaveOrder)) {
@@ -181,7 +185,7 @@ public class SsnsRegression {
                                     continue;
                                 }
                             }
-
+//////////////////////////////  
                             if (accObj.getApp().equals(SsnsService.APP_WIFI)) {
                                 String nameFeat = accObj.getName();
                                 if (nameFeat.indexOf("NotaBan") != -1) {
@@ -196,33 +200,17 @@ public class SsnsRegression {
                             String st = new ObjectMapper().writeValueAsString(tObj);
                             st = st.replace('"', '^');
                             testIdList.add(st);
-                            added++;
                             totalAdded++;
-
-//                            if (accObj.getApp().equals(SsnsService.APP_WLNPRO)) {
-//                                // add double test becuase the TC is too low
-//                                testIdList.add(st);
-//                                added++;
-//                                totalAdded++;
-//                                wlnProCnt += 2;
-//
-//                            }
-////////////////////////////////////////////////
-                            if (added > exitSrv) {  // 100 each product
-                                break;
-                            }
-                            if (featallList.size() > 50) {
-                                break;
-                            }
-////////////////////////////////////////////////
                         }
                     }
-                    if (added > exitSrv) {  // 100 each product
+                    if (testFeatListTemp.size() > MaxFeatExit) {
                         break;
                     }
                 }
+                logger.info("> startMonitor " + name + " prod:" + servProd + " Cnt:" + testFeatListTemp.size());
+
+                testIdList.addAll(testFeatListTemp);
             }
-//            logger.info("> startMonitor " + name + " wlnProCnt:" + wlnProCnt + " qualCnt:" + qualCnt);
             // make random list on testIdList 
             Collections.shuffle(testIdList);
 

@@ -488,8 +488,13 @@ public class ServiceAFweb {
         boolean clearssnsflag = false;
         if (clearssnsflag == true) {
 
-//            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_PRODUCT);
+//            SsnsRegression regression = new SsnsRegression();
+//            regression.processMonitorTesting(this);
+//            String name = CKey.ADMIN_USERNAME;
+//            regression.stopMonitor(this, name);
+//            regression.startMonitor(this, name, "");
 
+//            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_PRODUCT);
 //            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
 //            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_PRODUCT);
 //            ArrayList<SsnsAcc> ssnsObjList = getSsnsDataImp().testWifiSerial();
@@ -523,7 +528,6 @@ public class ServiceAFweb {
 //            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WIFI);
         }
 
-        
         boolean wifidebug = false;
         if (wifidebug == true) {
             String app = SsnsService.APP_WIFI; //"wifi";
