@@ -919,7 +919,7 @@ public class SsnsDataDB {
 
     public int deleteAllSsnsAccByUpdatedatel(String app, long timeL) {
         try {
-            String deleteSQL = "delete from ssnsacc where where app='" + app + "' and updatedatel < " + timeL;
+            String deleteSQL = "delete from ssnsacc where app='" + app + "' and updatedatel < " + timeL;
             processExecuteDB(deleteSQL);
             return 1;
         } catch (Exception e) {
@@ -930,7 +930,7 @@ public class SsnsDataDB {
     
     public int deleteAllSsnsDataByUpdatedatel(String app, long timeL) {
         try {
-            String deleteSQL = "delete from ssnsdata where where app='" + app + "' and updatedatel < " + timeL;
+            String deleteSQL = "delete from ssnsdata where app='" + app + "' and updatedatel < " + timeL;
             processExecuteDB(deleteSQL);
             return 1;
         } catch (Exception e) {
