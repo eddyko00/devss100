@@ -141,7 +141,7 @@ public class SsnsRegression {
                 }
                 // make random list on testIdList 
                 Collections.shuffle(featallList);
-                ArrayList<String> testFeatListTemp = new ArrayList();
+                ArrayList<String> testIDListTemp = new ArrayList();
                 int MaxFeatExit = 15;
 
                 for (int j = 0; j < featallList.size(); j++) {
@@ -152,7 +152,6 @@ public class SsnsRegression {
                     if (featN.indexOf("failed") != -1) {
                         continue;
                     }
-                    testFeatListTemp.add(featN);
 
                     Set<String> set = new HashSet<>();
 
@@ -199,17 +198,18 @@ public class SsnsRegression {
                             tObj.setTesturl(labURL);
                             String st = new ObjectMapper().writeValueAsString(tObj);
                             st = st.replace('"', '^');
-                            testIdList.add(st);
+
                             totalAdded++;
+                            testIDListTemp.add(st);
                         }
                     }
-                    if (testFeatListTemp.size() > MaxFeatExit) {
+                    if (testIDListTemp.size() > MaxFeatExit) {
                         break;
                     }
                 }
-                logger.info("> startMonitor " + name + " prod:" + servProd + " Cnt:" + testFeatListTemp.size());
+                logger.info("> startMonitor " + name + " prod:" + servProd + " Cnt:" + testIDListTemp.size());
 
-                testIdList.addAll(testFeatListTemp);
+                testIdList.addAll(testIDListTemp);
             }
             // make random list on testIdList 
             Collections.shuffle(testIdList);
