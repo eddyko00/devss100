@@ -430,27 +430,30 @@ public class ServiceAFweb {
                 // clear old report
                 SsReportClearExceptLast3(CKey.ADMIN_USERNAME);
             }
-            if ((getServerObj().getProcessTimerCnt() % 20) == 0) {
+            
+            // 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53
+            
+            if ((getServerObj().getProcessTimerCnt() % 19) == 0) {
                 ProcessAllLockCleanup();
                 ProcessAllOldSsnsAccCleanup(this);
             }
-            if ((getServerObj().getProcessTimerCnt() % 13) == 0) {
+            if ((getServerObj().getProcessTimerCnt() % 17) == 0) {
                 processFeatureProd();
                 processFeatureCallC();
 
-            } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
+            } else if ((getServerObj().getProcessTimerCnt() % 13) == 0) {
                 processFeatureApp();
                 processFeatureActCfg();
                 // monitor
                 SsnsRegression regression = new SsnsRegression();
                 regression.processMonitorTesting(this);
-            } else if ((getServerObj().getProcessTimerCnt() % 7) == 0) {
+            } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
                 //////require to save memory
                 System.gc();
                 //////require to save memory
                 processFeatureWifi();
                 processFeatureQual();
-            } else if ((getServerObj().getProcessTimerCnt() % 6) == 0) {
+            } else if ((getServerObj().getProcessTimerCnt() % 7) == 0) {
                 processFeatureWLNPro();
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
                 processFeatureTTVC();
@@ -459,7 +462,7 @@ public class ServiceAFweb {
                 processETL();
 
             } else if ((getServerObj().getProcessTimerCnt() % 2) == 0) {
-                processETL();
+
             } else {
 
             }
@@ -487,6 +490,8 @@ public class ServiceAFweb {
 
         boolean clearssnsflag = false;
         if (clearssnsflag == true) {
+//            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_TTVREQ);
+//            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_TTVSUB);
 
 //            SsnsRegression regression = new SsnsRegression();
 //            regression.processMonitorTesting(this);

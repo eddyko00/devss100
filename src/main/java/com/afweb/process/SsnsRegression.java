@@ -201,8 +201,13 @@ public class SsnsRegression {
 
                             totalAdded++;
                             testIDListTemp.add(st);
+                            if (testIDListTemp.size() > MaxFeatExit) {
+                                break;
+                            }
                         }
+                        testFeatList.add(featN);
                     }
+
                     if (testIDListTemp.size() > MaxFeatExit) {
                         break;
                     }
