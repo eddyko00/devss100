@@ -144,6 +144,7 @@ public class SsnsRegression {
                 ArrayList<String> testIDListTemp = new ArrayList();
                 int MaxFeatExit = 15;
 
+                int only2Cnt = 0;
                 for (int j = 0; j < featallList.size(); j++) {
                     String featN = featallList.get(j);
                     if (featN.indexOf("failed") != -1) {
@@ -201,13 +202,17 @@ public class SsnsRegression {
 
                             totalAdded++;
                             testIDListTemp.add(st);
+
                             if (testIDListTemp.size() > MaxFeatExit) {
+                                break;
+                            }
+                            only2Cnt++;
+                            if (only2Cnt > 2) {
                                 break;
                             }
                         }
                         testFeatList.add(featN);
                     }
-
                     if (testIDListTemp.size() > MaxFeatExit) {
                         break;
                     }
