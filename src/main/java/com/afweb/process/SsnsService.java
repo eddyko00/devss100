@@ -4751,7 +4751,7 @@ public class SsnsService {
                 con.setRequestMethod("GET");
             }
             ///////////
-            logger.info("POST request method:" + method + " host: " + request.getHost() + " url: " + request.getPath());
+//            logger.info("POST request method:" + method + " host: " + request.getHost() + " url: " + request.getPath());
             ///////            
             con.setRequestProperty("User-Agent", USER_AGENT);
 //            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
@@ -4880,7 +4880,7 @@ public class SsnsService {
                 con.setRequestMethod("GET");
             }
             ///////////
-            logger.info("POST request method:" + method + " host: " + request.getHost() + " url: " + request.getPath());
+//            logger.info("POST request method:" + method + " host: " + request.getHost() + " url: " + request.getPath());
             ///////            
 
             con.setRequestProperty("User-Agent", USER_AGENT);
