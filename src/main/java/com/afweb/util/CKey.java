@@ -32,6 +32,8 @@ public class CKey {
 
     public static boolean NN_DEBUG = false; //false; //true; 
     public static boolean UI_ONLY = true;
+    
+    
 //    public static boolean DEVOP = false;
 
 //    //

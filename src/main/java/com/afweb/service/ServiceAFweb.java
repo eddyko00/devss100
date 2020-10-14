@@ -488,11 +488,11 @@ public class ServiceAFweb {
 
         boolean clearssnsflag = false;
         if (clearssnsflag == true) {
-//            getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WLNPRO);
-//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WLNPRO);
-//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WLNPRO);
+//            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_CALLC);
+//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_CALLC);
+//            getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_CALLC);
 //            processETL_process();
-//            processFeatureWLNPro();
+//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_CALLC);
 
 //            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_TTVREQ);
 //            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_TTVSUB);
@@ -2607,6 +2607,21 @@ public class ServiceAFweb {
 
                             continue;
                         }
+                        if (app.equals(SsnsService.APP_CALLC)) {
+                            status = inLine.replace("parameter=", "");
+                            String parmSt = spSt;
+                            int beg = parmSt.indexOf("parameter=");
+
+                            String temSt = parmSt.substring(beg + 10, parmSt.length());
+                            int end = temSt.indexOf("]");
+                            if (end != -1) {
+//                                status = temSt.substring(0, end + 1);
+                                status = temSt;
+                            }
+                            ret = "parameter";
+
+                            continue;
+                        }
                         /////////////////
                         //default
                         status = inLine.replace("parameter=", "");
@@ -3825,7 +3840,7 @@ public class ServiceAFweb {
                 ArrayList<String> outputList = new ArrayList();
                 SsnsService ss = new SsnsService();
                 String feat = "";
-                if (Oper.equals(CALLC_GET) || Oper.equals(CALLC_UPDATE)) {
+                if (Oper.equals(CALLC_GET) || Oper.equals(CALLC_UPDATE) || Oper.equals(CALLC_RESET)) {
                     feat = ss.TestFeatureSsnsCallControl(ssnsAccObj, outputList, Oper, LABURL);
 
                     if (((feat == null) || (feat.length() == 0)) || (feat.indexOf(":testfailed") != -1)) {

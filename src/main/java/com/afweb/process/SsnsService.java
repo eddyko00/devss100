@@ -466,7 +466,11 @@ public class SsnsService {
         String postParm = "";
 
         try {
+
             String oper = dataObj.getOper();
+            if (oper.equals("error")) {
+                return "";
+            }
             if (oper.equals(CALLC_UPDATE)) {
                 dataSt = dataObj.getData();
                 dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
@@ -480,6 +484,24 @@ public class SsnsService {
                     // search call control with phone to find the ban
 
                     if (operList.length > 5) {
+
+                        for (int k = 0; k < operList.length; k++) {
+                            String inL = operList[k];
+//                          relatePartyList:id:35889253
+                            if (inL.indexOf("relatePartyList") != -1) {
+                                inL = ServiceAFweb.replaceAll("\"", "", inL);
+                                inL = ServiceAFweb.replaceAll("relatePartyList:id:", "", inL);
+                                banid = inL;
+                            }
+//                          callCharacteristicList
+                            if (inL.indexOf("callCharacteristicList") != -1) {
+                                inL = operList[k + 2]; //value:VOLTE
+                                inL = ServiceAFweb.replaceAll("\"", "", inL);
+                                inL = ServiceAFweb.replaceAll("value:", "", inL);
+                                host = inL;
+                            }
+                        }
+
                         dataSt = dataObj.getData();
 
                         int beg = dataSt.indexOf("{");
@@ -490,16 +512,6 @@ public class SsnsService {
                             postParm = ServiceAFweb.replaceAll(":\",", ":\" \",", postParm);
                             postParm = ServiceAFweb.replaceAll("= ", "", postParm);
 
-                            ////find ban from phone nubmer                            
-                            ////assume Get call control has the Ban for this number 
-                            ArrayList<SsnsAcc> ssnsAccObjList = getSsnsDataImp().getSsnsAccObjListByOperCustId(CALLC_GET, phone);
-                            if (ssnsAccObjList != null) {
-                                if (ssnsAccObjList.size() > 0) {
-                                    SsnsAcc acc = ssnsAccObjList.get(0);
-                                    banid = acc.getBanid();
-                                    host = acc.getRet();
-                                }
-                            }
                         }
                     }
                     cmd.add("get call control");
@@ -522,18 +534,60 @@ public class SsnsService {
                 cmd.add("get call control");
                 cmd.add(CALLC_GET);
                 pData.setCmd(cmd);
+            } else if (oper.equals(CALLC_RESET)) { //"getAppointment")) {
+                dataSt = dataObj.getData();
+                dataSt = ServiceAFweb.replaceAll("\"", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("[", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("]", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("{", "", dataSt);
+                dataSt = ServiceAFweb.replaceAll("}", "", dataSt);
+                String[] operList = dataSt.split(",");
+                if (operList.length > 1) {
+                    phone = operList[0];
+                    // search call control with phone to find the ban
 
+                    if (operList.length > 5) {
+
+                        for (int k = 0; k < operList.length; k++) {
+                            String inL = operList[k];
+//                          relatePartyList:id:35889253
+                            if (inL.indexOf("relatePartyList") != -1) {
+                                inL = ServiceAFweb.replaceAll("\"", "", inL);
+                                inL = ServiceAFweb.replaceAll("relatePartyList:id:", "", inL);
+                                banid = inL;
+                            }
+//                          callCharacteristicList
+                            if (inL.indexOf("callCharacteristicList") != -1) {
+                                inL = operList[k + 2]; //value:VOLTE
+                                inL = ServiceAFweb.replaceAll("\"", "", inL);
+                                inL = ServiceAFweb.replaceAll("value:", "", inL);
+                                host = inL;
+                            }
+                        }
+
+                        dataSt = dataObj.getData();
+
+                        int beg = dataSt.indexOf("{");
+                        if (beg != -1) {
+                            postParm = dataSt.substring(beg);
+                            postParm += "}}]}";
+                            //"callerList":[{"callerName":","phoneNumber":"355692727113"} error at :", 
+                            postParm = ServiceAFweb.replaceAll(":\",", ":\" \",", postParm);
+                            postParm = ServiceAFweb.replaceAll("= ", "", postParm);
+
+                        }
+                    }
+                    cmd.add("get call control");
+                    cmd.add(CALLC_GET);
+                    pData.setCmd(cmd);
+                }
             } else {
                 logger.info("> getFeatureSsnsCallCProcess Other oper " + oper);
+                return "";
             }
-            if (oper.equals(CALLC_GET)) {
-                // for testing ignore APP_GET_APP becase alwasy no info
-//                return "";
-                // for testing
-            } else if (oper.equals(CALLC_UPDATE)) {
 
-            } else {
-                logger.info(dataSt);
+            if ((banid.length() == 0) || (phone.length() == 0)) {
+                return "";
             }
 //            logger.info(dataSt);
 /////////////
@@ -588,7 +642,7 @@ public class SsnsService {
         try {
             String featTTV = "";
             String outputSt = null;
-            if (oper.equals(CALLC_GET) || oper.equals(CALLC_UPDATE)) {
+            if (oper.equals(CALLC_GET) || oper.equals(CALLC_UPDATE) || oper.equals(CALLC_RESET)) {
                 if ((banid.length() == 0) || (phone.length() == 0)) {
                     return false;
                 }
