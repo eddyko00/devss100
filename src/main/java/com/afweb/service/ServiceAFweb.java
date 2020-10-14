@@ -28,11 +28,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+
 import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.logging.Level;
 
 import java.util.logging.Logger;
 import javax.sql.DataSource;
@@ -377,7 +376,7 @@ public class ServiceAFweb {
 //
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
-                    testExec();
+                    AFWebtestExec();
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////  
@@ -430,9 +429,8 @@ public class ServiceAFweb {
                 // clear old report
                 SsReportClearExceptLast3(CKey.ADMIN_USERNAME);
             }
-            
+
             // 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53
-            
             if ((getServerObj().getProcessTimerCnt() % 19) == 0) {
                 ProcessAllLockCleanup();
                 ProcessAllOldSsnsAccCleanup(this);
@@ -485,20 +483,24 @@ public class ServiceAFweb {
         }
     }
 
-    void testExec() {
+    void AFWebtestExec() {
         ///////////////////////////////////////////////////////////////////////////////////
 
         boolean clearssnsflag = false;
         if (clearssnsflag == true) {
+//            getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_WLNPRO);
+//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_WLNPRO);
+//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_WLNPRO);
+//            processETL_process();
+//            processFeatureWLNPro();
+
 //            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_TTVREQ);
 //            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_TTVSUB);
-
 //            SsnsRegression regression = new SsnsRegression();
 //            regression.processMonitorTesting(this);
 //            String name = CKey.ADMIN_USERNAME;
 //            regression.stopMonitor(this, name);
 //            regression.startMonitor(this, name, "");
-
 //            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_PRODUCT);
 //            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
 //            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_PRODUCT);
@@ -2324,6 +2326,7 @@ public class ServiceAFweb {
                         int beg = parmSt.indexOf("CustomerInfo=");
                         status = parmSt.substring(beg + 13, parmSt.length());
                         ret = "parameter";
+                        logger.info("> ETLsplunkProcess  " + status + " " + spSt);
                         continue;
 
                     }
@@ -2336,6 +2339,7 @@ public class ServiceAFweb {
                         int beg = parmSt.indexOf("prodsubsInfo=");
                         status = parmSt.substring(beg + 13, parmSt.length());
                         ret = "parameter";
+                        logger.info("> ETLsplunkProcess  " + status + " " + spSt);
                         continue;
 
                     }
