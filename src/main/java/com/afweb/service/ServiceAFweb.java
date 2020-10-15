@@ -488,12 +488,13 @@ public class ServiceAFweb {
 
         boolean clearssnsflag = false;
         if (clearssnsflag == true) {
+//            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_QUAL);
+
 //            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_CALLC);
 //            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_CALLC);
 //            getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_CALLC);
 //            processETL_process();
 //            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_CALLC);
-
 //            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_TTVREQ);
 //            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_TTVSUB);
 //            SsnsRegression regression = new SsnsRegression();
@@ -4275,12 +4276,6 @@ public class ServiceAFweb {
                 SsnsService ss = new SsnsService();
                 String feat = "";
 
-                if (ProdOper.equals(SsnsService.PROD_GET_CC)) {
-                    String oper = SsnsService.APP_FEATT_TYPE_CC;
-                    feat = ss.TestFeatureSsnsCallControlFromProdInv(ssnsAccObj, outputList, ProdOper, LABURL);
-
-                    return outputList;
-                }
                 if (prod.equals(SsnsService.APP_PRODUCT)) {
                     String oper = ssnsAccObj.getRet();
 

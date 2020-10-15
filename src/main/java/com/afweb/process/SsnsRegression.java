@@ -142,7 +142,7 @@ public class SsnsRegression {
                 // make random list on testIdList 
                 Collections.shuffle(featallList);
                 ArrayList<String> testIDListTemp = new ArrayList();
-                int MaxFeatExit = 7;
+                int MaxFeatExit = 5;
 
                 int only2Cnt = 0;
                 for (int j = 0; j < featallList.size(); j++) {
@@ -725,7 +725,7 @@ public class SsnsRegression {
                         for (int i = 0; i < response.size(); i++) {
                             String st = response.get(i);
                             charSize += st.length();
-                            if (charSize > 6000) {
+                            if (charSize > 4000) {
                                 responseTmp.add("Data truncation too long ");
                                 break;
                             }
@@ -739,7 +739,7 @@ public class SsnsRegression {
                         for (int i = 0; i < labResponse.size(); i++) {
                             String st = labResponse.get(i);
                             charSize += st.length();
-                            if (charSize > 6000) {
+                            if (charSize > 4000) {
                                 responseTmp.add("Data truncation too long ");
                                 break;
                             }
@@ -750,6 +750,7 @@ public class SsnsRegression {
 
                         ProductData pDataNew = new ProductData();
                         pDataNew.setPostParam(pData.getPostParam());
+
                         pDataNew.setFlow(response);
                         pDataNew.setDetailResp(labResponse);
 
