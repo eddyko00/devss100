@@ -354,7 +354,7 @@ public class SsnsService {
     }
 
     public String SendSsnsQual(String ProductURL, String oper, String address, ArrayList<String> inList) {
-        logger.info("> SendSsnsQual " + ProductURL + " " + oper + " " + address);
+        logger.info("> SendSsnsQual " + oper + " " + address);
 
         String url = "";
 
@@ -970,7 +970,7 @@ public class SsnsService {
     }
 
     public String SendSsnsActCfg(String ProductURL, String custid, String consumer, String service, ArrayList<String> inList) {
-        logger.info("> SendSsnsActCfg " + ProductURL + " " + custid + " " + consumer + " " + service);
+        logger.info("> SendSsnsActCfg " + custid + " " + consumer + " " + service);
         String url = "";
         if ((custid.length() == 0) || (consumer.length() == 0) || (service.length() == 0)) {
             return null;
@@ -1263,7 +1263,7 @@ public class SsnsService {
     }
 
     public String SendSsnsWLNPro(String ProductURL, String oper, String custid, String serviceType, String skuP, ArrayList<String> inList) {
-        logger.info("> SendSsnsQual " + ProductURL + " " + oper + " " + custid + " " + serviceType);
+        logger.info("> SendSsnsQual " + oper + " " + custid + " " + serviceType);
 
         String url = "";
         try {
@@ -1720,7 +1720,7 @@ public class SsnsService {
     }
 
     public String SendSsnsTTVC(String ProductURL, String oper, String banid, String prodid, String postParm, ArrayList<String> inList) {
-        logger.info("> SendSsnsTTVC " + ProductURL + " " + oper + " " + banid + " " + prodid);
+        logger.info("> SendSsnsTTVC " + oper + " " + banid + " " + prodid);
 
         String url = "";
 
@@ -2474,6 +2474,7 @@ public class SsnsService {
     }
 
     public String SendSsnsTestURL(String ProductURL, ArrayList<String> inList) {
+        logger.info("> SendSsnsQual " + ProductURL);
         String url = ProductURL;
         try {
             if (inList != null) {
@@ -2509,7 +2510,7 @@ public class SsnsService {
     }
 
     public String SendSsnsWifi(String ProductURL, String oper, String banid, String uniquid, String prodClass, String serialid, String parm, ArrayList<String> inList) {
-        logger.info("> SendSsnsQual " + ProductURL + " " + oper + " " + banid + " " + uniquid + " " + prodClass + " " + serialid);
+        logger.info("> SendSsnsQual " + oper + " " + banid + " " + uniquid + " " + prodClass + " " + serialid);
 
         String url = "";
         if (banid.length() >= 10) {
@@ -3167,7 +3168,7 @@ public class SsnsService {
 //        return "";
 //    }
     public String SendSsnsAppointmentGetTimeslot(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
-        logger.info("> SendSsnsAppointmentGetApp " + ProductURL + " " + appTId + " " + banid + " " + cust);
+        logger.info("> SendSsnsAppointmentGetApp " + appTId + " " + banid + " " + cust);
         String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
 
         HashMap newbodymap = new HashMap();
@@ -3272,7 +3273,7 @@ public class SsnsService {
     }
 
     public String SendSsnsAppointmentGetApp(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
-        logger.info("> SendSsnsAppointmentGetApp " + ProductURL + " " + appTId + " " + banid + " " + cust);
+        logger.info("> SendSsnsAppointmentGetApp " + appTId + " " + banid + " " + cust);
 
         if (host.length() > 0) {
             host = host.replace("9", ""); // remove OMS9
@@ -4464,7 +4465,7 @@ public class SsnsService {
     }
 
     public String SendSsnsProdiuctInventoryByProdId(String ProductURL, String ban, String prodid, ArrayList<String> inList) {
-        logger.info("> SendSsnsProdiuctInventory " + ProductURL + " " + ban + " " + prodid);
+        logger.info("> SendSsnsProdiuctInventory " + ban + " " + prodid);
 
         String url = ProductURL + "/v1/cmo/selfmgmt/productinventory/product/" + prodid + "?billingAccount.id=" + ban;
         try {
@@ -4500,7 +4501,7 @@ public class SsnsService {
     }
 
     public String SendSsnsProdiuctInventory(String ProductURL, String ban, String prodid, String productType, ArrayList<String> inList) {
-        logger.info("> SendSsnsProdiuctInventory " + ProductURL + " " + ban + " " + prodid + " " + productType);
+        logger.info("> SendSsnsProdiuctInventory " + ban + " " + prodid + " " + productType);
 
         String url = "";
         if (prodid.length() == 0) {
@@ -4554,7 +4555,7 @@ public class SsnsService {
     }
 
     public String SendSsnsCallControl(String ProductURL, String ban, String phoneNum, String sys, ArrayList<String> inList) {
-        logger.info("> SendSsnsCallControl " + ProductURL + " " + ban + " " + phoneNum + " " + sys);
+        logger.info("> SendSsnsCallControl " + ban + " " + phoneNum + " " + sys);
         String url = "";
         if ((ban.length() == 0) || (phoneNum.length() == 0) || (sys.length() == 0)) {
             return null;

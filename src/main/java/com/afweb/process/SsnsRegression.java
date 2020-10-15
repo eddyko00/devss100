@@ -142,7 +142,7 @@ public class SsnsRegression {
                 // make random list on testIdList 
                 Collections.shuffle(featallList);
                 ArrayList<String> testIDListTemp = new ArrayList();
-                int MaxFeatExit = 5;
+                int MaxFeatExit = 7;
 
                 int only2Cnt = 0;
                 for (int j = 0; j < featallList.size(); j++) {
