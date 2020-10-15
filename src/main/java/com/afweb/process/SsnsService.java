@@ -1263,7 +1263,7 @@ public class SsnsService {
     }
 
     public String SendSsnsWLNPro(String ProductURL, String oper, String custid, String serviceType, String skuP, ArrayList<String> inList) {
-        logger.info("> SendSsnsQual " + oper + " " + custid + " " + serviceType);
+        logger.info("> SendSsnsWLNPro " + oper + " " + custid + " " + serviceType);
 
         String url = "";
         try {
@@ -2510,7 +2510,7 @@ public class SsnsService {
     }
 
     public String SendSsnsWifi(String ProductURL, String oper, String banid, String uniquid, String prodClass, String serialid, String parm, ArrayList<String> inList) {
-        logger.info("> SendSsnsQual " + oper + " " + banid + " " + uniquid + " " + prodClass + " " + serialid);
+        logger.info("> SendSsnsWifi " + oper + " " + banid + " " + uniquid + " " + prodClass + " " + serialid);
 
         String url = "";
         if (banid.length() >= 10) {
