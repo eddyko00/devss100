@@ -25,7 +25,7 @@ var app = {
         var servObjList = JSON.parse(servObjListStr);
 
         $.ajax({
-            url: iisurl + "cust/" + custObj.username + "/sys/lock",
+            url: iisurl + "/cust/" + custObj.username + "/sys/lock",
 
             crossDomain: true,
             cache: false,

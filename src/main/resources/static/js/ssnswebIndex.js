@@ -31,7 +31,7 @@ var app = {
                 }
 
                 $.ajax({
-                    url: iisurl + "cust/login?email=" + txemail + "&pass=" + txtpassword,
+                    url: iisurl + "/cust/login?email=" + txemail + "&pass=" + txtpassword,
                     crossDomain: true,
                     cache: false,
                     success: handleResult
@@ -116,7 +116,7 @@ var app = {
             }
 
             $.ajax({
-                url: iisurl + "cust/login?email=" + txemail + "&pass=" + txtpassword,
+                url: iisurl + "/cust/login?email=" + txemail + "&pass=" + txtpassword,
                 crossDomain: true,
                 cache: false,
                 success: handleResult
