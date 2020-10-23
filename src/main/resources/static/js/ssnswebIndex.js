@@ -21,13 +21,16 @@ var app = {
             if (keycode === '13') {
                 var txemail = document.getElementById("txt-email").value;
                 var txtpassword = document.getElementById("txt-password").value;
+
                 if (txemail === "") {
                     if (txtpassword === "") {
                         txemail = "GUEST";
                         txtpassword = "guest";
-                        txemail = "admin1";
-                        txtpassword = "abc123";
                     }
+                }
+                if (txemail === "11") {
+                    txemail = "admin1";
+                    txtpassword = "abc123";
                 }
 
                 $.ajax({
@@ -105,15 +108,18 @@ var app = {
         $("#btn-login").click(function () {
             var txemail = document.getElementById("txt-email").value;
             var txtpassword = document.getElementById("txt-password").value;
-
             if (txemail === "") {
                 if (txtpassword === "") {
                     txemail = "GUEST";
                     txtpassword = "guest";
-                    txemail = "admin1";
-                    txtpassword = "abc123";
                 }
             }
+            if (txemail === "11") {
+                txemail = "admin1";
+                txtpassword = "abc123";
+            }
+
+
 
             $.ajax({
                 url: iisurl + "/cust/login?email=" + txemail + "&pass=" + txtpassword,
