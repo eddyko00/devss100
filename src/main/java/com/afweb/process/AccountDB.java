@@ -310,7 +310,6 @@ public class AccountDB {
         return getAllUserNameSQL(sql);
     }
 
-
     public ArrayList<CommObj> getComObjByName(int accountID, String name) {
         String sql = "select * from ssnscomm where accountid=" + accountID + " and name='" + name + "' ";
         sql += " order by updatedatel";
@@ -408,7 +407,6 @@ public class AccountDB {
         return 0;
     }
 
-
     public int removeCustAccountCommByCommID(int id) {
         try {
             String deleteSQL = "delete from ssnscomm where id=" + id;
@@ -450,7 +448,8 @@ public class AccountDB {
     }
 
     public int updateAccountCommData(CommObj newA) {
-        String sqlCMD = "update ssnscomm set updatedatedisplay='" + new java.sql.Date(newA.getUpdatedatel()) + "', updatedatel=" + newA.getUpdatedatel() + ",data='" + newA.getData() + "' where id=" + newA.getId();
+        String sqlCMD = "update ssnscomm set updatedatedisplay='" + new java.sql.Date(newA.getUpdatedatel())
+                + "', updatedatel=" + newA.getUpdatedatel() + ", substatus=" + newA.getSubstatus() + ",data='" + newA.getData() + "' where id=" + newA.getId();
         try {
             processExecuteDB(sqlCMD);
             return 1;

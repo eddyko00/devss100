@@ -65,11 +65,6 @@ public class ConstantKey {
     public static final String COM_SIGNAL = "MSG_SIG";
     public static final int INT_COM_SIGNAL = 0;
 
-    public static final String COM_SPLIT = "MSG_SPLIT";
-    public static final int INT_COM_SPLIT = 2;
-
-    public static final String BILLING = "BILLING";
-    public static final int INT_BILLING = 10;
 //// Android configuration      
     public static final String nullSt = "null";    // fix mapper object translation
 }

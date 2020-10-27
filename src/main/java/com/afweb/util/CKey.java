@@ -34,6 +34,8 @@ public class CKey {
     public static boolean UI_ONLY = true;
     
     
+    public static boolean BATCH_OPER = false;  // test opeation in batch
+    
 //    public static boolean DEVOP = false;
 
 //    //

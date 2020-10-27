@@ -156,7 +156,7 @@ public class AccountImp {
         userN = userN.toUpperCase();
         NameObj nameObj = new NameObj(userN);
         String UserName = nameObj.getNormalizeName();
-        
+
         newCustomer.setUsername(UserName);
         logger.info("> addCustomer  " + newCustomer.getUsername());
         int result = 0;
@@ -225,7 +225,7 @@ public class AccountImp {
     }
 
     public CommData getCommDataObj(CommObj commObj) {
-        if (commObj.getType() == ConstantKey.INT_COM_SPLIT) {
+        if (commObj.getType() == ConstantKey.INT_COM_SIGNAL) {
             String name = commObj.getData();
             if ((name != null) && (name.length() > 0)) {
                 name = name.replaceAll("#", "\"");
@@ -258,8 +258,8 @@ public class AccountImp {
         CommObj message = new CommObj();
         message.setCustomerid(custObj.getId());
         message.setAccountid(custObj.getId());
-        message.setName(ConstantKey.COM_SPLIT);
-        message.setType(ConstantKey.INT_COM_SPLIT);
+        message.setName(ConstantKey.COM_SIGNAL);
+        message.setType(ConstantKey.INT_COM_SIGNAL);
 
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
         long dateNowLong = dateNow.getTimeInMillis();
@@ -275,6 +275,7 @@ public class AccountImp {
         return accountdb.insertAccountCommData(message);
     }
 
+    // make sure message no   ("\"", "#");
     public int addCustAccountMessage(CustomerObj custObj, String msg) {
         if (custObj == null) {
             return -1;
@@ -292,6 +293,10 @@ public class AccountImp {
         message.setUpdatedatel(dateNowLong);
         message.setData(msg);
         return accountdb.insertAccountCommData(message);
+    }
+
+    public int updateAccountCommData(CommObj newA) {
+        return accountdb.updateAccountCommData(newA);
     }
 
     //////////////////////////////////////////////
@@ -321,7 +326,7 @@ public class AccountImp {
         saveDBcustomer(serviceAFWeb);
         saveSsnsDataAcc(serviceAFWeb, "ssnsacc");
         saveSsnsDataAcc(serviceAFWeb, "ssreport");
-        saveSsnsDataAcc(serviceAFWeb, "ssnsdata");        
+        saveSsnsDataAcc(serviceAFWeb, "ssnsdata");
         saveDBcomm(serviceAFWeb);
         return true;
     }
@@ -538,11 +543,13 @@ public class AccountImp {
         return true;
 
     }
+
     public boolean restoreSsReportDB(ServiceAFweb serviceAFWeb) {
         restoreDBSsnsDataAcc(serviceAFWeb, "ssreport");
         return true;
 
     }
+
     public boolean restoreDBData(ServiceAFweb serviceAFWeb) {
 
         if (FileUtil.FileTest(ServiceAFweb.FileLocalPath + "cust.txt") == false) {
