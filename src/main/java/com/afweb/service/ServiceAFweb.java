@@ -3085,6 +3085,14 @@ public class ServiceAFweb {
             id = Integer.parseInt(pidSt);
         }
         SsReport reportObj = getSsnsDataImp().getSsReportByID(id);
+        //reportObj -> data contain compress data
+        String data = reportObj.getData();
+        if (data != null) {
+            if (data.length() > 0) {
+                String nameSt = ServiceAFweb.decompress(data);
+                reportObj.setData(nameSt);
+            }
+        }
         return reportObj;
     }
 
@@ -4081,6 +4089,61 @@ public class ServiceAFweb {
     }
 
     //////////////////////
+       public SsReport getCommById(String EmailUserName, String IDSt, String pidSt) {
+
+        if (getServerObj().isSysMaintenance() == true) {
+            return null;
+        }
+        CustomerObj custObj = getAccountImp().getCustomerPassword(EmailUserName, null);
+        if (custObj == null) {
+            return null;
+        }
+        if (IDSt != null) {
+            if (IDSt.equals(custObj.getId() + "") != true) {
+                return null;
+            }
+        }
+        int id = 0;
+
+        if (pidSt != null) {
+            id = Integer.parseInt(pidSt);
+        }
+        ArrayList<CommObj> comObjList = getCommByCustomerAccountID(EmailUserName, null, IDSt);
+        if (comObjList != null) {
+            if (comObjList.size() > 0) {
+                CommObj comObj = comObjList.get(0);
+                SsReport reportObj = new SsReport();
+
+                reportObj.setStatus(comObj.getSubstatus());
+                
+                if (comObj.getSubstatus() != ConstantKey.OPEN) {
+                    String data = comObj.getData();
+                    if (data != null) {
+                        if (data.length() > 0) {
+                            String nameSt = ServiceAFweb.decompress(data);
+                            reportObj.setData(nameSt);
+                            return reportObj;
+                        }
+                    }
+                }
+                return reportObj;
+            }
+            return null;
+        }
+
+        SsReport reportObj = getSsnsDataImp().getSsReportByID(id);
+        //reportObj -> data contain compress data
+        String data = reportObj.getData();
+        if (data != null) {
+            if (data.length() > 0) {
+                String nameSt = ServiceAFweb.decompress(data);
+                reportObj.setData(nameSt);
+            }
+        }
+        return reportObj;
+    }
+ 
+    
     public void processTestSsnsByIdRT() {
 
         if (CKey.BATCH_OPER == false) {
@@ -4165,6 +4228,7 @@ public class ServiceAFweb {
         }
     }
 
+
     public ArrayList<String> testSsnsByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {
             return null;
@@ -4178,6 +4242,7 @@ public class ServiceAFweb {
                 return null;
             }
         }
+
         String data = "";
         ProductData pData = new ProductData();
         String parm = EmailUserName + ":" + IDSt + ":" + PIDSt + ":" + prod + ":" + Oper + ":" + LABURL + ":end";
@@ -4185,6 +4250,14 @@ public class ServiceAFweb {
 
         try {
             data = new ObjectMapper().writeValueAsString(pData);
+            String nameSt = new ObjectMapper().writeValueAsString(data);
+            ///////do compassion
+            if (nameSt != null) {
+                if (nameSt.length() > 0) {
+                    nameSt = ServiceAFweb.compress(nameSt);
+                }
+            }
+            data = nameSt;
             data = replaceAll("\"", "#", data);
         } catch (JsonProcessingException ex) {
         }
@@ -5199,7 +5272,7 @@ public class ServiceAFweb {
     public void setAccountImp(AccountImp accountImp) {
         this.accountImp = accountImp;
     }
-    
+
     ////////////////////////////////////////////////////
     public static String compress(String str) {
         if (str == null || str.length() == 0) {

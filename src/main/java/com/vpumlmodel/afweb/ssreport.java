@@ -5,6 +5,9 @@
  */
 package com.vpumlmodel.afweb;
 
+import com.afweb.service.ServiceAFweb;
+import com.afweb.util.CKey;
+
 /**
  *
  * @author eddyko
@@ -74,7 +77,7 @@ public class ssreport {
     private String uid;
     private String cusid;
     private String banid;
-    private String tiid;    
+    private String tiid;
     private String app;
     private String oper;
     private String down;
@@ -145,6 +148,10 @@ public class ssreport {
      * @return the data
      */
     public String getData() {
+//        if (CKey.COMPASS_DATA == true) {
+//            String nameSt = ServiceAFweb.decompress(data);
+//            return nameSt;
+//        }
         return data;
     }
 
@@ -152,6 +159,11 @@ public class ssreport {
      * @param data the data to set
      */
     public void setData(String data) {
+//        if (CKey.COMPASS_DATA == true) {
+//            String nameSt = ServiceAFweb.compress(data);
+//            this.data = nameSt;
+//            return;
+//        }
         this.data = data;
     }
 

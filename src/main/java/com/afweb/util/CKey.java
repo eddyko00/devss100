@@ -31,11 +31,11 @@ public class CKey {
     public static String URL_PRODUCT_TMP = "https://sabcoa-mp-rmsabck-prabc.tsabcl.teabclus.com";
 
     public static boolean NN_DEBUG = false; //false; //true; 
-    public static boolean UI_ONLY = false;
+    public static boolean UI_ONLY = true;
     
     
     public static boolean BATCH_OPER = false;  // test opeation in batch
-    
+    public static boolean COMPASS_DATA = false;  
 //    public static boolean DEVOP = false;
 
 //    //

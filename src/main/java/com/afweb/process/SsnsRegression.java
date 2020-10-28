@@ -755,7 +755,12 @@ public class SsnsRegression {
                         pDataNew.setDetailResp(labResponse);
 
                         String nameSt = new ObjectMapper().writeValueAsString(pDataNew);
-
+                        ///////do compassion
+                        if (nameSt != null) {
+                            if (nameSt.length() > 0) {
+                                nameSt = ServiceAFweb.compress(nameSt);
+                            }
+                        }
                         //////exception with not sure why so make sure not special #
 //                        logger.info("nameSt size " + nameSt.length());
                         if (nameSt.indexOf("#") != -1) {

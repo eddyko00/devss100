@@ -58,6 +58,7 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/regression/start");
         arrayString.add("/cust/{username}/id/{id}/regression/stop");
 
+        arrayString.add("/cust/{username}/id/{id}/comm/pid/{pid}");
         arrayString.add("/cust/{username}/id/{id}/mon");
         arrayString.add("/cust/{username}/id/{id}/mon/start?app=");
         arrayString.add("/cust/{username}/id/{id}/mon/stop");
@@ -91,7 +92,7 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/summary?length={0 for all}");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevices");
-        arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdeviceshdml");          
+        arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdeviceshdml");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevicestatus");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/id/{pid}/rttest/getdevicestatus");
         arrayString.add("/cust/{username}/id/{id}/serv/wifi/featureall");
@@ -343,6 +344,25 @@ public class IndexController {
         return ret;
     }
 
+//////////    
+    @RequestMapping(value = "/cust/{username}/id/{id}/comm/pid/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    SsReport getcommpid(
+            @PathVariable("username") String username,
+            @PathVariable("id") String idSt,
+            @PathVariable("pid") String pidSt,
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return null;
+        }
+        SsReport ret = afWebService.getCommById(username, idSt, pidSt);
+        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+        return ret;
+    }
+
 ////////////////////// 
     @RequestMapping(value = "/cust/{username}/id/{id}/serv", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
@@ -369,6 +389,7 @@ public class IndexController {
 ////////////////////// 
 //////////////////////
 /////////////////////    
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/wlnpro/summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList<ProdSummary> getwlnproprodSummary(
@@ -1226,6 +1247,7 @@ public class IndexController {
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
+
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/wifi/id/{pid}/rt/getdevices", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getwifiidrtstatus(
@@ -1732,6 +1754,7 @@ public class IndexController {
         }
         return null;
     }
+
     @RequestMapping(value = "/cust/{username}/sys/backupall", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     WebStatus SystemBackupacc(@PathVariable("username") String username) {
@@ -1748,8 +1771,6 @@ public class IndexController {
 
         return null;
     }
-
-
 
     @RequestMapping(value = "/cust/{username}/sys/reopenssnsdata", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
