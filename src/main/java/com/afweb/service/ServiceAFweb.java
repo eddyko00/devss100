@@ -394,7 +394,12 @@ public class ServiceAFweb {
             processTestSsnsByIdRT();
             return;
         }
-
+        
+        if (getEnv.checkLocalPC() == false) {
+            // if openshfit, no need to do the sending command to PR
+            return;
+        }
+        
         try {
             if (getServerObj().getProcessTimerCnt() < 0) {
                 getServerObj().setProcessTimerCnt(0);
