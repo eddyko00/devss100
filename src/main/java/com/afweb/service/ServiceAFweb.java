@@ -343,6 +343,15 @@ public class ServiceAFweb {
                 } else if (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL) {
                     logger.info(">>>>> SystemRestoreDBData form to My SQL");
                 }
+                if (CKey.SQL_RemoveServerDB == true) {
+                    String retSt = SystemCleanSsnsAccDBData();
+                    if (retSt.equals("true")) {
+                        boolean retSatus = getAccountImp().restoreSsnsAccDBData(this);
+                    }
+                    logger.info(">>>>> SystemRestoreSsnsAccDBData done");
+                    return;
+                }
+
                 String retSt = SystemCleanDBData();
                 if (retSt.equals("true")) {
                     serverObj.setSysMaintenance(true);
@@ -394,12 +403,12 @@ public class ServiceAFweb {
             processTestSsnsByIdRT();
             return;
         }
-        
+
         if (getEnv.checkLocalPC() == false) {
             // if openshfit, no need to do the sending command to PR
             return;
         }
-        
+
         try {
             if (getServerObj().getProcessTimerCnt() < 0) {
                 getServerObj().setProcessTimerCnt(0);
@@ -5031,11 +5040,22 @@ public class ServiceAFweb {
         return "sysMaintenance " + retSatus;
     }
 
+    public String SystemCleanSsnsAccDBData() {
+        boolean retSatus = false;
+        if (getServerObj().isLocalDBservice() == true) {
+            serverObj.setSysMaintenance(true);
+            retSatus = getSsnsDataImp().cleanSsnsAccTableOnlyDB();
+
+        }
+        return "" + retSatus;
+    }
+
     public String SystemCleanDBData() {
         boolean retSatus = false;
         if (getServerObj().isLocalDBservice() == true) {
             serverObj.setSysMaintenance(true);
             retSatus = getSsnsDataImp().cleanSsnsDataDB();
+
         }
         return "" + retSatus;
     }

@@ -550,6 +550,11 @@ public class AccountImp {
 
     }
 
+    public boolean restoreSsnsAccDBData(ServiceAFweb serviceAFWeb) {
+        restoreDBSsnsDataAcc(serviceAFWeb, "ssnsacc");
+        return true;
+    }
+
     public boolean restoreDBData(ServiceAFweb serviceAFWeb) {
 
         if (FileUtil.FileTest(ServiceAFweb.FileLocalPath + "cust.txt") == false) {

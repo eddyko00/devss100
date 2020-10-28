@@ -285,6 +285,10 @@ public class SsnsDataImp {
         return ssnsdb.restSsnsDataDB();
     }
 
+    public boolean cleanSsnsAccTableOnlyDB() {
+        return ssnsdb.cleanSsnsAccTableOnlyDB();
+    }
+
     public boolean cleanSsnsDataDB() {
         return ssnsdb.cleanSsnsDataDB();
     }

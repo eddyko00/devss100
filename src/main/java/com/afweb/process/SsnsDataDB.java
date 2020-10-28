@@ -208,6 +208,35 @@ public class SsnsDataDB {
         return false;
     }
 
+    public boolean cleanSsnsAccTableOnlyDB() {
+        try {
+            processExecuteDB("drop table if exists ssnsacc");
+            ArrayList createTableList = new ArrayList();
+
+            if (CKey.DB == CKey.POSTGRESQLDB) {
+                createTableList.add("CREATE SEQUENCE ssnsaccIdSeq");
+                createTableList.add("create table ssnsacc (id int not null primary key DEFAULT NEXTVAL('ssnsaccIdSeq'), name varchar(255) not null, status int not null, type int not null,"
+                        + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint, "
+                        + "data text,  updatedatedisplay date, updatedatel bigint not null)");
+                createTableList.add("ALTER SEQUENCE ssnsaccIdSeq OWNED BY ssnsacc.id");
+                ExecuteSQLArrayList(createTableList);
+                createTableList.clear();
+
+            } else if (CKey.DB == CKey.MYSQLDB) {
+                createTableList.add("create table ssnsacc (id int(10) not null auto_increment, name varchar(255) not null, status int(10) not null, type int(10) not null,"
+                        + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint(20), "
+                        + "data text,  updatedatedisplay date, updatedatel bigint(20) not null, primary key (id))");
+
+            }
+            boolean resultCreate = ExecuteSQLArrayList(createTableList);
+
+            return resultCreate;
+        } catch (Exception e) {
+            logger.info("> cleanSsnsAccTableOnlyDB Table exception " + e.getMessage());
+        }
+        return false;
+    }
+
     public static String createDummytable() {
         String sqlCMD = "";
         if ((CKey.SQL_DATABASE == CKey.MYSQL) || (CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) || (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL)) {
@@ -927,7 +956,7 @@ public class SsnsDataDB {
         }
         return 0;
     }
-    
+
     public int deleteAllSsnsDataByUpdatedatel(String app, long timeL) {
         try {
             String deleteSQL = "delete from ssnsdata where app='" + app + "' and updatedatel < " + timeL;
@@ -938,7 +967,6 @@ public class SsnsDataDB {
         }
         return 0;
     }
-    
 
     public int deleteAllSsnsAcc(int month) {
         try {
