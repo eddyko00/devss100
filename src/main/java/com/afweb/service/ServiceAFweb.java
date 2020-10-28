@@ -15,7 +15,11 @@ import com.afweb.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -35,6 +39,8 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -5192,6 +5198,48 @@ public class ServiceAFweb {
      */
     public void setAccountImp(AccountImp accountImp) {
         this.accountImp = accountImp;
+    }
+    
+    ////////////////////////////////////////////////////
+    public static String compress(String str) {
+        if (str == null || str.length() == 0) {
+            return str;
+        }
+        try {
+            String inEncoding = "UTF-8";
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            GZIPOutputStream gzip = new GZIPOutputStream(out);
+            gzip.write(str.getBytes(inEncoding));
+            gzip.close();
+            return URLEncoder.encode(out.toString("ISO-8859-1"), "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String decompress(String str) {
+        if (str == null || str.length() == 0) {
+            return str;
+        }
+
+        try {
+            String outEncoding = "UTF-8";
+            String decode = URLDecoder.decode(str, "UTF-8");
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ByteArrayInputStream in = new ByteArrayInputStream(decode.getBytes("ISO-8859-1"));
+            GZIPInputStream gunzip = new GZIPInputStream(in);
+            byte[] buffer = new byte[256];
+            int n;
+            while ((n = gunzip.read(buffer)) >= 0) {
+                out.write(buffer, 0, n);
+            }
+            return out.toString(outEncoding);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
