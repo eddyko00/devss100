@@ -6,7 +6,7 @@ public class CKey {
     public static String FileLocalPathTemp = "C:\\TEMP\\";
 
     public static final boolean LocalPCflag = true; // true;
-    public static final String MYSQL_SERVICE_HOST = "100.65.128.12";
+    public static final String MYSQL_SERVICE_HOST = "100.65.146.18";
     //////////////////////
     // remember to update the application properties      
     public static final int LOCAL_MYSQL = 4; //jdbc:mysql://localhost:3306/db_sample       
@@ -17,7 +17,7 @@ public class CKey {
     public static final int MYSQLDB = 0;
     public static int DB = MYSQLDB;
 
-    public static final int SQL_DATABASE = REMOTE_MYSQL;
+    public static final int SQL_DATABASE = MYSQL;
     public static final boolean SQL_RemoveServerDB = false; // need true and REMOTE_MYSQL using remote server not PHP 
 //    public static final boolean SQL_Devop = false; 
     //
