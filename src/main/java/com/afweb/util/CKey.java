@@ -32,19 +32,18 @@ public class CKey {
 
     public static boolean NN_DEBUG = false; //false; //true; 
     public static boolean UI_ONLY = true;
-    
-    
+
     public static boolean BATCH_OPER = true;  // test opeation in batch
 
 //    public static boolean DEVOP = false;
-
 //    //
 //    //
     public static String WEBPOST_OP_PHP = "/health.php";
 
-    public static String URL_PATH_OP_DB_PHP1_TMP = "http://devphp-ssns-homephonemgmt.paas-app-east-np.tabcsl.telabcus.com";      
-    public static final String URL_PATH_OP_TMP =  "http://devssns-ssns-homephonemgmt.paas-app-east-np.tabcsl.telabcus.com";
-
+    public static String URL_PATH_OP_DB_PHP1_TMP = "http://devphp-ssns-homephonemgmt.paas-app-east-np.tabcsl.telabcus.com";
+    
+//  public static final String URL_PATH_OP_TMP = "http://devssns-ssns-homephonemgmt.paas-app-east-np.tabcsl.telabcus.com";
+    public static final String URL_PATH_OP_TMP = "http://devssns-project000.paas-app-east-np.tsl.telus.com";
 //
     public static String dataSourceURL = "";
     public static final String ADMIN_USERNAME = "Admin1";
