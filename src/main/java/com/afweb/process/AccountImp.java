@@ -295,6 +295,10 @@ public class AccountImp {
         return accountdb.insertAccountCommData(message);
     }
 
+    public int updateAccountCommSubStatus(int commId, int status) {
+        return accountdb.updateAccountCommSubStatus(commId, status);
+    }
+
     public int updateAccountCommData(CommObj newA) {
         return accountdb.updateAccountCommData(newA);
     }

@@ -447,6 +447,17 @@ public class AccountDB {
         return 0;
     }
 
+    public int updateAccountCommSubStatus(int commId, int status) {
+        String sqlCMD = "update ssnscomm set substatus=" + status + " where id=" + commId;
+        try {
+            processExecuteDB(sqlCMD);
+            return 1;
+        } catch (Exception e) {
+            logger.info("> updateAccountCommSubStatus exception " + e.getMessage());
+        }
+        return 0;
+    }
+
     public int updateAccountCommData(CommObj newA) {
         String sqlCMD = "update ssnscomm set updatedatedisplay='" + new java.sql.Date(newA.getUpdatedatel())
                 + "', updatedatel=" + newA.getUpdatedatel() + ", substatus=" + newA.getSubstatus() + ",data='" + newA.getData() + "' where id=" + newA.getId();

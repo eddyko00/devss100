@@ -4089,8 +4089,8 @@ public class ServiceAFweb {
     }
 
     //////////////////////
-       public SsReport getCommById(String EmailUserName, String IDSt, String pidSt) {
-
+    public ArrayList<String> getTestSsnsCommById(String EmailUserName, String IDSt, String pidSt) {
+        ArrayList<String> retArray = new ArrayList();
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -4108,126 +4108,160 @@ public class ServiceAFweb {
         if (pidSt != null) {
             id = Integer.parseInt(pidSt);
         }
+        SsReport reportObj = new SsReport();
         ArrayList<CommObj> comObjList = getCommByCustomerAccountID(EmailUserName, null, IDSt);
         if (comObjList != null) {
             if (comObjList.size() > 0) {
-                CommObj comObj = comObjList.get(0);
-                SsReport reportObj = new SsReport();
+                for (int j = 0; j < comObjList.size(); j++) {
+                    CommObj comObj = comObjList.get(j);
+                    if (j != 0) {
+                        // delete other command 
+                        getAccountImp().removeCustAccountCommByCommID(comObj.getId());
+                        continue;
+                    }
 
-                reportObj.setStatus(comObj.getSubstatus());
-                
-                if (comObj.getSubstatus() != ConstantKey.OPEN) {
-                    String data = comObj.getData();
-                    if (data != null) {
-                        if (data.length() > 0) {
+                    reportObj.setStatus(comObj.getSubstatus());
+
+                    if (comObj.getSubstatus() != ConstantKey.OPEN) {
+                        String data = comObj.getData();
+                        data = replaceAll("#", "\"", data);
+
+                        ProductData pData = null;
+                        try {
                             String nameSt = ServiceAFweb.decompress(data);
-                            reportObj.setData(nameSt);
-                            return reportObj;
+                            pData = new ObjectMapper().readValue(nameSt, ProductData.class);
+                        } catch (IOException ex) {
+                        }
+                        if (pData != null) {
+                            retArray = pData.getDetailResp();
                         }
                     }
                 }
-                return reportObj;
-            }
-            return null;
-        }
-
-        SsReport reportObj = getSsnsDataImp().getSsReportByID(id);
-        //reportObj -> data contain compress data
-        String data = reportObj.getData();
-        if (data != null) {
-            if (data.length() > 0) {
-                String nameSt = ServiceAFweb.decompress(data);
-                reportObj.setData(nameSt);
             }
         }
-        return reportObj;
+        return retArray;
     }
- 
-    
+
     public void processTestSsnsByIdRT() {
 
         if (CKey.BATCH_OPER == false) {
             return;
         }
-        ArrayList custNameList = getCustomerList(0);
-
-        for (int i = 0; i < custNameList.size(); i++) {
-            String customerName = (String) custNameList.get(i);
-            CustomerObj custObj = getAccountImp().getCustomerPassword(customerName, null);
-            if (custObj == null) {
-                continue;
+        Calendar dateNow = TimeConvertion.getCurrentCalendar();
+        long lockDateValue = dateNow.getTimeInMillis();
+        String LockName = "RT_TEST";
+        try {
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.SRV_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processFeatureTTVC");
+            if (CKey.NN_DEBUG == true) {
+                lockReturn = 1;
             }
-            String CIDSt = custObj.getId() + "";
-            ArrayList<CommObj> comObjList = getCommByCustomerAccountID(customerName, null, CIDSt);
-            if (comObjList == null) {
-                continue;
-            }
-            if (comObjList.size() == 0) {
-                continue;
+            if (lockReturn == 0) {
+                return;
             }
 
-            CommObj comObj = comObjList.get(0);
-            if (comObj.getSubstatus() != ConstantKey.OPEN) {
-                continue;
-            }
-            String data = comObj.getData();
-            data = replaceAll("#", "\"", data);
-            ProductData pData = null;
-            try {
-                pData = new ObjectMapper().readValue(data, ProductData.class);
-            } catch (IOException ex) {
-            }
-            if (pData == null) {
-                continue;
-            }
-            String parm = pData.getPostParam();
-            String[] parmList = parm.split(":");
-            if (parmList.length < 5) {
-                continue;
-            }
-            String EmailUserName = parmList[0];
-            String IDSt = parmList[1];
-            String PIDSt = parmList[2];
-            String prod = parmList[3];
-            String Oper = parmList[4];
-            String LABURL = parmList[5];
-            ArrayList<String> output = null;
-            if (prod.equals(APP_WIFI)) {
-                output = this.testSsnsprodWifiByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
-            } else if (prod.equals(APP_APP)) {
-                output = this.testSsnsprodAppByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
-            } else if (prod.equals(APP_PRODUCT)) {
-                output = this.testSsnsprodByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
-            } else if (prod.equals(APP_TTVC)) {
-                output = this.testSsnsprodTTVCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
-            } else if (prod.equals(APP_WLNPRO)) {
-                output = this.testSsnsprodWLNPROByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
-            } else if (prod.equals(APP_QUAL)) {
-                output = this.testSsnsprodQualByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
-            } else if (prod.equals(APP_CALLC)) {
-                output = this.testSsnsprodCallCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
-            } else if (prod.equals(APP_ACTCFG)) {
-                output = this.testSsnsprodActCfgByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
-            }
+            // get all customer list 
+            ArrayList custNameList = getCustomerList(0);
 
-            pData.setDetailResp(output);
+            for (int i = 0; i < custNameList.size(); i++) {
+                String customerName = (String) custNameList.get(i);
+                CustomerObj custObj = getAccountImp().getCustomerPassword(customerName, null);
+                if (custObj == null) {
+                    continue;
+                }
+                String CIDSt = custObj.getId() + "";
+                // get all comobj but only process the first one
+                ArrayList<CommObj> comObjList = getCommByCustomerAccountID(customerName, null, CIDSt);
+                if (comObjList == null) {
+                    continue;
+                }
+                if (comObjList.size() == 0) {
+                    continue;
+                }
 
-            try {
-                data = new ObjectMapper().writeValueAsString(pData);
-                data = replaceAll("\"", "#", data);
-            } catch (JsonProcessingException ex) {
+                for (int j = 0; j < comObjList.size(); j++) {
+                    CommObj comObj = comObjList.get(j);
+                    if (comObj.getSubstatus() != ConstantKey.OPEN) {
+                        continue;
+                    }
+                    if (j != 0) {
+                        // clear the rest command 
+                        getAccountImp().updateAccountCommSubStatus(comObj.getId(), ConstantKey.CLOSE);
+                        continue;
+                    }
+
+                    String data = comObj.getData();
+                    data = replaceAll("#", "\"", data);
+
+                    ProductData pData = null;
+                    try {
+                        String nameSt = ServiceAFweb.decompress(data);
+                        pData = new ObjectMapper().readValue(nameSt, ProductData.class);
+                    } catch (IOException ex) {
+                    }
+                    if (pData == null) {
+                        continue;
+                    }
+                    String parm = pData.getPostParam();
+                    String[] parmList = parm.split(":");
+                    if (parmList.length < 5) {
+                        continue;
+                    }
+                    String EmailUserName = parmList[0];
+                    String IDSt = parmList[1];
+                    String PIDSt = parmList[2];
+                    String prod = parmList[3];
+                    String Oper = parmList[4];
+                    String LABURL = parmList[5];
+                    ArrayList<String> output = null;
+                    if (prod.equals(APP_WIFI)) {
+                        output = this.testSsnsprodWifiByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                    } else if (prod.equals(APP_APP)) {
+                        output = this.testSsnsprodAppByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                    } else if (prod.equals(APP_PRODUCT)) {
+                        output = this.testSsnsprodByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                    } else if (prod.equals(APP_TTVC)) {
+                        output = this.testSsnsprodTTVCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                    } else if (prod.equals(APP_WLNPRO)) {
+                        output = this.testSsnsprodWLNPROByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                    } else if (prod.equals(APP_QUAL)) {
+                        output = this.testSsnsprodQualByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                    } else if (prod.equals(APP_CALLC)) {
+                        output = this.testSsnsprodCallCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                    } else if (prod.equals(APP_ACTCFG)) {
+                        output = this.testSsnsprodActCfgByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                    }
+                    pData.setDetailResp(output);
+
+                    try {
+                        data = new ObjectMapper().writeValueAsString(pData);
+                        String nameSt = new ObjectMapper().writeValueAsString(data);
+                        ///////do compassion
+                        if (nameSt != null) {
+                            if (nameSt.length() > 0) {
+                                nameSt = ServiceAFweb.compress(nameSt);
+                            }
+                        }
+                        data = nameSt;
+                        data = replaceAll("\"", "#", data);
+                    } catch (JsonProcessingException ex) {
+                    }
+
+                    comObj.setData(data);
+                    comObj.setSubstatus(ConstantKey.COMPLETED);
+
+                    Calendar dateNow1 = TimeConvertion.getCurrentCalendar();
+                    long dateNowLong = dateNow1.getTimeInMillis();
+                    comObj.setUpdatedatel(dateNowLong);
+
+                    getAccountImp().updateAccountCommData(comObj);
+
+                }
             }
-            comObj.setData(data);
-            comObj.setSubstatus(ConstantKey.COMPLETED);
-
-            Calendar dateNow = TimeConvertion.getCurrentCalendar();
-            long dateNowLong = dateNow.getTimeInMillis();
-            comObj.setUpdatedatel(dateNowLong);
-
-            getAccountImp().updateAccountCommData(comObj);
+        } catch (Exception ex) {
         }
-    }
+        removeNameLock(LockName, ConstantKey.SRV_LOCKTYPE);
 
+    }
 
     public ArrayList<String> testSsnsByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
         if (getServerObj().isSysMaintenance() == true) {
@@ -4243,11 +4277,11 @@ public class ServiceAFweb {
             }
         }
 
+        ArrayList<String> retArray = new ArrayList();
         String data = "";
         ProductData pData = new ProductData();
         String parm = EmailUserName + ":" + IDSt + ":" + PIDSt + ":" + prod + ":" + Oper + ":" + LABURL + ":end";
         pData.setPostParam(parm);
-
         try {
             data = new ObjectMapper().writeValueAsString(pData);
             String nameSt = new ObjectMapper().writeValueAsString(data);
@@ -4261,23 +4295,26 @@ public class ServiceAFweb {
             data = replaceAll("\"", "#", data);
         } catch (JsonProcessingException ex) {
         }
-        ArrayList<CommObj> comObjList = getCommByCustomerAccountID(EmailUserName, null, IDSt);
-        if (comObjList != null) {
-            if (comObjList.size() > 0) {
-                CommObj comObj = comObjList.get(0);
-                comObj.setData(data);
-                comObj.setSubstatus(ConstantKey.OPEN);
 
-                Calendar dateNow = TimeConvertion.getCurrentCalendar();
-                long dateNowLong = dateNow.getTimeInMillis();
-                comObj.setUpdatedatel(dateNowLong);
-
-                getAccountImp().updateAccountCommData(comObj);
-                return null;
-            }
-        }
+//        ArrayList<CommObj> comObjList = getCommByCustomerAccountID(EmailUserName, null, IDSt);
+//        if (comObjList != null) {
+//            if (comObjList.size() > 0) {
+//                CommObj comObj = comObjList.get(0);
+//                comObj.setData(data);
+//                comObj.setSubstatus(ConstantKey.OPEN);
+//
+//                Calendar dateNow = TimeConvertion.getCurrentCalendar();
+//                long dateNowLong = dateNow.getTimeInMillis();
+//                comObj.setUpdatedatel(dateNowLong);
+//
+//                getAccountImp().updateAccountCommData(comObj);
+//                return null;
+//            }
+//        }
+        // always add a new one
         this.addCommByCustomerAccountID(EmailUserName, null, IDSt, data);
-        return null;
+        retArray.add("Waiting for process.....");
+        return retArray;
     }
 
     public ArrayList<String> testSsnsprodAppByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {

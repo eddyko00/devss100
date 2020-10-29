@@ -58,7 +58,8 @@ public class IndexController {
         arrayString.add("/cust/{username}/id/{id}/regression/start");
         arrayString.add("/cust/{username}/id/{id}/regression/stop");
 
-        arrayString.add("/cust/{username}/id/{id}/comm/pid/{pid}");
+        arrayString.add("/cust/{username}/id/{id}/commrt/pid/{pid}");
+        
         arrayString.add("/cust/{username}/id/{id}/mon");
         arrayString.add("/cust/{username}/id/{id}/mon/start?app=");
         arrayString.add("/cust/{username}/id/{id}/mon/stop");
@@ -345,9 +346,9 @@ public class IndexController {
     }
 
 //////////    
-    @RequestMapping(value = "/cust/{username}/id/{id}/comm/pid/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/commrt/pid/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
-    SsReport getcommpid(
+    ArrayList getcommpid(
             @PathVariable("username") String username,
             @PathVariable("id") String idSt,
             @PathVariable("pid") String pidSt,
@@ -358,7 +359,7 @@ public class IndexController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             return null;
         }
-        SsReport ret = afWebService.getCommById(username, idSt, pidSt);
+        ArrayList ret = afWebService.getTestSsnsCommById(username, idSt, pidSt);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
