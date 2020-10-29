@@ -32,10 +32,9 @@ var app = {
         var iisurllocal = iisurl_OP; //iisurl_OP; //iisurl_LOCAL;
         iisurllocal = iisurllocal.replace("abc", "");
         iisurllocal = iisurllocal.replace("abc", "");
-        
+
         $.ajax({
-            url: iisurllocal + "/cust/" + custObj.username + "/id/" + custObj.id + "/serv/" + serv
-                    + "/id/" + featObjId + "/rt/" + cmd,
+            url: iisurllocal + "/cust/" + custObj.username + "/id/" + custObj.id + "/commrt",
             crossDomain: true,
             cache: false,
             beforeSend: function () {
@@ -54,7 +53,7 @@ var app = {
                 var iisWebObj = {'custObjStr': custObjStr, 'servObjListStr': servObjListStr, 'serv': serv,
                     'featIDObjListStr': featIDObjListStr, 'featObjId': featObjId, 'cmd': cmd, 'resultListStr': resultListStr};
                 window.localStorage.setItem(iisWebSession, JSON.stringify(iisWebObj));
-                window.location.href = "monservfeattestres.html";
+                window.location.href = "monservbatch.html";
             }
         });
 
