@@ -346,12 +346,11 @@ public class IndexController {
     }
 
 //////////    
-    @RequestMapping(value = "/cust/{username}/id/{id}/commrt/pid/{pid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/cust/{username}/id/{id}/commrt", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ArrayList getcommpid(
             @PathVariable("username") String username,
             @PathVariable("id") String idSt,
-            @PathVariable("pid") String pidSt,
             HttpServletRequest request, HttpServletResponse response
     ) {
         ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
@@ -359,7 +358,7 @@ public class IndexController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             return null;
         }
-        ArrayList ret = afWebService.getTestSsnsCommById(username, idSt, pidSt);
+        ArrayList ret = afWebService.getTestSsnsCommById(username, idSt);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -467,7 +466,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.APP_GET_DOWNURL;
-        ArrayList<String> ret = afWebService.testSsnsprodWLNPROByIdRT(username, idSt, pidSt, SsnsService.APP_WLNPRO, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodWLNPROByIdRT(username, idSt, pidSt, SsnsService.APP_WLNPRO, oper, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -607,7 +606,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.CALLC_GET;
-        ArrayList<String> ret = afWebService.testSsnsprodCallCByIdRT(username, idSt, pidSt, SsnsService.APP_CALLC, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodCallCByIdRT(username, idSt, pidSt, SsnsService.APP_CALLC, oper, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -748,7 +747,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.ACTCFG_GET_SRV;
-        ArrayList<String> ret = afWebService.testSsnsprodActCfgByIdRT(username, idSt, pidSt, SsnsService.APP_ACTCFG, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodActCfgByIdRT(username, idSt, pidSt, SsnsService.APP_ACTCFG, oper, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -888,7 +887,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.QUAL_AVAL;
-        ArrayList<String> ret = afWebService.testSsnsprodQualByIdRT(username, idSt, pidSt, SsnsService.APP_QUAL, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodQualByIdRT(username, idSt, pidSt, SsnsService.APP_QUAL, oper, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -907,7 +906,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.QUAL_MATCH;
-        ArrayList<String> ret = afWebService.testSsnsprodWLNPROByIdRT(username, idSt, pidSt, SsnsService.APP_QUAL, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodWLNPROByIdRT(username, idSt, pidSt, SsnsService.APP_QUAL, oper, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -1047,7 +1046,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.TT_GetSub;
-        ArrayList<String> ret = afWebService.testSsnsprodTTVCByIdRT(username, idSt, pidSt, SsnsService.APP_TTVC, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodTTVCByIdRT(username, idSt, pidSt, SsnsService.APP_TTVC, oper, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -1066,7 +1065,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.TT_Vadulate;
-        ArrayList<String> ret = afWebService.testSsnsprodTTVCByIdRT(username, idSt, pidSt, SsnsService.APP_TTVC, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodTTVCByIdRT(username, idSt, pidSt, SsnsService.APP_TTVC, oper, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -1085,7 +1084,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.TT_Quote;
-        ArrayList<String> ret = afWebService.testSsnsprodTTVCByIdRT(username, idSt, pidSt, SsnsService.APP_TTVC, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodTTVCByIdRT(username, idSt, pidSt, SsnsService.APP_TTVC, oper, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -1244,7 +1243,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.WI_GetDeviceStatus;
-        ArrayList<String> ret = afWebService.testSsnsprodWifiByIdRT(username, idSt, pidSt, SsnsService.APP_WIFI, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodWifiByIdRT(username, idSt, pidSt, SsnsService.APP_WIFI, oper, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -1263,7 +1262,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.WI_GetDevice;
-        ArrayList<String> ret = afWebService.testSsnsprodWifiByIdRT(username, idSt, pidSt, SsnsService.APP_WIFI, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodWifiByIdRT(username, idSt, pidSt, SsnsService.APP_WIFI, oper, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -1282,7 +1281,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.WI_GetDeviceHDML;
-        ArrayList<String> ret = afWebService.testSsnsprodWifiByIdRT(username, idSt, pidSt, SsnsService.APP_WIFI, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodWifiByIdRT(username, idSt, pidSt, SsnsService.APP_WIFI, oper, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -1422,7 +1421,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.APP_GET_APP;
-        ArrayList<String> ret = afWebService.testSsnsprodAppByIdRT(username, idSt, pidSt, SsnsService.APP_APP, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodAppByIdRT(username, idSt, pidSt, SsnsService.APP_APP, oper, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -1441,7 +1440,7 @@ public class IndexController {
             return null;
         }
         String oper = SsnsService.APP_GET_TIMES;
-        ArrayList<String> ret = afWebService.testSsnsprodAppByIdRT(username, idSt, pidSt, SsnsService.APP_APP, oper, "");
+        ArrayList<String> ret = afWebService.testSsnsprodAppByIdRT(username, idSt, pidSt, SsnsService.APP_APP, oper, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -1601,7 +1600,7 @@ public class IndexController {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             return null;
         }
-        ArrayList<String> ret = afWebService.testSsnsprodByIdRT(username, idSt, pidSt, SsnsService.APP_PRODUCT, SsnsService.PROD_GET_CC, "");
+        ArrayList<String> ret = afWebService.testSsnsprodByIdRT(username, idSt, pidSt, SsnsService.APP_PRODUCT, SsnsService.PROD_GET_CC, "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }
@@ -1620,7 +1619,7 @@ public class IndexController {
             return null;
         }
 
-        ArrayList<String> ret = afWebService.testSsnsprodByIdRT(username, idSt, pidSt, SsnsService.APP_PRODUCT, "", "");
+        ArrayList<String> ret = afWebService.testSsnsprodByIdRT(username, idSt, pidSt, SsnsService.APP_PRODUCT, "", "", CKey.REALTIME_OPER);
         ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
         return ret;
     }

@@ -76,7 +76,7 @@ public class AccountImp {
         return accountdb.getAllSQLqueryDBSQL(sql);
     }
 
-    public ArrayList getCustomerList(int length) {
+    public ArrayList<CustomerObj> getCustomerList(int length) {
         ArrayList customerList = new ArrayList();
 
         ArrayList customerDBList = accountdb.getCustomerList(0);

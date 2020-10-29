@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -3694,8 +3695,8 @@ public class ServiceAFweb {
         return null;
     }
 
-    public ArrayList<String> testSsnsprodQualByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
-        if (CKey.BATCH_OPER == true) {
+    public ArrayList<String> testSsnsprodQualByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL, boolean realtime) {
+        if (realtime == false) {
             return this.testSsnsByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         }
         if (getServerObj().isSysMaintenance() == true) {
@@ -3744,8 +3745,8 @@ public class ServiceAFweb {
         return null;
     }
 
-    public ArrayList<String> testSsnsprodWLNPROByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
-        if (CKey.BATCH_OPER == true) {
+    public ArrayList<String> testSsnsprodWLNPROByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL, boolean realtime) {
+        if (realtime == false) {
             return this.testSsnsByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         }
         if (getServerObj().isSysMaintenance() == true) {
@@ -3794,8 +3795,8 @@ public class ServiceAFweb {
         return null;
     }
 
-    public ArrayList<String> testSsnsprodActCfgByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
-        if (CKey.BATCH_OPER == true) {
+    public ArrayList<String> testSsnsprodActCfgByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL, boolean realtime) {
+        if (realtime == false) {
             return this.testSsnsByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         }
         if (getServerObj().isSysMaintenance() == true) {
@@ -3844,7 +3845,11 @@ public class ServiceAFweb {
         return null;
     }
 
-    public ArrayList<String> testSsnsprodCallCByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
+    public ArrayList<String> testSsnsprodCallCByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL, boolean realtime) {
+        if (realtime == false) {
+            return this.testSsnsByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+        }
+
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -3891,8 +3896,8 @@ public class ServiceAFweb {
         return null;
     }
 
-    public ArrayList<String> testSsnsprodTTVCByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
-        if (CKey.BATCH_OPER == true) {
+    public ArrayList<String> testSsnsprodTTVCByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL, boolean realtime) {
+        if (realtime == false) {
             return this.testSsnsByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         }
         if (getServerObj().isSysMaintenance() == true) {
@@ -3943,21 +3948,21 @@ public class ServiceAFweb {
 
     public ArrayList<String> testSsnsprodPRocessByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
         if (prod.equals(SsnsService.APP_APP)) {
-            return this.testSsnsprodAppByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+            return this.testSsnsprodAppByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
         } else if (prod.equals(SsnsService.APP_TTVC)) {
-            return this.testSsnsprodTTVCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+            return this.testSsnsprodTTVCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
         } else if (prod.equals(SsnsService.APP_WIFI)) {
-            return this.testSsnsprodWifiByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+            return this.testSsnsprodWifiByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
         } else if (prod.equals(SsnsService.APP_PRODUCT)) {
-            return testSsnsprodByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+            return testSsnsprodByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
         } else if (prod.equals(SsnsService.APP_WLNPRO)) {
-            return testSsnsprodWLNPROByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+            return testSsnsprodWLNPROByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
         } else if (prod.equals(SsnsService.APP_QUAL)) {
-            return testSsnsprodQualByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+            return testSsnsprodQualByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
         } else if (prod.equals(SsnsService.APP_CALLC)) {
-            return testSsnsprodCallCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+            return testSsnsprodCallCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
         } else if (prod.equals(SsnsService.APP_ACTCFG)) {
-            return testSsnsprodActCfgByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+            return testSsnsprodActCfgByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
         }
         return null;
     }
@@ -4031,8 +4036,8 @@ public class ServiceAFweb {
         return "";
     }
 
-    public ArrayList<String> testSsnsprodWifiByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
-        if (CKey.BATCH_OPER == true) {
+    public ArrayList<String> testSsnsprodWifiByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL, boolean realtime) {
+        if (realtime == false) {
             return this.testSsnsByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         }
         if (getServerObj().isSysMaintenance() == true) {
@@ -4084,8 +4089,8 @@ public class ServiceAFweb {
     }
 
     //////////////////////
-    public ArrayList<String> getTestSsnsCommById(String EmailUserName, String IDSt, String pidSt) {
-        ArrayList<String> retArray = new ArrayList();
+    public ArrayList<String> getTestSsnsCommById(String EmailUserName, String IDSt) {
+
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -4098,38 +4103,38 @@ public class ServiceAFweb {
                 return null;
             }
         }
-        int id = 0;
 
-        if (pidSt != null) {
-            id = Integer.parseInt(pidSt);
-        }
-        SsReport reportObj = new SsReport();
+        ArrayList<String> retArray = new ArrayList();
+        retArray.add("Queuing for process. Please refresh.....");
         ArrayList<CommObj> comObjList = getCommByCustomerAccountID(EmailUserName, null, IDSt);
         if (comObjList != null) {
             if (comObjList.size() > 0) {
+                // list is oldest first
+                Collections.reverse(comObjList);
+
                 for (int j = 0; j < comObjList.size(); j++) {
                     CommObj comObj = comObjList.get(j);
-                    if (j != 0) {
-                        // delete other command 
-                        getAccountImp().removeCustAccountCommByCommID(comObj.getId());
-                        continue;
-                    }
-
-                    reportObj.setStatus(comObj.getSubstatus());
-
-                    if (comObj.getSubstatus() != ConstantKey.OPEN) {
+                    if (j == 0) {
+                        if (comObj.getSubstatus() == ConstantKey.OPEN) {
+                            break;
+                        }
                         String data = comObj.getData();
-                        data = replaceAll("#", "\"", data);
 
-                        ProductData pData = null;
+                        RequestObj pData = null;
+
                         try {
                             String nameSt = ServiceAFweb.decompress(data);
-                            pData = new ObjectMapper().readValue(nameSt, ProductData.class);
+                            pData = new ObjectMapper().readValue(nameSt, RequestObj.class);
+                            String outputSt = pData.getResp();
+                            outputSt = replaceAll("#", "\"", outputSt);
+
+                            retArray = new ArrayList();
+                            retArray = new ObjectMapper().readValue(outputSt, ArrayList.class);
+
                         } catch (IOException ex) {
+                            logger.info("> getTestSsnsCommById  " + ex.getMessage());
                         }
-                        if (pData != null) {
-                            retArray = pData.getDetailResp();
-                        }
+                        break;
                     }
                 }
             }
@@ -4139,7 +4144,7 @@ public class ServiceAFweb {
 
     public void processTestSsnsByIdRT() {
 
-        if (CKey.BATCH_OPER == false) {
+        if (CKey.REALTIME_OPER == true) {
             return;
         }
         Calendar dateNow = TimeConvertion.getCurrentCalendar();
@@ -4155,14 +4160,14 @@ public class ServiceAFweb {
             }
 
             // get all customer list 
-            ArrayList custNameList = getCustomerList(0);
-
+            ArrayList<CustomerObj> custNameList = getCustomerList(0);
+            if (custNameList == null) {
+                return;
+            }
             for (int i = 0; i < custNameList.size(); i++) {
-                String customerName = (String) custNameList.get(i);
-                CustomerObj custObj = getAccountImp().getCustomerPassword(customerName, null);
-                if (custObj == null) {
-                    continue;
-                }
+                CustomerObj custObj = custNameList.get(i);
+                String customerName = custObj.getUsername();
+
                 String CIDSt = custObj.getId() + "";
                 // get all comobj but only process the first one
                 ArrayList<CommObj> comObjList = getCommByCustomerAccountID(customerName, null, CIDSt);
@@ -4172,31 +4177,34 @@ public class ServiceAFweb {
                 if (comObjList.size() == 0) {
                     continue;
                 }
+                // list is oldest first
+                Collections.reverse(comObjList);
 
                 for (int j = 0; j < comObjList.size(); j++) {
                     CommObj comObj = comObjList.get(j);
-                    if (comObj.getSubstatus() != ConstantKey.OPEN) {
-                        continue;
-                    }
+
                     if (j != 0) {
                         // clear the rest command 
                         getAccountImp().updateAccountCommSubStatus(comObj.getId(), ConstantKey.CLOSE);
                         continue;
                     }
-
-                    String data = comObj.getData();
-                    data = replaceAll("#", "\"", data);
-
-                    ProductData pData = null;
-                    try {
-                        String nameSt = ServiceAFweb.decompress(data);
-                        pData = new ObjectMapper().readValue(nameSt, ProductData.class);
-                    } catch (IOException ex) {
-                    }
-                    if (pData == null) {
+                    if (comObj.getSubstatus() != ConstantKey.OPEN) {
                         continue;
                     }
-                    String parm = pData.getPostParam();
+                    String data = comObj.getData();
+                    RequestObj pData = null;
+
+                    try {
+                        String nameSt = ServiceAFweb.decompress(data);
+                        pData = new ObjectMapper().readValue(nameSt, RequestObj.class);
+                    } catch (IOException ex) {
+                        logger.info("> processTestSsnsByIdRT  " + ex.getMessage());
+                    }
+                    if (pData == null) {
+                        getAccountImp().updateAccountCommSubStatus(comObj.getId(), ConstantKey.CLOSE);
+                        continue;
+                    }
+                    String parm = pData.getReq();
                     String[] parmList = parm.split(":");
                     if (parmList.length < 5) {
                         continue;
@@ -4209,45 +4217,40 @@ public class ServiceAFweb {
                     String LABURL = parmList[5];
                     ArrayList<String> output = null;
                     if (prod.equals(APP_WIFI)) {
-                        output = this.testSsnsprodWifiByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                        output = this.testSsnsprodWifiByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
                     } else if (prod.equals(APP_APP)) {
-                        output = this.testSsnsprodAppByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                        output = this.testSsnsprodAppByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
                     } else if (prod.equals(APP_PRODUCT)) {
-                        output = this.testSsnsprodByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                        output = this.testSsnsprodByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
                     } else if (prod.equals(APP_TTVC)) {
-                        output = this.testSsnsprodTTVCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                        output = this.testSsnsprodTTVCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
                     } else if (prod.equals(APP_WLNPRO)) {
-                        output = this.testSsnsprodWLNPROByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                        output = this.testSsnsprodWLNPROByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
                     } else if (prod.equals(APP_QUAL)) {
-                        output = this.testSsnsprodQualByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                        output = this.testSsnsprodQualByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
                     } else if (prod.equals(APP_CALLC)) {
-                        output = this.testSsnsprodCallCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                        output = this.testSsnsprodCallCByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
                     } else if (prod.equals(APP_ACTCFG)) {
-                        output = this.testSsnsprodActCfgByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
+                        output = this.testSsnsprodActCfgByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
                     }
-                    pData.setDetailResp(output);
 
                     try {
+                        String outputSt = new ObjectMapper().writeValueAsString(output);
+                        outputSt = replaceAll("\"", "#", outputSt);
+                        pData.setResp(outputSt);
                         data = new ObjectMapper().writeValueAsString(pData);
-                        String nameSt = new ObjectMapper().writeValueAsString(data);
                         ///////do compassion
-                        if (nameSt != null) {
-                            if (nameSt.length() > 0) {
-                                nameSt = ServiceAFweb.compress(nameSt);
-                            }
-                        }
+                        String nameSt = ServiceAFweb.compress(data);
                         data = nameSt;
-                        data = replaceAll("\"", "#", data);
                     } catch (JsonProcessingException ex) {
-                    }
 
+                    }
                     comObj.setData(data);
                     comObj.setSubstatus(ConstantKey.COMPLETED);
 
                     Calendar dateNow1 = TimeConvertion.getCurrentCalendar();
                     long dateNowLong = dateNow1.getTimeInMillis();
                     comObj.setUpdatedatel(dateNowLong);
-
                     getAccountImp().updateAccountCommData(comObj);
 
                 }
@@ -4274,21 +4277,16 @@ public class ServiceAFweb {
 
         ArrayList<String> retArray = new ArrayList();
         String data = "";
-        ProductData pData = new ProductData();
+        RequestObj pData = new RequestObj();
         String parm = EmailUserName + ":" + IDSt + ":" + PIDSt + ":" + prod + ":" + Oper + ":" + LABURL + ":end";
-        pData.setPostParam(parm);
+        pData.setReq(parm);
         try {
             data = new ObjectMapper().writeValueAsString(pData);
-            String nameSt = new ObjectMapper().writeValueAsString(data);
             ///////do compassion
-            if (nameSt != null) {
-                if (nameSt.length() > 0) {
-                    nameSt = ServiceAFweb.compress(nameSt);
-                }
-            }
+            String nameSt = ServiceAFweb.compress(data);
             data = nameSt;
-            data = replaceAll("\"", "#", data);
-        } catch (JsonProcessingException ex) {
+        } catch (Exception ex) {
+
         }
 
 //        ArrayList<CommObj> comObjList = getCommByCustomerAccountID(EmailUserName, null, IDSt);
@@ -4308,12 +4306,12 @@ public class ServiceAFweb {
 //        }
         // always add a new one
         this.addCommByCustomerAccountID(EmailUserName, null, IDSt, data);
-        retArray.add("Waiting for process.....");
+        retArray.add("Queuing for process. Please refresh.....");
         return retArray;
     }
 
-    public ArrayList<String> testSsnsprodAppByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL) {
-        if (CKey.BATCH_OPER == true) {
+    public ArrayList<String> testSsnsprodAppByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String Oper, String LABURL, boolean realtime) {
+        if (realtime == false) {
             return this.testSsnsByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL);
         }
         if (getServerObj().isSysMaintenance() == true) {
@@ -4517,13 +4515,11 @@ public class ServiceAFweb {
         return "";
     }
 
-    public ArrayList<String> testSsnsprodByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String ProdOper, String LABURL) {
-        if (CKey.BATCH_OPER == true) {
+    public ArrayList<String> testSsnsprodByIdRT(String EmailUserName, String IDSt, String PIDSt, String prod, String ProdOper, String LABURL, boolean realtime) {
+        if (realtime == false) {
             return this.testSsnsByIdRT(EmailUserName, IDSt, PIDSt, prod, ProdOper, LABURL);
         }
-        if (CKey.BATCH_OPER == true) {
-            return this.testSsnsByIdRT(EmailUserName, IDSt, PIDSt, prod, ProdOper, LABURL);
-        }
+
         if (getServerObj().isSysMaintenance() == true) {
             return null;
         }
@@ -4588,7 +4584,7 @@ public class ServiceAFweb {
         return result;
     }
 
-    public ArrayList getCustomerList(int length) {
+    public ArrayList<CustomerObj> getCustomerList(int length) {
         ArrayList result = null;
         if (getServerObj().isSysMaintenance() == true) {
             return null;
