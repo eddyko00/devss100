@@ -259,42 +259,35 @@ public class ServiceAFweb {
                     return getServerObj().getTimerCnt();
 
                 }
-                if (CKey.UI_ONLY == false) {
+//                if (CKey.UI_ONLY == false) {
 
-                    // make sure not request during DB initialize
-                    if (getServerObj().isLocalDBservice() == true) {
-                        getServerObj().setSysMaintenance(true);
-                        logger.info(">>>>>>> InitDBData started.........");
-                        // 0 - new db, 1 - db already exist, -1 db error
-                        int ret = InitDBData();  // init DB Adding customer account
+                // make sure not request during DB initialize
+                if (getServerObj().isLocalDBservice() == true) {
+                    getServerObj().setSysMaintenance(true);
+                    logger.info(">>>>>>> InitDBData started.........");
+                    // 0 - new db, 1 - db already exist, -1 db error
+                    int ret = InitDBData();  // init DB Adding customer account
 
-                        if (ret != -1) {
+                    if (ret != -1) {
 
-                            initProcessTimer = false;
-                            delayProcessTimer = 0;
+                        initProcessTimer = false;
+                        delayProcessTimer = 0;
 
-                            getServerObj().setSysMaintenance(false);
-                            serverObj.setTimerInit(true);
-                            logger.info(">>>>>>> InitDBData Competed.....");
-                        } else {
-                            serverObj.setTimerInit(false);
-                            serverObj.setTimerQueueCnt(serverObj.getTimerQueueCnt() - 1);
-                            logger.info(">>>>>>> InitDBData Failed.....");
-                            return getServerObj().getTimerCnt();
-                        }
-
+                        getServerObj().setSysMaintenance(false);
+                        serverObj.setTimerInit(true);
+                        logger.info(">>>>>>> InitDBData Competed.....");
+                    } else {
+                        serverObj.setTimerInit(false);
+                        serverObj.setTimerQueueCnt(serverObj.getTimerQueueCnt() - 1);
+                        logger.info(">>>>>>> InitDBData Failed.....");
+                        return getServerObj().getTimerCnt();
                     }
-                    serverObj.setTimerInit(true);
-                    setLockNameProcess(serverLockName, ConstantKey.SRV_LOCKTYPE, lockDateValue, serverObj.getSrvProjName());
 
-//                    boolean clearssnsflag = false;
-//                    if (clearssnsflag == true) {
-//                        getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_PRODUCT);
-//                        getSsnsDataImp().updateSsnsDataAllOpenStatus();
-//                    }
                 }
-                // final initialization
-//                getSsnsDataImp().updateSsnsDataAllOpenStatus();
+                serverObj.setTimerInit(true);
+                setLockNameProcess(serverLockName, ConstantKey.SRV_LOCKTYPE, lockDateValue, serverObj.getSrvProjName());
+
+//                }
             } else {
                 if (timerThreadMsg != null) {
                     if (timerThreadMsg.indexOf("debugtest") != -1) {
@@ -484,8 +477,7 @@ public class ServiceAFweb {
     void debugtest() {
         try {
             processTestSsnsByIdRT();
-            
-            
+
 //            SsnsService ssns = new SsnsService();
 ////            String urlSt = "https://soa-mp-rmsk-pr.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
 //            String urlSt = "http://ssns-appointmentmgmt-it03.paas-app-east-np.tabcsl.tabcelus.com/v2/cmo/selfmgmt/appointmentmanagement/appointment?ban=237221582&customerid=10171491&appointmentlist.hostsystemcd.in=FIFA";
