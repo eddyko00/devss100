@@ -6,7 +6,7 @@ public class CKey {
     public static String FileLocalPathTemp = "C:\\TEMP\\";
 
     public static final boolean LocalPCflag = true; // true;
-    public static final String MYSQL_SERVICE_HOST = "100.65.146.18";
+
     //////////////////////
     // remember to update the application properties      
     public static final int LOCAL_MYSQL = 4; //jdbc:mysql://localhost:3306/db_sample       
