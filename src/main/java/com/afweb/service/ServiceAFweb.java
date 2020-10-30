@@ -260,35 +260,35 @@ public class ServiceAFweb {
                     return getServerObj().getTimerCnt();
 
                 }
-//                if (CKey.UI_ONLY == false) {
+                if (CKey.UI_ONLY == false) {
 
-                // make sure not request during DB initialize
-                if (getServerObj().isLocalDBservice() == true) {
-                    getServerObj().setSysMaintenance(true);
-                    logger.info(">>>>>>> InitDBData started.........");
-                    // 0 - new db, 1 - db already exist, -1 db error
-                    int ret = InitDBData();  // init DB Adding customer account
+                    // make sure not request during DB initialize
+                    if (getServerObj().isLocalDBservice() == true) {
+                        getServerObj().setSysMaintenance(true);
+                        logger.info(">>>>>>> InitDBData started.........");
+                        // 0 - new db, 1 - db already exist, -1 db error
+                        int ret = InitDBData();  // init DB Adding customer account
 
-                    if (ret != -1) {
+                        if (ret != -1) {
 
-                        initProcessTimer = false;
-                        delayProcessTimer = 0;
+                            initProcessTimer = false;
+                            delayProcessTimer = 0;
 
-                        getServerObj().setSysMaintenance(false);
-                        serverObj.setTimerInit(true);
-                        logger.info(">>>>>>> InitDBData Competed.....");
-                    } else {
-                        serverObj.setTimerInit(false);
-                        serverObj.setTimerQueueCnt(serverObj.getTimerQueueCnt() - 1);
-                        logger.info(">>>>>>> InitDBData Failed.....");
-                        return getServerObj().getTimerCnt();
+                            getServerObj().setSysMaintenance(false);
+                            serverObj.setTimerInit(true);
+                            logger.info(">>>>>>> InitDBData Competed.....");
+                        } else {
+                            serverObj.setTimerInit(false);
+                            serverObj.setTimerQueueCnt(serverObj.getTimerQueueCnt() - 1);
+                            logger.info(">>>>>>> InitDBData Failed.....");
+                            return getServerObj().getTimerCnt();
+                        }
+
                     }
+                    serverObj.setTimerInit(true);
+                    setLockNameProcess(serverLockName, ConstantKey.SRV_LOCKTYPE, lockDateValue, serverObj.getSrvProjName());
 
                 }
-                serverObj.setTimerInit(true);
-                setLockNameProcess(serverLockName, ConstantKey.SRV_LOCKTYPE, lockDateValue, serverObj.getSrvProjName());
-
-//                }
             } else {
                 if (timerThreadMsg != null) {
                     if (timerThreadMsg.indexOf("debugtest") != -1) {
