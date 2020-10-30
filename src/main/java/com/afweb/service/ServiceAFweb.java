@@ -400,7 +400,6 @@ public class ServiceAFweb {
             if (cmd.equals("debugtest")) {
                 debugtest();
             }
-
             return;
         }
 
@@ -1865,9 +1864,9 @@ public class ServiceAFweb {
         if (lockReturn == 0) {
             return;
         }
-        if (CKey.SQL_RemoveServerDB == false) {
-            processETL_process();
-        }
+
+        processETL_process();
+
         removeNameLock(LockName, ConstantKey.ETL_LOCKTYPE);
 
     }
