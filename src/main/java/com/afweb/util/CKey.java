@@ -3,7 +3,7 @@ package com.afweb.util;
 public class CKey {
 
     //local pc
-    public static String FileLocalPathTemp = "C:\\TEMP\\";
+    public static String FileLocalPathTemp = "\\TEMP\\";
 
     public static final boolean LocalPCflag = true; // true;
 
