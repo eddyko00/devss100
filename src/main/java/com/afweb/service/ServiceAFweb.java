@@ -4253,7 +4253,22 @@ public class ServiceAFweb {
                         output = this.testSsnsprodActCfgByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
                     }
 
+                                        
                     try {
+                        // data too big
+                        int charSize = 0;
+                        ArrayList responseTmp = new ArrayList();
+                        for (int k = 0; k < output.size(); k++) {
+                            String st = output.get(k);
+                            charSize += st.length();
+                            if (charSize > 5000) {
+                                responseTmp.add("Data truncation too long ");
+                                break;
+                            }
+                            responseTmp.add(st);
+                        }
+                        output = responseTmp;
+                        
                         String outputSt = new ObjectMapper().writeValueAsString(output);
                         outputSt = replaceAll("\"", "#", outputSt);
                         pData.setResp(outputSt);
