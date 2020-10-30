@@ -437,6 +437,7 @@ public class ServiceAFweb {
             if ((getServerObj().getProcessTimerCnt() % 17) == 0) {
                 processTestSsnsByIdRT();
                 ProcessAllLockCleanup();
+                /////// clean the old ssnsacc if > 2 wk
                 ProcessAllOldSsnsAccCleanup(this);
 
             } else if ((getServerObj().getProcessTimerCnt() % 13) == 0) {
@@ -1169,7 +1170,7 @@ public class ServiceAFweb {
             if (ssnsAccObjList.size() > 0) {
                 SsnsAcc accObj = ssnsAccObjList.get(0);
                 long timeL = accObj.getUpdatedatel();
-                timeL = TimeConvertion.addMonths(timeL, -1); // delete last month
+                timeL = TimeConvertion.addDays(timeL, -15); // delete 2 wk
                 getSsnsDataImp().deleteAllSsnsAccByUpdatedatel(servProd, timeL);
                 getSsnsDataImp().deleteAllSsnsDataByUpdatedatel(servProd, timeL);
             }
