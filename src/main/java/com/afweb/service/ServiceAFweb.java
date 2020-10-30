@@ -427,6 +427,7 @@ public class ServiceAFweb {
 
             if ((getServerObj().getProcessTimerCnt() % 31) == 0) {
                 // 15 mintes
+                processTestSsnsByIdRT();
                 SsnsRegression regression = new SsnsRegression();
                 int ret = regression.startMonitor(this, CKey.ADMIN_USERNAME, "");
                 // clear old report
@@ -435,32 +436,44 @@ public class ServiceAFweb {
 
             // 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53
             if ((getServerObj().getProcessTimerCnt() % 17) == 0) {
+                processTestSsnsByIdRT();
                 ProcessAllLockCleanup();
                 ProcessAllOldSsnsAccCleanup(this);
 
             } else if ((getServerObj().getProcessTimerCnt() % 13) == 0) {
+                processTestSsnsByIdRT();
 
             } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
                 //////require to save memory
                 System.gc();
                 // monitor
+                processTestSsnsByIdRT();
                 SsnsRegression regression = new SsnsRegression();
                 regression.processMonitorTesting(this);
 
             } else if ((getServerObj().getProcessTimerCnt() % 7) == 0) {
+                processTestSsnsByIdRT();
                 processFeatureWLNPro();
+                processTestSsnsByIdRT();
                 processFeatureActCfg();
+                processTestSsnsByIdRT();
                 processFeatureApp();
+                processTestSsnsByIdRT();
                 processFeatureQual();
 
             } else if ((getServerObj().getProcessTimerCnt() % 5) == 0) {
+                processTestSsnsByIdRT();
                 processFeatureTTVC();
+                processTestSsnsByIdRT();
                 processFeatureProd();
+                processTestSsnsByIdRT();
                 processFeatureCallC();
+                processTestSsnsByIdRT();
                 processFeatureWifi();
 
             } else if ((getServerObj().getProcessTimerCnt() % 3) == 0) {
                 //10 Sec * 5 ~ 1 minutes
+                processTestSsnsByIdRT();
                 processETL();
 
             } else if ((getServerObj().getProcessTimerCnt() % 2) == 0) {

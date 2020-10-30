@@ -841,6 +841,9 @@ public class SsnsRegression {
     public void reportUpdateStatistic(ServiceAFweb serviceAFweb, String name) {
         // report
         try {
+            /// run RT
+            serviceAFweb.processTestSsnsByIdRT();
+
             String uid = REPORT_REPORT;
             ArrayList<SsReport> reportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, uid, 1);
 

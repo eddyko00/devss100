@@ -1,5 +1,6 @@
 package com.example.herokudemo;
 
+import com.afweb.service.Javamain;
 import com.afweb.service.ServiceAFweb;
 import static com.afweb.service.ServiceAFweb.*;
 import com.afweb.util.CKey;
@@ -12,12 +13,23 @@ import org.springframework.scheduling.annotation.Scheduled;
 @SpringBootApplication
 @EnableScheduling
 public class HerokuDemoApplication {
-
+    
     private static AFwebService afWebService = new AFwebService();
     private static RESTtimer restTimer = new RESTtimer();
-
+    
     public static void main(String[] args) {
-        SpringApplication.run(HerokuDemoApplication.class, args);
+        boolean webapp = true;
+        if (args.length > 0) {
+            String cmd = args[0];
+            if (cmd.indexOf("javamain") != -1) {
+                webapp = false;
+            }
+        }
+        if (webapp == true) {
+            SpringApplication.run(HerokuDemoApplication.class, args);
+        } else {
+            Javamain.javamain(args);
+        }
     }
     public static int timerSchCnt = 0;
     public static boolean init = false;
@@ -37,14 +49,14 @@ public class HerokuDemoApplication {
         if (timerSchCnt < 0) {
             timerSchCnt = 100;
         }
-
+        
         try {
             restTimer.RestTimerHandler();
             TimeUnit.SECONDS.sleep(1);
-
+            
         } catch (Exception ex) {
-
+            
         }
     }
-
+    
 }
