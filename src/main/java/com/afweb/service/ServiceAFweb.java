@@ -490,6 +490,12 @@ public class ServiceAFweb {
 
     void debugtest() {
         try {
+//            getSsnsDataImp().updateSsnsDataOpenStatus(SsnsService.APP_APP);
+//            for (int k = 0; k < 10; k++) {
+//                processFeatureApp();
+//            }
+//            ProcessAllOldSsnsAccCleanup(this);
+            
             processTestSsnsByIdRT();
 
 //            SsnsService ssns = new SsnsService();

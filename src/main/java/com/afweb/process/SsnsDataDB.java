@@ -1224,11 +1224,12 @@ public class SsnsDataDB {
     }
 
     public ArrayList getSsnsDataIDList(String app, String ret, int status, int length) {
-        String sql = "select id as name from ssnsdata where app='" + app + "' and ret='" + ret + "' and status=" + status
+        String sql = "select id as id from ssnsdata where app='" + app + "' and ret='" + ret + "' and status=" + status
                 + " order by updatedatel asc";
 
         sql = ServiceAFweb.getSQLLengh(sql, length);
-        ArrayList array = getAllNameSQL(sql);
+        ArrayList array = getAllIdSQL(sql);
+//        ArrayList array = getAllNameSQL(sql);
         return array;
     }
 
