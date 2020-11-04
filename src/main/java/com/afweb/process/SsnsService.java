@@ -1865,6 +1865,18 @@ public class SsnsService {
             oper = TT_Quote;
         }
         if (oper.equals(TT_Vadulate) || oper.equals(TT_Quote)) {
+            ProductData pData = null;
+            String output = dataObj.getData();
+            try {
+                pData = new ObjectMapper().readValue(output, ProductData.class);
+            } catch (IOException ex) {
+            }
+            if (pData == null) {
+                return "";
+            }
+
+            String postParamSt = ProductDataHelper.getPostParamRestore(pData.getPostParam());
+
 //        if (oper.equals(TT_SaveOrder) || oper.equals(TT_Vadulate) || oper.equals(TT_Quote) || oper.equals(TT_SaveOrder)) {
             outputSt = SendSsnsTTVC(LABURL, TT_GetSub, banid, appTId, null, inList);
             if (outputSt == null) {
@@ -1876,25 +1888,13 @@ public class SsnsService {
             outputSt = outputSt.replaceAll("^", "");
 
             ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            String feat = parseTTVCFeature(outputSt, oper, null);
+            String feat = parseTTVCFeature(outputSt, oper, postParamSt);
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 feat += ":testfailed";
             }
-
-            outputList.add(feat);
-            ProductData pData = null;
-            String output = dataObj.getData();
-
-            try {
-                pData = new ObjectMapper().readValue(output, ProductData.class);
-            } catch (IOException ex) {
-            }
-            if (pData == null) {
-                return "";
-            }
+            
             inList.clear();
-
-            String postParamSt = ProductDataHelper.getPostParamRestore(pData.getPostParam());
+            outputList.add(feat);
             outputSt = SendSsnsTTVC(LABURL, oper, banid, appTId, postParamSt, inList);
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 feat += ":testfailed";
