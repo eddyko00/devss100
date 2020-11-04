@@ -29,7 +29,7 @@ var app = {
         var featIDObjList = JSON.parse(featIDObjListStr);
         var featObjId = iisWebObj.featObjId;
         var cmd = iisWebObj.cmd;
-        var iisurllocal = iisurl_OP; //iisurl_OP; //iisurl_LOCAL;
+        var iisurllocal = iisurl; //iisurl_OP; //iisurl_LOCAL;
         iisurllocal = iisurllocal.replace("abc", "");
         iisurllocal = iisurllocal.replace("abc", "");
         
