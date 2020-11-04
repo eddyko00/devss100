@@ -1865,24 +1865,26 @@ public class SsnsService {
             oper = TT_Quote;
         }
         if (oper.equals(TT_Vadulate) || oper.equals(TT_Quote)) {
-//            outputSt = SendSsnsTTVC(LABURL, TT_GetSub, banid, appTId, null, inList);
-//            if (outputSt == null) {
-//                return "";
-//            }
-//            ////special char #, need to ignore for this system
-//            outputSt = outputSt.replaceAll("#", "");
-//            outputSt = outputSt.replaceAll("~", "");
-//            outputSt = outputSt.replaceAll("^", "");
-//
-//            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-//            String feat = parseTTVCFeature(outputSt, oper, null);
-//            if (outputSt.indexOf("responseCode:400500") != -1) {
-//                feat += ":testfailed";
-//            }
+//        if (oper.equals(TT_SaveOrder) || oper.equals(TT_Vadulate) || oper.equals(TT_Quote) || oper.equals(TT_SaveOrder)) {
+            outputSt = SendSsnsTTVC(LABURL, TT_GetSub, banid, appTId, null, inList);
+            if (outputSt == null) {
+                return "";
+            }
+            ////special char #, need to ignore for this system
+            outputSt = outputSt.replaceAll("#", "");
+            outputSt = outputSt.replaceAll("~", "");
+            outputSt = outputSt.replaceAll("^", "");
 
-//            outputList.add(feat);
+            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+            String feat = parseTTVCFeature(outputSt, oper, null);
+            if (outputSt.indexOf("responseCode:400500") != -1) {
+                feat += ":testfailed";
+            }
+
+            outputList.add(feat);
             ProductData pData = null;
             String output = dataObj.getData();
+
             try {
                 pData = new ObjectMapper().readValue(output, ProductData.class);
             } catch (IOException ex) {
@@ -1894,22 +1896,13 @@ public class SsnsService {
 
             String postParamSt = ProductDataHelper.getPostParamRestore(pData.getPostParam());
             outputSt = SendSsnsTTVC(LABURL, oper, banid, appTId, postParamSt, inList);
-            if (outputSt == null) {
-                return "";
-            }
-            ////special char #, need to ignore for this system
-            outputSt = outputSt.replaceAll("#", "");
-            outputSt = outputSt.replaceAll("~", "");
-            outputSt = outputSt.replaceAll("^", "");
-            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
-            String feat = parseTTVCFeature(outputSt, oper, postParamSt);
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 feat += ":testfailed";
                 outputList.remove(0);
                 outputList.add(0, feat);
             }
+            outList = ServiceAFweb.prettyPrintJSON(outputSt);
 
-            outputList.add(feat);
             outputList.addAll(inList);
             outputList.addAll(outList);
 
@@ -1940,6 +1933,101 @@ public class SsnsService {
         return "";
     }
 
+//    public String TestFeatureSsnsProdTTVC(SsnsAcc dataObj, ArrayList<String> outputList, String oper, String LABURL) {
+//        if (dataObj == null) {
+//            return "";
+//        }
+//
+//        dataObj.getData();
+//        String banid = dataObj.getBanid();
+//        String appTId = dataObj.getTiid();
+//        if (appTId.length() == 0) {
+//            return "";
+//        }
+//        if (LABURL.length() == 0) {
+//            LABURL = ServiceAFweb.URL_PRODUCT_PR;
+//        }
+//
+//        String outputSt = null;
+//        ArrayList<String> inList = new ArrayList();
+//        if (oper.equals(TT_SaveOrder)) {
+//            oper = TT_Quote;
+//        }
+//        if (oper.equals(TT_Vadulate) || oper.equals(TT_Quote)) {
+////            outputSt = SendSsnsTTVC(LABURL, TT_GetSub, banid, appTId, null, inList);
+////            if (outputSt == null) {
+////                return "";
+////            }
+////            ////special char #, need to ignore for this system
+////            outputSt = outputSt.replaceAll("#", "");
+////            outputSt = outputSt.replaceAll("~", "");
+////            outputSt = outputSt.replaceAll("^", "");
+////
+////            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+////            String feat = parseTTVCFeature(outputSt, oper, null);
+////            if (outputSt.indexOf("responseCode:400500") != -1) {
+////                feat += ":testfailed";
+////            }
+//
+////            outputList.add(feat);
+//            ProductData pData = null;
+//            String output = dataObj.getData();
+//            try {
+//                pData = new ObjectMapper().readValue(output, ProductData.class);
+//            } catch (IOException ex) {
+//            }
+//            if (pData == null) {
+//                return "";
+//            }
+//            inList.clear();
+//
+//            String postParamSt = ProductDataHelper.getPostParamRestore(pData.getPostParam());
+//            outputSt = SendSsnsTTVC(LABURL, oper, banid, appTId, postParamSt, inList);
+//            if (outputSt == null) {
+//                return "";
+//            }
+//            ////special char #, need to ignore for this system
+//            outputSt = outputSt.replaceAll("#", "");
+//            outputSt = outputSt.replaceAll("~", "");
+//            outputSt = outputSt.replaceAll("^", "");
+//            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+//            String feat = parseTTVCFeature(outputSt, oper, postParamSt);
+//            if (outputSt.indexOf("responseCode:400500") != -1) {
+//                feat += ":testfailed";
+//                outputList.remove(0);
+//                outputList.add(0, feat);
+//            }
+//
+//            outputList.add(feat);
+//            outputList.addAll(inList);
+//            outputList.addAll(outList);
+//
+//            return feat;
+//        } else if (oper.equals(TT_GetSub)) {
+//
+//            outputSt = SendSsnsTTVC(LABURL, oper, banid, appTId, null, inList);;
+//            if (outputSt == null) {
+//                return "";
+//            }
+//            ////special char #, need to ignore for this system
+//            outputSt = outputSt.replaceAll("#", "");
+//            outputSt = outputSt.replaceAll("~", "");
+//            outputSt = outputSt.replaceAll("^", "");
+//
+//            ArrayList<String> outList = ServiceAFweb.prettyPrintJSON(outputSt);
+//            String feat = parseTTVCFeature(outputSt, oper, null);
+//            if (outputSt.indexOf("responseCode:400500") != -1) {
+//                feat += ":testfailed";
+//            }
+//            outputList.add(feat);
+//            outputList.addAll(inList);
+//            outputList.addAll(outList);
+//
+//            return feat;
+//        }
+//
+//        return "";
+//    }
 ////////////////////////////////////////////    
     public String getFeatureSsnsWifi(SsnsData dataObj) {
         String feat = "";
