@@ -1021,7 +1021,8 @@ public class SsnsDataDB {
 
     public ArrayList<SsnsAcc> getSsnsAccObjListByFeature(String app, String name, int length) {
         String sql = "select * from ssnsacc where app='" + app + "' and name='" + name + "'";
-        sql = ServiceAFweb.getSQLLengh(sql, length);
+        sql += " order by updatedatel desc";
+        sql = ServiceAFweb.getSQLLengh(sql, length);  // not sure if work
         ArrayList entries = getAllSsnsAccSQL(sql, 0);
         return entries;
     }

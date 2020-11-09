@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.logging.Level;
 
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -403,11 +402,6 @@ public class ServiceAFweb {
             return;
         }
 
-        if (getEnv.checkLocalPC() == false) {
-            // if openshfit, no need to do the sending command to PR
-            return;
-        }
-
         try {
             if (getServerObj().getProcessTimerCnt() < 0) {
                 getServerObj().setProcessTimerCnt(0);
@@ -415,7 +409,7 @@ public class ServiceAFweb {
             getServerObj().setProcessTimerCnt(getServerObj().getProcessTimerCnt() + 1);
 
 //            logger.info("> processTimer " + getServerObj().getProcessTimerCnt());
-            if (((getServerObj().getProcessTimerCnt() % 10) == 0) || (getServerObj().getProcessTimerCnt() == 1)) {
+            if (((getServerObj().getProcessTimerCnt() % 19) == 0) || (getServerObj().getProcessTimerCnt() == 1)) {
                 long result = setRenewLock(serverLockName, ConstantKey.SRV_LOCKTYPE);
                 if (result == 0) {
                     Calendar dateNow1 = TimeConvertion.getCurrentCalendar();
@@ -424,6 +418,20 @@ public class ServiceAFweb {
                 }
             }
 
+            if ((getServerObj().getProcessTimerCnt() % 17) == 0) {
+                ProcessAllLockCleanup();
+                /////// clean the old ssnsacc if > 2 wk
+                ProcessAllOldSsnsAccCleanup(this);
+            }
+////////////////////////////////////////////
+// exit for openshit. it cannot call PR testing
+////////////////////////////////////////////
+            if (getEnv.checkLocalPC() == false) {
+                // if openshfit, no need to do the sending command to PR           
+                return;
+            }
+////////////////////////////////////////////
+////////////////////////////////////////////
             if ((getServerObj().getProcessTimerCnt() % 31) == 0) {
                 // 15 mintes
                 processTestSsnsByIdRT();
@@ -434,13 +442,7 @@ public class ServiceAFweb {
             }
 
             // 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53
-            if ((getServerObj().getProcessTimerCnt() % 17) == 0) {
-                processTestSsnsByIdRT();
-                ProcessAllLockCleanup();
-                /////// clean the old ssnsacc if > 2 wk
-                ProcessAllOldSsnsAccCleanup(this);
-
-            } else if ((getServerObj().getProcessTimerCnt() % 13) == 0) {
+            if ((getServerObj().getProcessTimerCnt() % 13) == 0) {
                 processTestSsnsByIdRT();
 
             } else if ((getServerObj().getProcessTimerCnt() % 11) == 0) {
@@ -495,7 +497,7 @@ public class ServiceAFweb {
 //                processFeatureApp();
 //            }
 //            ProcessAllOldSsnsAccCleanup(this);
-            
+
             processTestSsnsByIdRT();
 
 //            SsnsService ssns = new SsnsService();
@@ -4253,7 +4255,6 @@ public class ServiceAFweb {
                         output = this.testSsnsprodActCfgByIdRT(EmailUserName, IDSt, PIDSt, prod, Oper, LABURL, true);
                     }
 
-                                        
                     try {
                         // data too big
                         int charSize = 0;
@@ -4268,7 +4269,7 @@ public class ServiceAFweb {
                             responseTmp.add(st);
                         }
                         output = responseTmp;
-                        
+
                         String outputSt = new ObjectMapper().writeValueAsString(output);
                         outputSt = replaceAll("\"", "#", outputSt);
                         pData.setResp(outputSt);

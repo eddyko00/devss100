@@ -23,13 +23,11 @@ public class HerokuDemoApplication {
             String cmd = args[0];
             if (cmd.indexOf("javamain") != -1) {
                 webapp = false;
+                Javamain.javamain(args);
             }
         }
-        if (webapp == true) {
-            SpringApplication.run(HerokuDemoApplication.class, args);
-        } else {
-            Javamain.javamain(args);
-        }
+
+        SpringApplication.run(HerokuDemoApplication.class, args);
     }
     public static int timerSchCnt = 0;
     public static boolean init = false;
