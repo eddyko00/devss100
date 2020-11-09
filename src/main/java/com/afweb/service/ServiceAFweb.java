@@ -4172,7 +4172,7 @@ public class ServiceAFweb {
         long lockDateValue = dateNow.getTimeInMillis();
         String LockName = "RT_TEST";
         try {
-            int lockReturn = setLockNameProcess(LockName, ConstantKey.SRV_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processFeatureTTVC");
+            int lockReturn = setLockNameProcess(LockName, ConstantKey.SRV_LOCKTYPE, lockDateValue, ServiceAFweb.getServerObj().getSrvProjName() + " processRTtesting");
             if (CKey.NN_DEBUG == true) {
                 lockReturn = 1;
             }
