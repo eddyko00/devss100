@@ -133,9 +133,6 @@ public class SsnsRegression {
                     if (featN.indexOf("failed") != -1) {
                         continue;
                     }
-                    if (featN.indexOf("failed") != -1) {
-                        continue;
-                    }
                     featallList.add(featN);
 
                 }
