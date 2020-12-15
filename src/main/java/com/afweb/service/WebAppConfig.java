@@ -11,7 +11,7 @@ public class WebAppConfig {
 
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        if ((CKey.SQL_DATABASE == CKey.LOCAL_MYSQL) || (CKey.SQL_DATABASE == CKey.REMOTE_MYSQL)) {
+        if ((CKey.SQL_DATABASE == CKey.LOCAL_MYSQL) || (CKey.SQL_DATABASE == CKey.REMOTE_PHP_MYSQL)) {
 //            dataSource.setDriverClassName("com.mysql.jdbc.Driver");
 //            dataSource.setUrl("jdbc:mysql://mysql:3306/sampledb");
 //            dataSource.setUsername("sa");
@@ -29,7 +29,7 @@ public class WebAppConfig {
             ServiceAFweb.URL_LOCAL_DB = dataSource.getUrl();
 
         }
-        if (CKey.SQL_DATABASE == CKey.MYSQL) {
+        if (CKey.SQL_DATABASE == CKey.DIRECT_MYSQL) {
 
 //sh-4.2$ env | grep MYSQL
 //h-4.2$ env | grep MYSQL

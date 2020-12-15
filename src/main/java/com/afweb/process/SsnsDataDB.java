@@ -91,7 +91,7 @@ public class SsnsDataDB {
 
     public static boolean checkCallRemoveSQL_Mysql() {
         boolean ret = false;
-        if (CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) {
+        if (CKey.SQL_DATABASE == CKey.REMOTE_PHP_MYSQL) {
             ret = true;
         }
         return ret;
@@ -239,7 +239,7 @@ public class SsnsDataDB {
 
     public static String createDummytable() {
         String sqlCMD = "";
-        if ((CKey.SQL_DATABASE == CKey.MYSQL) || (CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) || (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL)) {
+        if ((CKey.SQL_DATABASE == CKey.DIRECT_MYSQL) || (CKey.SQL_DATABASE == CKey.REMOTE_PHP_MYSQL) || (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL)) {
             if (CKey.DB == CKey.POSTGRESQLDB) {
                 sqlCMD = "create table ssnsdummy (id int not null primary key)";
             } else if (CKey.DB == CKey.MYSQLDB) {
@@ -1069,7 +1069,7 @@ public class SsnsDataDB {
     public ArrayList<String> getSsReportObjListByFeatureOper(String name, String app) {
         String sql = "select DISTINCT oper as name from ssreport where name='" + name + "' and app='" + app + "' order by oper asc";
 
-        if ((CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) && (CKey.SQL_RemoveServerDB == true)) {
+        if ((CKey.SQL_DATABASE == CKey.REMOTE_PHP_MYSQL) && (CKey.SQL_RemoteServerDB == true)) {
             sql = "select DISTINCT oper from ssreport where name='" + name + "' and app='" + app + "' order by oper asc";
         }
         ArrayList array = getAllNameSQL(sql);
@@ -1078,7 +1078,7 @@ public class SsnsDataDB {
 
     public ArrayList<String> getSsnsAccObjListByFeature(String app) {
         String sql = "select DISTINCT name as name from ssnsacc where app='" + app + "' order by name asc";
-        if ((CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) && (CKey.SQL_RemoveServerDB == true)) {
+        if ((CKey.SQL_DATABASE == CKey.REMOTE_PHP_MYSQL) && (CKey.SQL_RemoteServerDB == true)) {
             sql = "select DISTINCT name from ssnsacc where app='" + app + "' order by name asc";
         }
         ArrayList array = getAllNameSQL(sql);

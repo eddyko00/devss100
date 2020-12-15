@@ -70,8 +70,8 @@ public class SsnsService {
     public static String APP_FEATT_TYPE_SING = "SING";
     public static String PROD_GET_PROD = "getProductList";
     public static String PROD_GET_BYID = "getProductById";
-    public static String PROD_GET_CC = "CallControl";
-    public static String APP_FEATT_TYPE_CC = "CC";
+//    public static String PROD_GET_CC = "CallControl";
+
 
     public static String APP_FEAT_TYPE_APP = "APP";
     public static String APP_GET_APP = "getAppointment";
@@ -91,6 +91,7 @@ public class SsnsService {
     public static String QUAL_MATCH = "address_matches";
 
     //call control
+    public static String APP_FEATT_TYPE_CC = "CC";    
     public static String CALLC_GET = "getCallControl";
     public static String CALLC_UPDATE = "updateCallControl";
     public static String CALLC_RESET = "resetCallFeature";

@@ -16,17 +16,20 @@ public class HerokuDemoApplication {
     
     private static AFwebService afWebService = new AFwebService();
     private static RESTtimer restTimer = new RESTtimer();
+    public static boolean webapp = true;
     
     public static void main(String[] args) {
-        boolean webapp = true;
         if (args.length > 0) {
-            String cmd = args[0];
-            if (cmd.indexOf("javamain") != -1) {
-                webapp = false;
-                Javamain.javamain(args);
+            for (int i = 0; i < args.length; i++) {
+                String cmd = args[i];
+
+                if (cmd.indexOf("javamain") != -1) {
+                    webapp = false;
+                    Javamain.javamain(args);
+                }
+                Javamain.checkParameterFlag(cmd);
             }
         }
-
         SpringApplication.run(HerokuDemoApplication.class, args);
     }
     public static int timerSchCnt = 0;

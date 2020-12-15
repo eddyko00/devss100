@@ -1338,7 +1338,7 @@ public class ServiceRemoteDB {
             throws Exception {
         try {
 
-            boolean RemoteCallflag = CKey.SQL_RemoveServerDB;  // using remote server not PHP
+            boolean RemoteCallflag = CKey.SQL_RemoteServerDB;  // using remote server not PHP
             if (RemoteCallflag == true) {
                 ServiceAFwebREST remoteREST = new ServiceAFwebREST();
                 RequestObj sqlObj = new RequestObj();

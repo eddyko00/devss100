@@ -1587,23 +1587,23 @@ public class IndexController {
         return ret;
     }
 
-    @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/id/{pid}/rt/callcontrol", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    ArrayList getprodCCrtTest(
-            @PathVariable("username") String username,
-            @PathVariable("id") String idSt,
-            @PathVariable("pid") String pidSt,
-            HttpServletRequest request, HttpServletResponse response
-    ) {
-        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
-        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            return null;
-        }
-        ArrayList<String> ret = afWebService.testSsnsprodByIdRT(username, idSt, pidSt, SsnsService.APP_PRODUCT, SsnsService.PROD_GET_CC, "", CKey.REALTIME_OPER);
-        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
-        return ret;
-    }
+//    @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/id/{pid}/rt/callcontrol", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+//    public @ResponseBody
+//    ArrayList getprodCCrtTest(
+//            @PathVariable("username") String username,
+//            @PathVariable("id") String idSt,
+//            @PathVariable("pid") String pidSt,
+//            HttpServletRequest request, HttpServletResponse response
+//    ) {
+//        ServiceAFweb.getServerObj().setCntControRequest(ServiceAFweb.getServerObj().getCntControRequest() + 1);
+//        if (ServiceAFweb.getServerObj().isSysMaintenance() == true) {
+//            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+//            return null;
+//        }
+//        ArrayList<String> ret = afWebService.testSsnsprodByIdRT(username, idSt, pidSt, SsnsService.APP_PRODUCT, SsnsService.PROD_GET_CC, "", CKey.REALTIME_OPER);
+//        ServiceAFweb.getServerObj().setCntControlResp(ServiceAFweb.getServerObj().getCntControlResp() + 1);
+//        return ret;
+//    }
 
     @RequestMapping(value = "/cust/{username}/id/{id}/serv/prod/id/{pid}/rt/getproductbyid", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody

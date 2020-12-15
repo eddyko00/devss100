@@ -45,6 +45,7 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Service;
 
 /**
@@ -234,19 +235,40 @@ public class ServiceAFweb {
 
                 getServerObj().setLocalDBservice(CKey.LocalPCflag);
 
-                if (CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) {
-                    if (CKey.SQL_RemoveServerDB == false) {
-                        logger.info(">>>>> System Openshift DB1 URL:" + URL_PATH_OP_DB_PHP1);
-                    } else {
-                        logger.info(">>>>> System Openshift Remote URL:" + URL_PATH_OP);
+//                if (CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) {
+//                    if (CKey.SQL_RemoveServerDB == false) {
+//                        logger.info(">>>>> System Openshift DB1 URL:" + URL_PATH_OP_DB_PHP1);
+//                    } else {
+//                        logger.info(">>>>> System Openshift Remote URL:" + URL_PATH_OP);
+//                    }
+//                }
+//                if (CKey.SQL_DATABASE == CKey.MYSQL) {
+//                    String dsURL = CKey.dataSourceURL;
+//                    logger.info(">>>>> System Local DB URL:" + dsURL);
+//                }
+                logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                logger.info(">>>>> System LOCAL_MYSQL = 4, REMOTE_PHP_MYSQL = 2, DIRECT_MYSQL = 0");
+                logger.info(">>>>> System SQL_DATABASE:" + CKey.SQL_DATABASE);
+ 
+                if (CKey.SQL_DATABASE == CKey.REMOTE_PHP_MYSQL) {
+                    logger.info(">>>>> System PHP MYSQL DB URL:" + ServiceAFweb.URL_PATH_OP_DB_PHP1);
+                } else if (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL) {
+                    if (dataSource != null) {
+                        DriverManagerDataSource dataSourceObj = (DriverManagerDataSource) dataSource;
+                        logger.info(">>>>> System LOCAL_MYSQL DB URL:" + dataSourceObj.getUrl());
                     }
                 }
-                if (CKey.SQL_DATABASE == CKey.MYSQL) {
-                    String dsURL = CKey.dataSourceURL;
-                    logger.info(">>>>> System Local DB URL:" + dsURL);
-                }
-                boolean backupFlag = false;
-                if (backupFlag == true) {
+                logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+                logger.info(">>>>> System SERVER_TIMMER_URL:" + ServiceAFweb.SERVERDB_URL);
+                logger.info(">>>>> System backupFlag:" + CKey.backupFlag);
+                logger.info(">>>>> System proxyflag PROXY:" + CKey.PROXY);
+                logger.info(">>>>> System nndebugflag NN_DEBUG:" + CKey.NN_DEBUG);
+                logger.info(">>>>> System nndebugflag UI_ONLY:" + CKey.UI_ONLY);
+                logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+//                boolean backupFlag = false;
+                if (CKey.backupFlag == true) {
                     backupSystem();
                     serverObj.setTimerQueueCnt(serverObj.getTimerQueueCnt() - 1);
                     return getServerObj().getTimerCnt();
@@ -311,7 +333,7 @@ public class ServiceAFweb {
 //            if (CKey.NN_DEBUG == true) {
             // LocalPCflag = true; 
             // SQL_DATABASE = REMOTE_MYSQL;
-            if (CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) {
+            if (CKey.SQL_DATABASE == CKey.REMOTE_PHP_MYSQL) {
                 logger.info(">>>>> SystemDownloadDBData form Openshift");
 
             } else if (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL) {
@@ -337,12 +359,12 @@ public class ServiceAFweb {
         serverObj.setTimerInit(true);
         if (CKey.NN_DEBUG == true) {
             if (CKey.LocalPCflag == true) {
-                if (CKey.SQL_DATABASE == CKey.REMOTE_MYSQL) {
+                if (CKey.SQL_DATABASE == CKey.REMOTE_PHP_MYSQL) {
                     logger.info(">>>>> SystemRestoreDBData to Openshift");
                 } else if (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL) {
                     logger.info(">>>>> SystemRestoreDBData form to My SQL");
                 }
-                if (CKey.SQL_RemoveServerDB == true) {
+                if (CKey.SQL_RemoteServerDB == true) {
                     String retSt = SystemCleanSsnsAccDBData();
                     if (retSt.equals("true")) {
                         boolean retSatus = getAccountImp().restoreSsnsAccDBData(this);
@@ -4457,50 +4479,50 @@ public class ServiceAFweb {
                 ArrayList<String> response = new ArrayList();
                 SsnsService ss = new SsnsService();
                 float exec = 0;
-                if (ProdOper.equals(SsnsService.PROD_GET_CC)) {
-                    String featRet = ss.TestFeatureSsnsCallControlFromProdInv(accObj, response, ProdOper, LABURL);
-                    if (response != null) {
-                        if (response.size() > 3) {
-                            String feat = response.get(0);
-
-                            String execSt = response.get(2);
-                            int index = execSt.indexOf("elapsedTime:");
-                            if (index != -1) {
-                                execSt = execSt.substring(index + 12);
-                                exec = Long.parseLong(execSt);
-                            }
-                            String passSt = R_FAIL;
-                            String featName = accObj.getRet();
-                            if (feat.equals(featName)) {
-                                passSt = R_PASS;
-                            } else {
-                                passSt = R_PASS;
-                                String[] featL = feat.split(":");
-                                String[] nameL = featName.split(":");
-                                if ((featL.length > 4) && (nameL.length > 4)) {
-                                    if (!featL[2].equals(nameL[2])) {
-                                        passSt = R_FAIL;
-                                    }
-                                    if (!featL[3].equals(nameL[3])) {
-                                        passSt = R_FAIL;
-                                    }
-                                    if (!featL[4].equals(nameL[4])) {
-                                        passSt = R_FAIL;
-                                    }
-                                } else if ((featL.length > 3) && (nameL.length > 3)) {
-                                    if (!featL[2].equals(nameL[2])) {
-                                        passSt = R_FAIL;
-                                    }
-                                    if (!featL[3].equals(nameL[3])) {
-                                        passSt = R_FAIL;
-                                    }
-                                }
-                            }
-                            passSt = feat + ":" + passSt;
-                            return passSt;
-                        }
-                    }
-                }
+//                if (ProdOper.equals(SsnsService.PROD_GET_CC)) {
+//                    String featRet = ss.TestFeatureSsnsCallControlFromProdInv(accObj, response, ProdOper, LABURL);
+//                    if (response != null) {
+//                        if (response.size() > 3) {
+//                            String feat = response.get(0);
+//
+//                            String execSt = response.get(2);
+//                            int index = execSt.indexOf("elapsedTime:");
+//                            if (index != -1) {
+//                                execSt = execSt.substring(index + 12);
+//                                exec = Long.parseLong(execSt);
+//                            }
+//                            String passSt = R_FAIL;
+//                            String featName = accObj.getRet();
+//                            if (feat.equals(featName)) {
+//                                passSt = R_PASS;
+//                            } else {
+//                                passSt = R_PASS;
+//                                String[] featL = feat.split(":");
+//                                String[] nameL = featName.split(":");
+//                                if ((featL.length > 4) && (nameL.length > 4)) {
+//                                    if (!featL[2].equals(nameL[2])) {
+//                                        passSt = R_FAIL;
+//                                    }
+//                                    if (!featL[3].equals(nameL[3])) {
+//                                        passSt = R_FAIL;
+//                                    }
+//                                    if (!featL[4].equals(nameL[4])) {
+//                                        passSt = R_FAIL;
+//                                    }
+//                                } else if ((featL.length > 3) && (nameL.length > 3)) {
+//                                    if (!featL[2].equals(nameL[2])) {
+//                                        passSt = R_FAIL;
+//                                    }
+//                                    if (!featL[3].equals(nameL[3])) {
+//                                        passSt = R_FAIL;
+//                                    }
+//                                }
+//                            }
+//                            passSt = feat + ":" + passSt;
+//                            return passSt;
+//                        }
+//                    }
+//                }
                 if (prod.equals(SsnsService.APP_PRODUCT)) {
 
                     String oper = accObj.getRet();

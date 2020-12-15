@@ -147,9 +147,6 @@ public class SsnsRegression {
                     if (featN.indexOf("failed") != -1) {
                         continue;
                     }
-                    if (featN.indexOf("failed") != -1) {
-                        continue;
-                    }
 
                     Set<String> set = new HashSet<>();
 
@@ -168,10 +165,10 @@ public class SsnsRegression {
                                         continue;
                                     }
                                 }
-                                String oper = accObj.getOper();
-                                if (oper.equals(SsnsService.PROD_GET_CC)) {
-                                    continue;
-                                }
+//                                String oper = accObj.getOper();
+//                                if (oper.equals(SsnsService.PROD_GET_CC)) {
+//                                    continue;
+//                                }
                             }
 //////////////////////////////                            
                             if (accObj.getApp().equals(SsnsService.APP_TTVC)) {
@@ -189,7 +186,14 @@ public class SsnsRegression {
                                     continue;
                                 }
                             }
-
+//////////////////////////////  
+                            if (accObj.getApp().equals(SsnsService.APP_APP)) {
+                                String nameFeat = accObj.getName();
+                                if (nameFeat.indexOf("Technician Assigned") != -1) {
+                                    continue;
+                                }
+                            }
+//////////////////////////////  
                             testData tObj = new testData();
                             tObj.setAccid(accObj.getId());
                             tObj.setUsername(name);
@@ -619,9 +623,9 @@ public class SsnsRegression {
                             totalTC++;
 
                             if (response != null) {
-                                if (oper.equals(SsnsService.PROD_GET_CC)) {
-                                    featName = accObj.getDown();
-                                }
+//                                if (oper.equals(SsnsService.PROD_GET_CC)) {
+//                                    featName = accObj.getDown();
+//                                }
                                 if (response.size() > 3) {
                                     response.add(0, featName);
                                     String feat = response.get(1);
