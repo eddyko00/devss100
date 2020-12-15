@@ -18,7 +18,7 @@ public class Javamain {
      */
     public static void checkParameterFlag(String cmd) {
 
-        if (cmd.indexOf("remoteserver") != -1) {
+        if (cmd.indexOf("remoteserverflag") != -1) {
             CKey.SQL_RemoteServerDB=true;
             CKey.SQL_DATABASE = CKey.REMOTE_PHP_MYSQL;
 

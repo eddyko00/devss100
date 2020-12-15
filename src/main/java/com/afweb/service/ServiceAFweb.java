@@ -249,9 +249,18 @@ public class ServiceAFweb {
                 logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                 logger.info(">>>>> System LOCAL_MYSQL = 4, REMOTE_PHP_MYSQL = 2, DIRECT_MYSQL = 0");
                 logger.info(">>>>> System SQL_DATABASE:" + CKey.SQL_DATABASE);
- 
-                if (CKey.SQL_DATABASE == CKey.REMOTE_PHP_MYSQL) {
+                logger.info(">>>>> System SQL_RemoteServerDB:" + CKey.SQL_RemoteServerDB);
+                if (CKey.SQL_RemoteServerDB == true) {
+                    logger.info(">>>>> System remote server DB URL:" + ServiceAFweb.SERVERDB_URL);
+                    
+                } else if (CKey.SQL_DATABASE == CKey.REMOTE_PHP_MYSQL) {
                     logger.info(">>>>> System PHP MYSQL DB URL:" + ServiceAFweb.URL_PATH_OP_DB_PHP1);
+                    
+                } else if (CKey.SQL_DATABASE == CKey.DIRECT_MYSQL) {
+                    if (dataSource != null) {
+                        DriverManagerDataSource dataSourceObj = (DriverManagerDataSource) dataSource;
+                        logger.info(">>>>> System DIRECT_MYSQL DB URL:" + dataSourceObj.getUrl());
+                    }
                 } else if (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL) {
                     if (dataSource != null) {
                         DriverManagerDataSource dataSourceObj = (DriverManagerDataSource) dataSource;
