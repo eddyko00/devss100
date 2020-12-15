@@ -271,6 +271,7 @@ public class ServiceAFweb {
 
                 logger.info(">>>>> System SERVER_TIMMER_URL:" + ServiceAFweb.SERVERDB_URL);
                 logger.info(">>>>> System backupFlag:" + CKey.backupFlag);
+                logger.info(">>>>> System restoreFlag:" + CKey.restoreFlag);                
                 logger.info(">>>>> System proxyflag PROXY:" + CKey.PROXY);
                 logger.info(">>>>> System nndebugflag NN_DEBUG:" + CKey.NN_DEBUG);
                 logger.info(">>>>> System nndebugflag UI_ONLY:" + CKey.UI_ONLY);
