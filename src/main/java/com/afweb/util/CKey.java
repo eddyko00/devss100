@@ -34,6 +34,7 @@ public class CKey {
 
     public static boolean REALTIME_OPER = false;  // test opeation in batch
     public static boolean backupFlag = false;
+    public static boolean restoreFlag = false;
 //
     public static String WEBPOST_OP_PHP = "/health.php";
     public static String URL_PATH_OP_DB_PHP1_TMP = "http://devphp-ssns-homephonemgmt.paas-app-east-np.tabcsl.telabcus.com";

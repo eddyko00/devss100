@@ -283,8 +283,9 @@ public class ServiceAFweb {
                     return getServerObj().getTimerCnt();
 
                 }
-                boolean restoreFlag = false; // only work on PHP
-                if (restoreFlag == true) {
+                
+//                boolean restoreFlag = false; // only work on PHP
+                if (CKey.restoreFlag == true) {
                     restoreSystem();
                     serverObj.setTimerQueueCnt(serverObj.getTimerQueueCnt() - 1);
                     return getServerObj().getTimerCnt();
