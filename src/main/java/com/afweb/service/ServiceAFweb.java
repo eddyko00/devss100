@@ -471,7 +471,7 @@ public class ServiceAFweb {
                 SsnsRegression regression = new SsnsRegression();
                 int ret = regression.startMonitor(this, CKey.ADMIN_USERNAME, "");
                 // clear old report
-                SsReportClearExceptLast3(CKey.ADMIN_USERNAME);
+                SsReportClearExceptLast5(CKey.ADMIN_USERNAME);
             }
 
             // 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53
@@ -3245,7 +3245,7 @@ public class ServiceAFweb {
             }
             ret = regression.startMonitorRegression(this, name, app, urlSt);
             // clear old report
-            SsReportClearExceptLast3(name);
+            SsReportClearExceptLast5(name);
 
         } catch (Exception ex) {
         }
@@ -3327,7 +3327,7 @@ public class ServiceAFweb {
             }
             ret = regression.startMonitor(this, name, app);
             // clear old report
-            SsReportClearExceptLast3(name);
+            SsReportClearExceptLast5(name);
 
         } catch (Exception ex) {
         }
@@ -3352,12 +3352,12 @@ public class ServiceAFweb {
 
     }
 
-    public int SsReportClearExceptLast3(String name) {
+    public int SsReportClearExceptLast5(String name) {
 
         ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT, 0);
         if (ssReportObjList != null) {
             for (int i = 0; i < ssReportObjList.size(); i++) {
-                if (i < 3) {
+                if (i < 5) {
                     continue;
                 }
                 SsReport repObj = ssReportObjList.get(i);
