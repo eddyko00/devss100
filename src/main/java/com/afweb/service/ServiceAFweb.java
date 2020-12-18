@@ -247,7 +247,7 @@ public class ServiceAFweb {
 //                    logger.info(">>>>> System Local DB URL:" + dsURL);
 //                }
                 logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                logger.info(">>>>> System LOCAL_MYSQL = 4, REMOTE_PHP_MYSQL = 2, DIRECT_MYSQL = 0");
+                logger.info(">>>>> System DIRECT_MYSQL = 0, REMOTE_PHP_MYSQL = 2, LOCAL_MYSQL = 4");
                 logger.info(">>>>> System SQL_DATABASE:" + CKey.SQL_DATABASE);
                 logger.info(">>>>> System SQL_RemoteServerDB:" + CKey.SQL_RemoteServerDB);
                 if (CKey.SQL_RemoteServerDB == true) {
@@ -267,7 +267,6 @@ public class ServiceAFweb {
                         logger.info(">>>>> System LOCAL_MYSQL DB URL:" + dataSourceObj.getUrl());
                     }
                 }
-
                 logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                 logger.info(">>>>> System MYSQLDB = 0, POSTGRESQLDB = 1");
                 logger.info(">>>>> System OTHER_DB:" + CKey.OTHER_DB);
@@ -475,7 +474,7 @@ public class ServiceAFweb {
                 SsnsRegression regression = new SsnsRegression();
                 int ret = regression.startMonitor(this, CKey.ADMIN_USERNAME, "");
                 // clear old report
-                SsReportClearExceptLast3(CKey.ADMIN_USERNAME);
+                SsReportClearExceptLast5(CKey.ADMIN_USERNAME);
             }
 
             // 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53
@@ -3238,7 +3237,7 @@ public class ServiceAFweb {
             }
             ret = regression.startMonitorRegression(this, name, app, urlSt);
             // clear old report
-            SsReportClearExceptLast3(name);
+            SsReportClearExceptLast5(name);
 
         } catch (Exception ex) {
         }
@@ -3320,7 +3319,7 @@ public class ServiceAFweb {
             }
             ret = regression.startMonitor(this, name, app);
             // clear old report
-            SsReportClearExceptLast3(name);
+            SsReportClearExceptLast5(name);
 
         } catch (Exception ex) {
         }
@@ -3345,12 +3344,12 @@ public class ServiceAFweb {
 
     }
 
-    public int SsReportClearExceptLast3(String name) {
-
+    public int SsReportClearExceptLast5(String name) {
+        int delSize = 5;
         ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT, 0);
         if (ssReportObjList != null) {
             for (int i = 0; i < ssReportObjList.size(); i++) {
-                if (i < 3) {
+                if (i < delSize) {
                     continue;
                 }
                 SsReport repObj = ssReportObjList.get(i);
@@ -3363,7 +3362,7 @@ public class ServiceAFweb {
             ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT, 0);
             if (ssReportObjList != null) {
                 for (int i = 0; i < ssReportObjList.size(); i++) {
-                    if (i < 3) {
+                    if (i < delSize) {
                         continue;
                     }
                     SsReport repObj = ssReportObjList.get(i);

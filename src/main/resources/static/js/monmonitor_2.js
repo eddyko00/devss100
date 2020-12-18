@@ -59,7 +59,7 @@ var app = {
                     alert("Return Status " + resultObjList);
                 }
                 if (resultObjList == null) {
-                    window.location.href = "index.html";
+//                    window.location.href = "index.html";
                 }
 
                 var iisWebObj = {'custObjStr': custObjStr, 'servObjListStr': servObjListStr, 'resultMonObjListStr': resultMonObjListStr};
