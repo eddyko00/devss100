@@ -246,39 +246,41 @@ public class ServiceAFweb {
 //                    String dsURL = CKey.dataSourceURL;
 //                    logger.info(">>>>> System Local DB URL:" + dsURL);
 //                }
-                logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                logger.info(">>>>> System DIRECT_MYSQL = 0, REMOTE_PHP_MYSQL = 2, LOCAL_MYSQL = 4");
-                logger.info(">>>>> System SQL_DATABASE:" + CKey.SQL_DATABASE);
-                logger.info(">>>>> System SQL_RemoteServerDB:" + CKey.SQL_RemoteServerDB);
+                String displayStr = "";
+                displayStr += "\r\n" + (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                displayStr += "\r\n" + (">>>>> System DIRECT_MYSQL = 0, REMOTE_PHP_MYSQL = 2, LOCAL_MYSQL = 4");
+                displayStr += "\r\n" + (">>>>> System SQL_DATABASE:" + CKey.SQL_DATABASE);
+                displayStr += "\r\n" + (">>>>> System SQL_RemoteServerDB:" + CKey.SQL_RemoteServerDB);
                 if (CKey.SQL_RemoteServerDB == true) {
-                    logger.info(">>>>> System remote server DB URL:" + ServiceAFweb.SERVERDB_URL);
+                    displayStr += "\r\n" + (">>>>> System remote server DB URL:" + ServiceAFweb.SERVERDB_URL);
 
                 } else if (CKey.SQL_DATABASE == CKey.REMOTE_PHP_MYSQL) {
-                    logger.info(">>>>> System PHP MYSQL DB URL:" + ServiceAFweb.URL_PATH_OP_DB_PHP1);
+                    displayStr += "\r\n" + (">>>>> System PHP MYSQL DB URL:" + ServiceAFweb.URL_PATH_OP_DB_PHP1);
 
                 } else if (CKey.SQL_DATABASE == CKey.DIRECT_MYSQL) {
                     if (dataSource != null) {
                         DriverManagerDataSource dataSourceObj = (DriverManagerDataSource) dataSource;
-                        logger.info(">>>>> System DIRECT_MYSQL DB URL:" + dataSourceObj.getUrl());
+                        displayStr += "\r\n" + (">>>>> System DIRECT_MYSQL DB URL:" + dataSourceObj.getUrl());
                     }
                 } else if (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL) {
                     if (dataSource != null) {
                         DriverManagerDataSource dataSourceObj = (DriverManagerDataSource) dataSource;
-                        logger.info(">>>>> System LOCAL_MYSQL DB URL:" + dataSourceObj.getUrl());
+                        displayStr += "\r\n" + (">>>>> System LOCAL_MYSQL DB URL:" + dataSourceObj.getUrl());
                     }
                 }
-                logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                logger.info(">>>>> System MYSQLDB = 0, POSTGRESQLDB = 1");
-                logger.info(">>>>> System OTHER_DB:" + CKey.OTHER_DB);
+                displayStr += "\r\n" + (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                displayStr += "\r\n" + (">>>>> System MYSQLDB = 0, POSTGRESQLDB = 1");
+                displayStr += "\r\n" + (">>>>> System OTHER_DB:" + CKey.OTHER_DB);
 
-                logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                logger.info(">>>>> System SERVER_TIMMER_URL:" + ServiceAFweb.SERVERDB_URL);
-                logger.info(">>>>> System backupFlag:" + CKey.backupFlag);
-                logger.info(">>>>> System restoreFlag:" + CKey.restoreFlag);
-                logger.info(">>>>> System proxyflag PROXY:" + CKey.PROXY);
-                logger.info(">>>>> System nndebugflag NN_DEBUG:" + CKey.NN_DEBUG);
-                logger.info(">>>>> System nndebugflag UI_ONLY:" + CKey.UI_ONLY);
-                logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                displayStr += "\r\n" + (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                displayStr += "\r\n" + (">>>>> System SERVER_TIMMER_URL:" + ServiceAFweb.SERVERDB_URL);
+                displayStr += "\r\n" + (">>>>> System backupFlag:" + CKey.backupFlag);
+                displayStr += "\r\n" + (">>>>> System restoreFlag:" + CKey.restoreFlag);
+                displayStr += "\r\n" + (">>>>> System proxyflag PROXY:" + CKey.PROXY);
+                displayStr += "\r\n" + (">>>>> System nndebugflag NN_DEBUG:" + CKey.NN_DEBUG);
+                displayStr += "\r\n" + (">>>>> System nndebugflag UI_ONLY:" + CKey.UI_ONLY);
+                displayStr += "\r\n" + (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                logger.info(displayStr);
 
 //                boolean backupFlag = false;
                 if (CKey.backupFlag == true) {
@@ -474,7 +476,7 @@ public class ServiceAFweb {
                 SsnsRegression regression = new SsnsRegression();
                 int ret = regression.startMonitor(this, CKey.ADMIN_USERNAME, "");
                 // clear old report
-                SsReportClearExceptLast5(CKey.ADMIN_USERNAME);
+                deleteSsReportExceptLast5(CKey.ADMIN_USERNAME);
             }
 
             // 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53
@@ -555,10 +557,11 @@ public class ServiceAFweb {
         if (mydebugtestflag == true) {
             //set up run parm 
             // javamain remoteserverflag mydebugtestflag
-            
-            
+
+            deleteSsReportExceptLast5(CKey.ADMIN_USERNAME);
+
         }
-        
+
         boolean clearssnsflag = false;
         if (clearssnsflag == true) {
 //            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_QUAL);
@@ -3235,7 +3238,7 @@ public class ServiceAFweb {
             }
             ret = regression.startMonitorRegression(this, name, app, urlSt);
             // clear old report
-            SsReportClearExceptLast5(name);
+            deleteSsReportExceptLast5(name);
 
         } catch (Exception ex) {
         }
@@ -3317,7 +3320,7 @@ public class ServiceAFweb {
             }
             ret = regression.startMonitor(this, name, app);
             // clear old report
-            SsReportClearExceptLast5(name);
+            deleteSsReportExceptLast5(name);
 
         } catch (Exception ex) {
         }
@@ -3342,12 +3345,13 @@ public class ServiceAFweb {
 
     }
 
-    public int SsReportClearExceptLast5(String name) {
+    public int deleteSsReportExceptLast5(String name) {
         int delSize = 5;
         ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT, 0);
         if (ssReportObjList != null) {
             for (int i = 0; i < ssReportObjList.size(); i++) {
-                if (i < delSize) {
+                if (delSize > 0) {
+                    delSize--;
                     continue;
                 }
                 SsReport repObj = ssReportObjList.get(i);
@@ -3357,13 +3361,20 @@ public class ServiceAFweb {
                 getSsnsDataImp().DeleteSsReportObjByID(repObj.getId());  // delete report
             }
 
-            ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT, 0);
-            if (ssReportObjList != null) {
-                for (int i = 0; i < ssReportObjList.size(); i++) {
-                    if (i < delSize) {
-                        continue;
+            delSize = 5;
+            ArrayList<SsReport> ssResultReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT, 0);
+            if (ssResultReportObjList != null) {
+                for (int i = 0; i < ssResultReportObjList.size(); i++) {
+                    String dataF = ssResultReportObjList.get(i).getData();
+                    if (dataF != null) {
+                        if (dataF.length() > 0) {
+                            if (delSize > 0) {
+                                delSize--;
+                                continue;
+                            }
+                        }
                     }
-                    SsReport repObj = ssReportObjList.get(i);
+                    SsReport repObj = ssResultReportObjList.get(i);
                     getSsnsDataImp().DeleteSsReportObjByID(repObj.getId());  // delete result
                 }
             }
