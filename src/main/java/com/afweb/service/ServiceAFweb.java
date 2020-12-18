@@ -3358,11 +3358,11 @@ public class ServiceAFweb {
     }
 
     public int SsReportClearExceptLast5(String name) {
-
+        int delSize = 5;
         ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT, 0);
         if (ssReportObjList != null) {
             for (int i = 0; i < ssReportObjList.size(); i++) {
-                if (i < 5) {
+                if (i < delSize) {
                     continue;
                 }
                 SsReport repObj = ssReportObjList.get(i);
@@ -3375,7 +3375,7 @@ public class ServiceAFweb {
             ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT, 0);
             if (ssReportObjList != null) {
                 for (int i = 0; i < ssReportObjList.size(); i++) {
-                    if (i < 3) {
+                    if (i < delSize) {
                         continue;
                     }
                     SsReport repObj = ssReportObjList.get(i);
