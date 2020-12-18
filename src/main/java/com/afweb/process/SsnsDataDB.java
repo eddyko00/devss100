@@ -213,7 +213,7 @@ public class SsnsDataDB {
             processExecuteDB("drop table if exists ssnsacc");
             ArrayList createTableList = new ArrayList();
 
-            if (CKey.DB == CKey.POSTGRESQLDB) {
+            if (CKey.OTHER_DB == CKey.POSTGRESQLDB) {
                 createTableList.add("CREATE SEQUENCE ssnsaccIdSeq");
                 createTableList.add("create table ssnsacc (id int not null primary key DEFAULT NEXTVAL('ssnsaccIdSeq'), name varchar(255) not null, status int not null, type int not null,"
                         + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint, "
@@ -222,7 +222,7 @@ public class SsnsDataDB {
                 ExecuteSQLArrayList(createTableList);
                 createTableList.clear();
 
-            } else if (CKey.DB == CKey.MYSQLDB) {
+            } else if (CKey.OTHER_DB == CKey.MYSQLDB) {
                 createTableList.add("create table ssnsacc (id int(10) not null auto_increment, name varchar(255) not null, status int(10) not null, type int(10) not null,"
                         + " uid varchar(255), cusid varchar(255), banid varchar(255), tiid varchar(255) ,app varchar(255), oper varchar(255), down varchar(255), ret varchar(255), exec  bigint(20), "
                         + "data text,  updatedatedisplay date, updatedatel bigint(20) not null, primary key (id))");
@@ -240,9 +240,9 @@ public class SsnsDataDB {
     public static String createDummytable() {
         String sqlCMD = "";
         if ((CKey.SQL_DATABASE == CKey.DIRECT_MYSQL) || (CKey.SQL_DATABASE == CKey.REMOTE_PHP_MYSQL) || (CKey.SQL_DATABASE == CKey.LOCAL_MYSQL)) {
-            if (CKey.DB == CKey.POSTGRESQLDB) {
+            if (CKey.OTHER_DB == CKey.POSTGRESQLDB) {
                 sqlCMD = "create table ssnsdummy (id int not null primary key)";
-            } else if (CKey.DB == CKey.MYSQLDB) {
+            } else if (CKey.OTHER_DB == CKey.MYSQLDB) {
                 sqlCMD = "create table ssnsdummy (id int(10) not null auto_increment, primary key (id))";
             }
         }
@@ -288,9 +288,9 @@ public class SsnsDataDB {
 
             processExecuteDB("drop table if exists ssnsdummy1");
             String sqlCMD = "";
-            if (CKey.DB == CKey.POSTGRESQLDB) {
+            if (CKey.OTHER_DB == CKey.POSTGRESQLDB) {
                 sqlCMD = "create table ssnsdummy1 (id int not null primary key)";
-            } else if (CKey.DB == CKey.MYSQLDB) {
+            } else if (CKey.OTHER_DB == CKey.MYSQLDB) {
                 sqlCMD = "create table ssnsdummy1 (id int(10) not null auto_increment, primary key (id))";
             }
             processExecuteDB(sqlCMD);
@@ -313,7 +313,7 @@ public class SsnsDataDB {
 
             ArrayList createTableList = new ArrayList();
 
-            if (CKey.DB == CKey.POSTGRESQLDB) {
+            if (CKey.OTHER_DB == CKey.POSTGRESQLDB) {
                 //https://www.postgresql.org/docs/9.2/datatype.html
                 createTableList.add("create table ssnsdummy (id int not null primary key)");
                 ExecuteSQLArrayList(createTableList);
@@ -361,7 +361,7 @@ public class SsnsDataDB {
                 ExecuteSQLArrayList(createTableList);
                 createTableList.clear();
 
-            } else if (CKey.DB == CKey.MYSQLDB) {
+            } else if (CKey.OTHER_DB == CKey.MYSQLDB) {
                 createTableList.add("create table ssnsdummy (id int(10) not null auto_increment, primary key (id))");
                 createTableList.add("create table ssnslock (id int(10) not null auto_increment, lockname varchar(255) not null unique, type int(10) not null, lockdatedisplay date, lockdatel bigint(20), comment varchar(255), primary key (id))");
                 createTableList.add("create table cust (id int(10) not null auto_increment, username varchar(255) not null unique, password varchar(255) not null, type int(10) not null, status int(10) not null, substatus int(10) not null, startdate date, firstname varchar(255), lastname varchar(255), email varchar(255), updatedatedisplay date, updatedatel bigint(20) not null, primary key (id))");

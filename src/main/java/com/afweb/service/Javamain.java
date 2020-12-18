@@ -19,12 +19,15 @@ public class Javamain {
     public static void checkParameterFlag(String cmd) {
 
         if (cmd.indexOf("remoteserverflag") != -1) {
-            CKey.SQL_RemoteServerDB=true;
+            CKey.SQL_RemoteServerDB = true;
             CKey.SQL_DATABASE = CKey.REMOTE_PHP_MYSQL;
 
         } else if (cmd.indexOf("localmysqlflag") != -1) {
             CKey.SQL_DATABASE = CKey.LOCAL_MYSQL;
             
+        } else if (cmd.indexOf("postgresqlflag") != -1) {
+            CKey.OTHER_DB = CKey.POSTGRESQLDB;
+
         } else if (cmd.indexOf("backupFlag") != -1) {
             CKey.backupFlag = true;
 
