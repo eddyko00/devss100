@@ -19,15 +19,15 @@ public class Javamain {
     public static void checkParameterFlag(String cmd) {
 
         if (cmd.indexOf("remoteserverflag") != -1) {
-            CKey.SQL_RemoteServerDB=true;
+            CKey.SQL_RemoteServerDB = true;
             CKey.SQL_DATABASE = CKey.REMOTE_PHP_MYSQL;
 
         } else if (cmd.indexOf("localmysqlflag") != -1) {
             CKey.SQL_DATABASE = CKey.LOCAL_MYSQL;
 
-         } else if (cmd.indexOf("postgresqldbflag") != -1) {
+        } else if (cmd.indexOf("postgresqldbflag") != -1) {
             CKey.OTHER_DB = CKey.POSTGRESQLDB;
-                       
+
         } else if (cmd.indexOf("backupFlag") != -1) {
             CKey.backupFlag = true;
 
@@ -36,7 +36,13 @@ public class Javamain {
 
         } else if (cmd.indexOf("proxyflag") != -1) {
             CKey.PROXY = true;
+
         } else if (cmd.indexOf("nndebugflag") != -1) {
+            CKey.NN_DEBUG = true;
+            CKey.UI_ONLY = true;
+
+        } else if (cmd.indexOf("mydebugtestflag") != -1) {
+            ServiceAFweb.mydebugtestflag = true;
             CKey.NN_DEBUG = true;
             CKey.UI_ONLY = true;
 

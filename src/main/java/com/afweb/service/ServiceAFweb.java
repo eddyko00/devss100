@@ -267,11 +267,11 @@ public class ServiceAFweb {
                         logger.info(">>>>> System LOCAL_MYSQL DB URL:" + dataSourceObj.getUrl());
                     }
                 }
-                
+
                 logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                 logger.info(">>>>> System MYSQLDB = 0, POSTGRESQLDB = 1");
                 logger.info(">>>>> System OTHER_DB:" + CKey.OTHER_DB);
-                
+
                 logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                 logger.info(">>>>> System SERVER_TIMMER_URL:" + ServiceAFweb.SERVERDB_URL);
                 logger.info(">>>>> System backupFlag:" + CKey.backupFlag);
@@ -548,9 +548,20 @@ public class ServiceAFweb {
         }
     }
 
+    public static boolean mydebugtestflag = false;
+
     void AFWebtestExec() {
         ///////////////////////////////////////////////////////////////////////////////////
 
+        if (mydebugtestflag == true) {
+            //set up run parm 
+            // javamain remoteserverflag mydebugtestflag
+            
+            
+            
+            
+        }
+        
         boolean clearssnsflag = false;
         if (clearssnsflag == true) {
 //            getSsnsDataImp().updateSsnsDataCompleteStatus(SsnsService.APP_QUAL);
@@ -1054,37 +1065,15 @@ public class ServiceAFweb {
 
         boolean monflag = false;
         if (monflag == true) {
-//                        this.getSsnsDataImp().deleteAllSsReport(0);
-//
             SsnsRegression regression = new SsnsRegression();
             String name = CKey.ADMIN_USERNAME;
             ArrayList<SsReport> ret = new ArrayList();
-//                        /////////Regression
-//                        name = "GUEST";
-//
-//                        getSsReportRegressionStart(name, null, APP_APP, DEF_LABURL); //"http://L097105:8080");
-//                        ret = getSsReportRegression(name, null);
-//                        for (int i = 0; i < 10; i++) {
-//                            regression.processMonitorTesting(this);
-//                            if (i == 2) {
-//                                regression.stopMonitor(this, name);
-//                            }
-//                            ret = getSsReportRegression(name, null);
-//                        }
-//                        ret = getSsReportRegression(name, null);
 
-            /////////monitor
-//                        ret = getSsReportMon(name, null);
-//                        regression.startMonitor(this, name);
-//
             for (int i = 0; i < 10; i++) {
                 regression.processMonitorTesting(this);
-//                            if (i == 2) {
-//                                regression.stopMonitor(this, name);
-//                            }
+
                 ret = getSsReportMon(name, null);
             }
-//                        ret = getSsReportMon(name, null);
         }
 /////////
 /////////
