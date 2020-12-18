@@ -14,7 +14,7 @@ public class CKey {
 
     public static final int POSTGRESQLDB = 1; //using LOCAL_MYSQL require this set
     public static final int MYSQLDB = 0;
-    public static int DB = MYSQLDB;
+    public static int OTHER_DB = MYSQLDB;
 
     public static int SQL_DATABASE = DIRECT_MYSQL;
     public static boolean SQL_RemoteServerDB = false; // need true and REMOTE_MYSQL using remote server not PHP 

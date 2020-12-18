@@ -252,10 +252,10 @@ public class ServiceAFweb {
                 logger.info(">>>>> System SQL_RemoteServerDB:" + CKey.SQL_RemoteServerDB);
                 if (CKey.SQL_RemoteServerDB == true) {
                     logger.info(">>>>> System remote server DB URL:" + ServiceAFweb.SERVERDB_URL);
-                    
+
                 } else if (CKey.SQL_DATABASE == CKey.REMOTE_PHP_MYSQL) {
                     logger.info(">>>>> System PHP MYSQL DB URL:" + ServiceAFweb.URL_PATH_OP_DB_PHP1);
-                    
+
                 } else if (CKey.SQL_DATABASE == CKey.DIRECT_MYSQL) {
                     if (dataSource != null) {
                         DriverManagerDataSource dataSourceObj = (DriverManagerDataSource) dataSource;
@@ -267,11 +267,15 @@ public class ServiceAFweb {
                         logger.info(">>>>> System LOCAL_MYSQL DB URL:" + dataSourceObj.getUrl());
                     }
                 }
+                
                 logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-
+                logger.info(">>>>> System MYSQLDB = 0, POSTGRESQLDB = 1");
+                logger.info(">>>>> System OTHER_DB:" + CKey.OTHER_DB);
+                
+                logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                 logger.info(">>>>> System SERVER_TIMMER_URL:" + ServiceAFweb.SERVERDB_URL);
                 logger.info(">>>>> System backupFlag:" + CKey.backupFlag);
-                logger.info(">>>>> System restoreFlag:" + CKey.restoreFlag);                
+                logger.info(">>>>> System restoreFlag:" + CKey.restoreFlag);
                 logger.info(">>>>> System proxyflag PROXY:" + CKey.PROXY);
                 logger.info(">>>>> System nndebugflag NN_DEBUG:" + CKey.NN_DEBUG);
                 logger.info(">>>>> System nndebugflag UI_ONLY:" + CKey.UI_ONLY);
@@ -284,7 +288,7 @@ public class ServiceAFweb {
                     return getServerObj().getTimerCnt();
 
                 }
-                
+
 //                boolean restoreFlag = false; // only work on PHP
                 if (CKey.restoreFlag == true) {
                     restoreSystem();

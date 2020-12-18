@@ -24,7 +24,10 @@ public class Javamain {
 
         } else if (cmd.indexOf("localmysqlflag") != -1) {
             CKey.SQL_DATABASE = CKey.LOCAL_MYSQL;
-            
+
+         } else if (cmd.indexOf("postgresqldbflag") != -1) {
+            CKey.OTHER_DB = CKey.POSTGRESQLDB;
+                       
         } else if (cmd.indexOf("backupFlag") != -1) {
             CKey.backupFlag = true;
 
