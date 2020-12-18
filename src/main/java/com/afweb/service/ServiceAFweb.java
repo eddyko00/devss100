@@ -557,8 +557,6 @@ public class ServiceAFweb {
             // javamain remoteserverflag mydebugtestflag
             
             
-            
-            
         }
         
         boolean clearssnsflag = false;
