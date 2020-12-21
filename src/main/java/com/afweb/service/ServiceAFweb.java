@@ -280,7 +280,7 @@ public class ServiceAFweb {
                 displayStr += "\r\n" + (">>>>> System nndebugflag NN_DEBUG:" + CKey.NN_DEBUG);
                 displayStr += "\r\n" + (">>>>> System nndebugflag UI_ONLY:" + CKey.UI_ONLY);
                 displayStr += "\r\n" + (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                
+
                 logger.info(displayStr);
 
 //                boolean backupFlag = false;
@@ -559,7 +559,16 @@ public class ServiceAFweb {
             //set up run parm 
             // javamain remoteserverflag mydebugtestflag
 
-            deleteSsReportExceptLast5(CKey.ADMIN_USERNAME);
+            for (int i = 0; i < 5; i++) {
+                SsnsRegression regression = new SsnsRegression();
+                deleteSsReportExceptLast5(CKey.ADMIN_USERNAME);
+                regression.stopMonitor(this, CKey.ADMIN_USERNAME);
+                regression.processMonitorTesting(this);
+                regression.startMonitor(this, CKey.ADMIN_USERNAME, SsnsService.APP_PRODUCT);
+                regression.processMonitorTesting(this);
+//                
+                ArrayList<SsReport> report = getSsReportMon(CKey.ADMIN_USERNAME, "1");
+            }
 
         }
 
@@ -3366,14 +3375,18 @@ public class ServiceAFweb {
             ArrayList<SsReport> ssResultReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT, 0);
             if (ssResultReportObjList != null) {
                 for (int i = 0; i < ssResultReportObjList.size(); i++) {
-                    String dataF = ssResultReportObjList.get(i).getData();
-                    if (dataF != null) {
-                        if (dataF.length() > 0) {
-                            if (delSize > 0) {
-                                delSize--;
-                                continue;
-                            }
-                        }
+//                    String dataF = ssResultReportObjList.get(i).getData();
+//                    if (dataF != null) {
+//                        if (dataF.length() > 0) {
+//                            if (delSize > 0) {
+//                                delSize--;
+//                                continue;
+//                            }
+//                        }
+//                    }
+                    if (delSize > 0) {
+                        delSize--;
+                        continue;
                     }
                     SsReport repObj = ssResultReportObjList.get(i);
                     getSsnsDataImp().DeleteSsReportObjByID(repObj.getId());  // delete result
