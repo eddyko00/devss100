@@ -30,6 +30,18 @@ import java.util.logging.Logger;
  * @author koed
  */
 public class SsnsRegression {
+//------------------------------------------   
+//id	name 		UUID			data/ret
+////contain feature name
+//2	Admin1		user			{"reportList":["Admin1 TC remaining 28 time:12/21/2020 08:36 AM EST","prod,result,pass,6,fail,0,exec,1.1
+//						Admin1 TC remaining 4 time:12/21/2020 09:20 AM EST
+//// contain TC number
+//86008	Admin1		report			start:12/21/2020 09:16 AM EST
+//
+//------------------------------------------
+//	Admin1_86008	result			TC:8 start:12/21/2020 08:51 AM EST			
+////from report test case
+//	Admin1_86008	test
 
     /**
      * @return the ssnsDataImp
