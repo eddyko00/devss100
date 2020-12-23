@@ -42,6 +42,13 @@ var app = {
                 htmlSt += '</div>';
                 var htmlName = '<li id="' + objId + '"><a href="#">' + htmlSt;
                 htmlName += '</a></li>';
+
+                if (i !== 0) {
+                    var prodDataStr = monObj.data;
+                    if (prodDataStr === "") {
+                        continue;
+                    }
+                }
                 $("#myid").append(htmlName);
                 if (monObj.uid === 'user') {
                     var prodDataStr = monObj.data;
@@ -74,6 +81,7 @@ var app = {
 
                     }
                 }
+
             }
         } else {
             $("#myid").html("No report running ");
