@@ -477,7 +477,7 @@ public class ServiceAFweb {
                 SsnsRegression regression = new SsnsRegression();
                 int ret = regression.startMonitor(this, CKey.ADMIN_USERNAME, "");
                 // clear old report
-                deleteSsReportExceptLast5(CKey.ADMIN_USERNAME);
+                deleteSsReportExceptLast9(CKey.ADMIN_USERNAME);
             }
 
             // 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53
@@ -561,7 +561,7 @@ public class ServiceAFweb {
 
             for (int i = 0; i < 5; i++) {
                 SsnsRegression regression = new SsnsRegression();
-                deleteSsReportExceptLast5(CKey.ADMIN_USERNAME);
+                deleteSsReportExceptLast9(CKey.ADMIN_USERNAME);
                 regression.stopMonitor(this, CKey.ADMIN_USERNAME);
                 regression.processMonitorTesting(this);
                 regression.startMonitor(this, CKey.ADMIN_USERNAME, SsnsService.APP_PRODUCT);
@@ -3248,7 +3248,7 @@ public class ServiceAFweb {
             }
             ret = regression.startMonitorRegression(this, name, app, urlSt);
             // clear old report
-            deleteSsReportExceptLast5(name);
+            deleteSsReportExceptLast9(name);
 
         } catch (Exception ex) {
         }
@@ -3330,7 +3330,7 @@ public class ServiceAFweb {
             }
             ret = regression.startMonitor(this, name, app);
             // clear old report
-            deleteSsReportExceptLast5(name);
+            deleteSsReportExceptLast9(name);
 
         } catch (Exception ex) {
         }
@@ -3355,8 +3355,8 @@ public class ServiceAFweb {
 
     }
 
-    public int deleteSsReportExceptLast5(String name) {
-        int delSize = 5;
+    public int deleteSsReportExceptLast9(String name) {
+        int delSize = 9;
         ArrayList<SsReport> ssReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_REPORT, 0);
         if (ssReportObjList != null) {
             for (int i = 0; i < ssReportObjList.size(); i++) {
@@ -3371,7 +3371,7 @@ public class ServiceAFweb {
                 getSsnsDataImp().DeleteSsReportObjByID(repObj.getId());  // delete report
             }
 
-            delSize = 5;
+            delSize = 9;
             ArrayList<SsReport> ssResultReportObjList = getSsnsDataImp().getSsReportObjListByUidDesc(name, SsnsRegression.REPORT_RESULT, 0);
             if (ssResultReportObjList != null) {
                 for (int i = 0; i < ssResultReportObjList.size(); i++) {
