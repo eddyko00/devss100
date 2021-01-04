@@ -874,15 +874,40 @@ public class SsnsRegression {
             ArrayList<String> overviewList = new ArrayList();
             ArrayList<String> testRList = new ArrayList();
             String nameRepId = name + "_" + reportReportObj.getId();
-
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_PRODUCT, testRList, overviewList);
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WIFI, testRList, overviewList);
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_APP, testRList, overviewList);
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_TTVC, testRList, overviewList);
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WLNPRO, testRList, overviewList);
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_QUAL, testRList, overviewList);
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_CALLC, testRList, overviewList);
-            this.getReportStat(serviceAFweb, nameRepId, SsnsService.APP_ACTCFG, testRList, overviewList);
+            resultObj totalResult = new resultObj();
+            resultObj retObj = new resultObj();
+            retObj = getReportStat(serviceAFweb, nameRepId, SsnsService.APP_PRODUCT, testRList, overviewList);
+            totalResult.Pass += retObj.Pass;
+            totalResult.Fail += retObj.Fail;
+            totalResult.exec += retObj.exec;
+            retObj = getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WIFI, testRList, overviewList);
+            totalResult.Pass += retObj.Pass;
+            totalResult.Fail += retObj.Fail;
+            totalResult.exec += retObj.exec;
+            retObj = getReportStat(serviceAFweb, nameRepId, SsnsService.APP_APP, testRList, overviewList);
+            totalResult.Pass += retObj.Pass;
+            totalResult.Fail += retObj.Fail;
+            totalResult.exec += retObj.exec;
+            retObj = getReportStat(serviceAFweb, nameRepId, SsnsService.APP_TTVC, testRList, overviewList);
+            totalResult.Pass += retObj.Pass;
+            totalResult.Fail += retObj.Fail;
+            totalResult.exec += retObj.exec;
+            retObj = getReportStat(serviceAFweb, nameRepId, SsnsService.APP_WLNPRO, testRList, overviewList);
+            totalResult.Pass += retObj.Pass;
+            totalResult.Fail += retObj.Fail;
+            totalResult.exec += retObj.exec;
+            retObj = getReportStat(serviceAFweb, nameRepId, SsnsService.APP_QUAL, testRList, overviewList);
+            totalResult.Pass += retObj.Pass;
+            totalResult.Fail += retObj.Fail;
+            totalResult.exec += retObj.exec;
+            retObj = getReportStat(serviceAFweb, nameRepId, SsnsService.APP_CALLC, testRList, overviewList);
+            totalResult.Pass += retObj.Pass;
+            totalResult.Fail += retObj.Fail;
+            totalResult.exec += retObj.exec;
+            retObj = getReportStat(serviceAFweb, nameRepId, SsnsService.APP_ACTCFG, testRList, overviewList);
+            totalResult.Pass += retObj.Pass;
+            totalResult.Fail += retObj.Fail;
+            totalResult.exec += retObj.exec;
             logger.info("> reportList  " + testRList.size());
 
             uid = REPORT_RESULT;
@@ -913,8 +938,8 @@ public class SsnsRegression {
                 // format date in target timezone
                 format.setTimeZone(tz);
                 String ESTdate = format.format(d);
-
-                NumTC = name + " TC remaining " + idList.size() + " time:" + ESTdate;;
+                String resultObjSt = " TC Re:" + idList.size()+ " P:"+totalResult.Pass+" F:"+totalResult.Fail;
+                NumTC = name + resultObjSt + " time:" + ESTdate;;
                 testRList.add(0, NumTC);
                 overviewList.add(0, NumTC);
             }
@@ -966,7 +991,8 @@ public class SsnsRegression {
         }
     }
 
-    public void getReportStat(ServiceAFweb serviceAFweb, String nameRepId, String app, ArrayList<String> testRList, ArrayList<String> overviewList) {
+    public resultObj getReportStat(ServiceAFweb serviceAFweb, String nameRepId, String app, ArrayList<String> testRList, ArrayList<String> overviewList) {
+
         int Pass = 0;
         int Fail = 0;
         float exec = 0;
@@ -1023,7 +1049,13 @@ public class SsnsRegression {
             overviewList.add(reportLine);
             testRList.add(reportLine);
             logger.info("getReportStat " + nameRepId + " " + reportLine);
+
         }
+        resultObj ret = new resultObj();
+        ret.Pass = Pass;
+        ret.Fail = Fail;
+        ret.exec = exec;
+        return ret;
     }
 
     /////
