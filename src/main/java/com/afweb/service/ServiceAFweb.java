@@ -558,18 +558,23 @@ public class ServiceAFweb {
         if (mydebugtestflag == true) {
             //set up run parm 
             // javamain remoteserverflag mydebugtestflag
-
-            for (int i = 0; i < 5; i++) {
-                SsnsRegression regression = new SsnsRegression();
-                deleteSsReportExceptLast9(CKey.ADMIN_USERNAME);
-                regression.stopMonitor(this, CKey.ADMIN_USERNAME);
-                regression.processMonitorTesting(this);
-                regression.startMonitor(this, CKey.ADMIN_USERNAME, SsnsService.APP_PRODUCT);
-                regression.processMonitorTesting(this);
-//                
-                ArrayList<SsReport> report = getSsReportMon(CKey.ADMIN_USERNAME, "1");
+            String str = SsnsService.get_ISO_8601_Date(0);
+            String str7 = SsnsService.get_ISO_8601_Date(-7);
+            String str14 = SsnsService.get_ISO_8601_Date(-14);
+            while (true) {
+                processTestSsnsByIdRT();
             }
 
+//            for (int i = 0; i < 5; i++) {
+//                SsnsRegression regression = new SsnsRegression();
+//                deleteSsReportExceptLast9(CKey.ADMIN_USERNAME);
+//                regression.stopMonitor(this, CKey.ADMIN_USERNAME);
+//                regression.processMonitorTesting(this);
+//                regression.startMonitor(this, CKey.ADMIN_USERNAME, SsnsService.APP_PRODUCT);
+//                regression.processMonitorTesting(this);
+////                
+//                ArrayList<SsReport> report = getSsReportMon(CKey.ADMIN_USERNAME, "1");
+//            }
         }
 
         boolean clearssnsflag = false;

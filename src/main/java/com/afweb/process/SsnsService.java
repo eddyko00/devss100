@@ -72,7 +72,6 @@ public class SsnsService {
     public static String PROD_GET_BYID = "getProductById";
 //    public static String PROD_GET_CC = "CallControl";
 
-
     public static String APP_FEAT_TYPE_APP = "APP";
     public static String APP_GET_APP = "getAppointment";
     public static String APP_CAN_APP = "cancelAppointment";
@@ -91,7 +90,7 @@ public class SsnsService {
     public static String QUAL_MATCH = "address_matches";
 
     //call control
-    public static String APP_FEATT_TYPE_CC = "CC";    
+    public static String APP_FEATT_TYPE_CC = "CC";
     public static String CALLC_GET = "getCallControl";
     public static String CALLC_UPDATE = "updateCallControl";
     public static String CALLC_RESET = "resetCallFeature";
@@ -1893,7 +1892,7 @@ public class SsnsService {
             if (outputSt.indexOf("responseCode:400500") != -1) {
                 feat += ":testfailed";
             }
-            
+
             inList.clear();
             outputList.add(feat);
             outputSt = SendSsnsTTVC(LABURL, oper, banid, appTId, postParamSt, inList);
@@ -3266,6 +3265,23 @@ public class SsnsService {
 //        }
 //        return "";
 //    }
+    public static String get_ISO_8601_Date(int offset) {
+
+//        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        try {
+            long startTime = TimeConvertion.currentTimeMillis();
+            startTime = TimeConvertion.addDays(startTime, offset);
+            Date unformatedDate = new Date(startTime);
+//            String formatedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(unformatedDate);
+            String formatedDate = new SimpleDateFormat("yyyy-MM-dd").format(unformatedDate) + "T16:00:00.000-0700";
+            return formatedDate;
+        } catch (Exception e) {
+            System.out.println("Error");
+        }
+        return "";
+
+    }
+
     public String SendSsnsAppointmentGetTimeslot(String ProductURL, String appTId, String banid, String cust, String host, ArrayList<String> inList) {
         logger.info("> SendSsnsAppointmentGetApp " + appTId + " " + banid + " " + cust);
         String url = ProductURL + "/v2/cmo/selfmgmt/appointmentmanagement/searchtimeslot";
@@ -3276,6 +3292,13 @@ public class SsnsService {
         }
         newbodymap.put("id", appTId);
         newbodymap.put("hostSystemCd", host);
+
+        String str = SsnsService.get_ISO_8601_Date(0);
+        String str7 = SsnsService.get_ISO_8601_Date(7);        
+//        String str14 = SsnsService.get_ISO_8601_Date(14);
+        newbodymap.put("startDate", str);
+        newbodymap.put("endDate ", str7);
+
         try {
             if (inList != null) {
                 inList.add(url);
