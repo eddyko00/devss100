@@ -3294,10 +3294,12 @@ public class SsnsService {
         newbodymap.put("hostSystemCd", host);
 
         String str = SsnsService.get_ISO_8601_Date(0);
-        String str7 = SsnsService.get_ISO_8601_Date(7);        
+        String str7 = SsnsService.get_ISO_8601_Date(7);
 //        String str14 = SsnsService.get_ISO_8601_Date(14);
-        newbodymap.put("startDate", str);
-        newbodymap.put("endDate ", str7);
+        HashMap timebodymap = new HashMap();
+        timebodymap.put("startDate", str);
+        timebodymap.put("endDate", str7);
+        newbodymap.put("validFor", timebodymap);
 
         try {
             if (inList != null) {
