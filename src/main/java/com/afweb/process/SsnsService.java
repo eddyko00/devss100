@@ -761,6 +761,11 @@ public class SsnsService {
                             String[] parmList = postParm.split(",");
                             for (int j = 0; j < parmList.length; j++) {
                                 String inLine = parmList[j];
+                                if (inLine.indexOf("serviceType") != -1) {
+                                    String value = parmList[j];
+                                    value = ServiceAFweb.replaceAll("serviceType:", "", value);
+                                    service = value;
+                                }
                                 if (inLine.indexOf("customerid") != -1) {
                                     String value = parmList[j - 1];
                                     //"relatedPartyList":[{"id":"20006858"
@@ -1699,20 +1704,32 @@ public class SsnsService {
             coll = "Essential";
         }
         featTTV += ":" + coll;
-        featTTV += ":Pack_" + packCd;
+
+//        featTTV += ":Pack_" + packCd;
+        if (packCd == 0) {
+            featTTV += ":Pack0";
+        } else if (packCd < 5) {
+            featTTV += ":PackL5";
+        } else if (packCd < 10) {
+            featTTV += ":PackL10";
+        } else if (packCd < 15) {
+            featTTV += ":PackL15";
+        } else {
+            featTTV += ":Pack_" + packCd;
+        }
         featTTV += ":Channel_" + channelCd;
         featTTV += ":Disc_" + discountCd;
         if (add == 0) {
-            featTTV += ":NAdd";
+            featTTV += ":Add0";
         } else if (add < 3) {
-            featTTV += ":Add";
+            featTTV += ":AddL3";
         } else {
             featTTV += ":Add_" + add;
         }
         if (remove == 0) {
-            featTTV += ":NRemove";
-        } else if (remove < 3) {
-            featTTV += ":Remove";
+            featTTV += ":Remove0";
+        } else if (remove < 4) {
+            featTTV += ":RemoveL4";
         } else {
             featTTV += ":Remove_" + remove;
         }
