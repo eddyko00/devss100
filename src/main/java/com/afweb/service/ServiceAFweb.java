@@ -558,13 +558,12 @@ public class ServiceAFweb {
         if (mydebugtestflag == true) {
             //set up run parm 
             // javamain remoteserverflag mydebugtestflag
-            String str = SsnsService.get_ISO_8601_Date(0);
-            String str7 = SsnsService.get_ISO_8601_Date(-7);
-            String str14 = SsnsService.get_ISO_8601_Date(-14);
-            while (true) {
-                processTestSsnsByIdRT();
-            }
+            // javamain remoteserverflag mydebugtestflag
 
+//            getSsnsDataImp().deleteSsnsAccApp(SsnsService.APP_TTVC);
+//            getSsnsDataImp().deleteSsnsDataApp(SsnsService.APP_TTVC);
+         
+            
 //            for (int i = 0; i < 5; i++) {
 //                SsnsRegression regression = new SsnsRegression();
 //                deleteSsReportExceptLast9(CKey.ADMIN_USERNAME);
