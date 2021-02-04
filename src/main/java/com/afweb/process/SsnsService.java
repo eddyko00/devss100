@@ -970,7 +970,16 @@ public class SsnsService {
         featTTV += ":" + oper;
         featTTV += ":" + service;
         featTTV += ":" + "userName_" + userName;
-        featTTV += ":" + "name_" + name;
+        if (name == 0) {
+            featTTV += ":" + "Aname0";
+        } else if (name < 5) {
+            featTTV += ":" + "AnameL5";
+        } else if (name < 10) {
+            featTTV += ":" + "AnameL10";
+        } else {
+            featTTV += ":" + "Aname_" + name;
+        }
+
         return featTTV;
     }
 
